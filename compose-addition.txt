@@ -1,5 +1,5 @@
 Add this to the docker-compse file of WorkAdventure:
-NB: SSL is currently not enabled. You also have to set the according environment variables.
+NB: SSL is currently not enabled. You also have to set the according environment variables by changing them in the env file of WorkAdventure.
 
   admin:
     image: node:14
