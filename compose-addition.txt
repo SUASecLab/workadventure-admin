@@ -1,0 +1,18 @@
+Add this to the docker-compse file of WorkAdventure:
+NB: SSL is currently not enabled. You also have to set the according environment variables.
+
+  admin:
+    image: node:14
+    user: "node"
+    working_dir: /home/node/app
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./admin:/home/node/app
+    expose:
+      - "3000"
+    command: "node app.js"
+    labels:
+      - "traefik.http.routers.admin.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.admin.entryPoints=admin"
+      - "traefik.http.services.admin.loadbalancer.server.port=3000"
