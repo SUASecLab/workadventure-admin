@@ -43,7 +43,7 @@ app.get('/api/room/access', (req, res) => {
             url: "resources/characters/pipoya/Male 01-1.png",
             rights: "",
         }],
-        messages: [],//??
+        messages: [],// send messages to the client
         anonymous: false,
     };
     
