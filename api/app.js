@@ -147,11 +147,7 @@ app.get('/api/check-moderate-user/:organization/:world', (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Admin API stub listening on port ${port}`);
-    console.log('ADMIN_DB_MYSQL_ROOT_PASSWORD: ' + process.env.DB_MYSQL_ROOT_PASSWORD);
-    console.log('ADMIN_MYSQL_DATABASE: ' + process.env.DB_MYSQL_DATABASE);
-    console.log('ADMIN_MYSQL_USER: ' + process.env.DB_MYSQL_USER);
-    console.log('ADMIN_MYSQL_PASSWORD: ' + process.env.DB_MYSQL_PASSWORD);
+    console.log(`Admin API listening on port ${port}`);
 });
 
 async function createConnection() {
