@@ -8,8 +8,8 @@ const mysql = require('mysql2/promise');
 //TODO: lookup message parameters from admin api where console logs req.params (this currently returns only an array of objects)
 //TODO: implement
 
-//WARNING: this is a test implemantion. With this, everyone joins as admin.
 // fetch map details -> returns MapDetailsData
+// currently, the tags and the policy type are used
 app.get('/api/map', (req, res) => {
     console.log('fetchMapDetails called');
     console.log('organizationSlug: ' + req.query.organizationSlug);
@@ -18,6 +18,11 @@ app.get('/api/map', (req, res) => {
 });
 
 // fetch member data by uuid -> returns FetchMemberDataByUuidResponse
+// currently, the messages, the tags, the textures, the tags, the anonymous variable and http status codes are used
+// Status codes:
+// 404 -> anonymous login
+// 403 -> world full
+// tags: 'admin' for sending world messages, furthermore a jitsi moderator tag can be set (set in map, is a custom tag)
 app.get('/api/room/access', async (req, res) => {
     console.log('fetchMemberDataByUuid called');
     console.log('uuid: ' + req.query.uuid);
@@ -58,23 +63,22 @@ app.get('/api/room/access', async (req, res) => {
         messages: [],// send messages to the client
         anonymous: false,
     };
-    
-   // return res.status(404).json({ error: 'test' });
-    
-    /*
-     * return 404 to force an anonymous login
-     * return 403 if a yet to be specified number of maximal users has been reached
-     */
+
     res.json(result);
 });
 
 // fetch member data by token -> returns AdminApiData
+// maybe useful for generating the admin join links
+// currently, the uuid, the organization slug, the world slug, the room slug,
+// the mapUrlStart and the textures are being considered
 app.get('/api/login-url/:token', (req, res) => {
     console.log('fetchMemberDataByToken called');
     console.log('token: ' + req.params.token);
 });
 
 // fetch check user by token -> returns AdminApiData
+// as of now, only the uuid and the http status code of the result are being evaluated
+// if this API method is being called
 app.get('/api/check-user/:token', async (req, res) => {
     console.log('fetchCheckUserByToken called');
     console.log('token: ' + req.params.token);
@@ -105,7 +109,7 @@ app.get('/api/check-user/:token', async (req, res) => {
     const result = {
         organizationSlug: "HSM", //?
         roomSlug: "IoT-Lab", //?
-        mapUrlStart: "maps/work/map.json",// probably the URL to the start map
+        mapUrlStart: "maps/gaming/map.json",// probably the URL to the start map
         tags: tags, //User tags. None -> normal user. 'admin' -> admin user. I don't know whether there are more options
         policy_type: 1,//?
         userUuid: uuid,// UserId? -> This must be unique.
@@ -121,6 +125,8 @@ app.get('/api/check-user/:token', async (req, res) => {
 });
 
 // report player -> returns ?
+// no result object -> not used by the client
+// does not seem to work properly as of now
 app.post('/api/report', (req, res) => {
     console.log('reportPlayer called');
     console.log('reportedUserUuid: ' + req.query.reportedUserUuid);
@@ -130,6 +136,8 @@ app.post('/api/report', (req, res) => {
 });
 
 // verify ban -> returns AdminBannedData
+// only works on private maps -> '@' url part
+// is_banned is used, message not but most likely equal to ban message
 app.get('/api/check-moderate-user/:organization/:world', (req, res) => {
     console.log('verifyBanUser called');
     console.log('organization: ' + req.params.organization);
