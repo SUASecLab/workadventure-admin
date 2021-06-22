@@ -8,6 +8,9 @@ const mysql = require('mysql2/promise');
 //TODO: lookup message parameters from admin api where console logs req.params (this currently returns only an array of objects)
 //TODO: implement
 
+
+// ---------- REST API Routes ----------
+
 // fetch map details -> returns MapDetailsData
 // currently, the tags and the policy type are used
 app.get('/api/map', (req, res) => {
@@ -29,27 +32,13 @@ app.get('/api/room/access', async (req, res) => {
     console.log('roomId: ' + req.query.roomId);
 
     // Get token
-    var uuid = req.query.uuid;
-    if (uuid === undefined) {
-        uuid = uuidv4();
-    }
+    const uuid = getUuid(req.query.uuid);
 
     // create account on first connection
-    var userExistsValue = await userExists(uuid);
-    if (!userExistsValue) {
-        console.log('User with uuid ' + uuid + ' does not exist. Creating account.');
-        writeUuidToDatabase(uuid);
-    }
+    await createAccountIfNotExistent(uuid);
 
     // Get tags
-    let tags = [];
-    var isAdminValue = await isAdmin(uuid);
-    if (isAdminValue) {
-        console.log('User with uuid ' + uuid + ' is an admin. Pushing admin tag.');
-        tags.push('admin');
-    } else {
-        console.log('User with uuid ' + uuid + ' is not an admin.');
-    }
+    const tags = await getTags(uuid);
 
     const result = {
         uuid: uuid,
@@ -84,27 +73,13 @@ app.get('/api/check-user/:token', async (req, res) => {
     console.log('token: ' + req.params.token);
 
     // Get uuid ( = token)
-    var uuid = req.params.token;
-    if (uuid == undefined) {
-        uuid = uuidv4();
-    }
+    const uuid = getUuid(req.params.token);
 
     // create account on first connection
-    var userExistsValue = await userExists(uuid);
-    if (!userExistsValue) {
-        console.log('User with uuid ' + uuid + ' does not exist. Creating account.');
-        writeUuidToDatabase(uuid);
-    }
+    await createAccountIfNotExistent(uuid)
 
     // Get tags
-    let tags = [];
-    var isAdminValue = await isAdmin(uuid);
-    if (isAdminValue) {
-        console.log('User with uuid ' + uuid + ' is an admin. Pushing admin tag.');
-        tags.push('admin');
-    } else {
-        console.log('User with uuid ' + uuid + ' is not an admin.');
-    }
+    const tags = await getTags(uuid);
 
     const result = {
         organizationSlug: "HSM", //?
@@ -150,6 +125,34 @@ app.listen(port, () => {
     console.log(`Admin API listening on port ${port}`);
 });
 
+// ---------- Helper Functions ----------
+
+function getUuid(uuid) {
+    var result = uuid;
+    if (uuid == undefined) {
+        result = uuidv4();
+    }
+    return result;
+}
+
+async function createAccountIfNotExistent(uuid) {
+    const userExistsValue = await userExists(uuid);
+    if (!userExistsValue) {
+        console.log('User with uuid ' + uuid + ' does not exist. Creating account.');
+        writeUuidToDatabase(uuid);
+    }
+}
+
+async function getTags(uuid) {
+    let tags = [];
+    var isAdminValue = await isAdmin(uuid);
+    if (isAdminValue) {
+        console.log('User with uuid ' + uuid + ' is an admin. Pushing admin tag.');
+        tags.push('admin');
+    }
+    return tags;
+}
+
 async function createConnection() {
     return connection = await mysql.createConnection({
         host     : 'admin-db',
@@ -160,8 +163,6 @@ async function createConnection() {
 }
 
 async function userExists(uuid) {
-    console.log('userExists called');
-
     result = false;
     connection = await createConnection();
     await connection.connect();
@@ -181,8 +182,6 @@ async function userExists(uuid) {
 }
 
 async function writeUuidToDatabase(uuid) {
-    console.log('writeUuidToDatabase called');
-
     connection = await createConnection();
     await connection.connect();
 
@@ -191,8 +190,6 @@ async function writeUuidToDatabase(uuid) {
 }
 
 async function isAdmin(uuid) {
-    console.log('isAdmin called');
-
     result = false;
     connection = await createConnection();
     await connection.connect();
