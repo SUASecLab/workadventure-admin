@@ -69,9 +69,36 @@ app.get('/api/room/access', async (req, res) => {
 // maybe useful for generating the admin join links
 // currently, the uuid, the organization slug, the world slug, the room slug,
 // the mapUrlStart and the textures are being considered
-app.get('/api/login-url/:token', (req, res) => {
+app.get('/api/login-url/:token', async (req, res) => {
     console.log('fetchMemberDataByToken called');
     console.log('token: ' + req.params.token);
+
+    // Get uuid ( = token)
+    const uuid = getUuid(req.params.token);
+
+    // create account on first connection
+    await createAccountIfNotExistent(uuid)
+
+    // Get tags
+    const tags = await getTags(uuid);
+
+    const result = {
+        organizationSlug: "hsm", //?
+        worldSlug: "computerscience",
+        roomSlug: "laboratory", //?
+        mapUrlStart: "maps/gaming/map.json",// probably the URL to the start map
+        tags: tags, //User tags. None -> normal user. 'admin' -> admin user. I don't know whether there are more options
+        policy_type: 1,//?
+        userUuid: uuid,// UserId? -> This must be unique.
+        messages: [],//??
+        textures: [{//something with textures, maybe some filter to restrict textures
+            id: 1,
+            level: 1,
+            url: "https://lab.itsec.hs-sm.de/resources/characters/artwork_characters_hsm_professor_unfinished_teacher_hsm.png",
+            rights: "",
+        }],
+    };
+    res.json(result);
 });
 
 // fetch check user by token -> returns AdminApiData
@@ -91,8 +118,9 @@ app.get('/api/check-user/:token', async (req, res) => {
     const tags = await getTags(uuid);
 
     const result = {
-        organizationSlug: "HSM", //?
-        roomSlug: "IoT-Lab", //?
+        organizationSlug: "hsm", //?
+        worldSlug: "computerscience",
+        roomSlug: "laboratory", //?
         mapUrlStart: "maps/gaming/map.json",// probably the URL to the start map
         tags: tags, //User tags. None -> normal user. 'admin' -> admin user. I don't know whether there are more options
         policy_type: 1,//?
