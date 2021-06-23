@@ -1,0 +1,9 @@
+.container {
+    padding: 1rem;
+    margin: 1rem;
+}
+
+.nav{
+    border-width: 1px;
+    border-radius: .5rem;
+}
