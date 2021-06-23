@@ -18,6 +18,15 @@ app.get('/api/map', (req, res) => {
     console.log('organizationSlug: ' + req.query.organizationSlug);
     console.log('worldSlug: ' + req.query.worldSlug);
     console.log('roomSlug: ' + req.query.roomSlug);
+
+    const result = {
+        roomSlug: "roomSlug",
+        mapUrl: "https://lab.itsec.hs-sm.de/maps/hsm/work/map.json",
+        policy_type: 1,
+        tags: [],
+    };
+
+    res.json(result);
 });
 
 // fetch member data by uuid -> returns FetchMemberDataByUuidResponse
@@ -46,7 +55,7 @@ app.get('/api/room/access', async (req, res) => {
         textures: [{//something with textures, maybe some filter to restrict textures
             id: 1,
             level: 1,
-            url: "resources/characters/pipoya/Male 01-1.png",
+            url: "https://lab.itsec.hs-sm.de/resources/characters/artwork_characters_hsm_professor_unfinished_teacher_hsm.png",
             rights: "",
         }],
         messages: [],// send messages to the client
@@ -92,7 +101,7 @@ app.get('/api/check-user/:token', async (req, res) => {
         textures: [{//something with textures, maybe some filter to restrict textures
             id: 1,
             level: 1,
-            url: "resources/characters/pipoya/Male 01-1.png",
+            url: "https://lab.itsec.hs-sm.de/resources/characters/artwork_characters_hsm_professor_unfinished_teacher_hsm.png",
             rights: "",
         }],
     };
@@ -109,7 +118,6 @@ app.post('/api/report', (req, res) => {
     console.log('reporterUserUuid: ' + req.query.reporterUserUuid);
     console.log('reportWorldSlug: ' + req.query.reportWorldSlug);
 });
-
 // verify ban -> returns AdminBannedData
 // only works on private maps -> '@' url part
 // is_banned is used, message not but most likely equal to ban message
@@ -119,6 +127,13 @@ app.get('/api/check-moderate-user/:organization/:world', (req, res) => {
     console.log('world: ' + req.params.world);
     console.log('ipAddress: ' + req.query.ipAddress);
     console.log('token: ' + req.query.token);
+
+    const result = {
+        is_banned: false,
+        message: "",
+    };
+
+    res.json(result);
 });
 
 app.listen(port, () => {
