@@ -9,58 +9,42 @@
   <title>Workadventure Administration</title>
 </head>
 <body>
-  <?
-  // Connect to database
-  $mysqli = mysqli_connect("admin-db", getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'), getenv('DB_MYSQL_DATABASE'));
-
-  // Get number of users
-  $result = $mysqli->query("SELECT count('uuid') as number FROM USERS;");
-  $row = mysqli_fetch_assoc($result);
-  ?>
-  <nav class="container navbar navbar-expant-lg navbar-light bg-light">
-    <div class="container-fluid">
-      <a class="navbar-brand href="#">WorkAdventure Administration</a>
-    </div>
-  </nav>
+  <? include 'meta/toolbar.php'; ?>
   
   <div class="container">
-  
-  <?
-  echo "<p class=\"fs-3\">Listing ".$row["number"]." accounts</p>";
-
-  // Get all users
-  $result = $mysqli->query("SELECT * FROM USERS;");
-  $rows = $result->fetch_all(MYSQLI_ASSOC);
-  
-  // Display all accounts
-  ?>
-  <table class="table">
-    <tr>
-      <th scope="col">UUID</th>
-      <th scope="col">Tags</th>
-      <th scope="col">Edit tags</th>
-    </tr>
-  <?
-  foreach ($rows as $row) {
-    echo "<tr><td><p class=\"fw-normal\">".$row["uuid"]."</p></td><td>";
-    if ($row["isadmin"] == "1") {
-    ?>
-      <span class="badge rounded-pill bg-primary">Admin</span>
-    <?
-    }
-    ?>
-    </td>
-    <td>
-    <form action="promote.php" method="get">
-    <input type="hidden" name="promote" value="admin">
-    <input type="hidden" name="uuid" value="<? echo $row["uuid"]; ?>">
-    <input type="submit" class="btn btn-dark" value="Promote to Admin">
-    </form>
-    </td>
-    <?
-  }
-  ?>
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="card" style="width: 18 rem;">
+          <img src="..." class="card-img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">Room Management</h5>
+            <p class="card-text">Here, you can adjust the room settings. Furthermore, you can restrict the access to the room</p>
+            <a href="#" class="btn btn-primary">Go to Room Management</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="card" style="width: 18 rem;">
+          <img src="..." class="card-img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">User Management</h5>
+            <p class="card-text">Here, you can manage the user accounts. You can also set user tags here</p>
+            <a href="user.php" class="btn btn-primary">User Management</a>
+          </div>
+        </div>
+      </div>
+        <div class="col-sm-6">
+          <div class="card" style="width: 18 rem;">
+            <img src="..." class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">Manage Reports</h5>
+              <p class="card-text">Here, you can see, which users have been reported. Furthermore, you can view the reports details and impose sanctions on non-behaving users</p>
+              <a href="#" class="btn btn-primary">Reports Management</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </table>
+  </div>
 </body>
 </html>

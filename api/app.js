@@ -186,16 +186,6 @@ async function createAccountIfNotExistent(uuid) {
     }
 }
 
-async function getTags(uuid) {
-    let tags = [];
-    var isAdminValue = await isAdmin(uuid);
-    if (isAdminValue) {
-        console.log('User with uuid ' + uuid + ' is an admin. Pushing admin tag.');
-        tags.push('admin');
-    }
-    return tags;
-}
-
 async function createConnection() {
     return connection = await mysql.createConnection({
         host     : 'admin-db',
@@ -228,21 +218,19 @@ async function writeUuidToDatabase(uuid) {
     connection = await createConnection();
     await connection.connect();
 
-    await connection.execute('INSERT INTO `USERS` (`uuid`, `isadmin`) VALUES (?, ?)', [uuid, false]);
+    await connection.execute('INSERT INTO `USERS` (`uuid`, `name`, `email`, `tags`) VALUES (?, ?, ?, ?)', [uuid, 'anonymous', 'anonymous@example.com', JSON.stringify([])]);
     await connection.end();
 }
 
-async function isAdmin(uuid) {
-    result = false;
+async function getTags(uuid) {
+    var result = [];
     connection = await createConnection();
     await connection.connect();
 
     const[rows, files] = await connection.execute('SELECT * FROM `USERS` WHERE `uuid` = ?', [uuid]);
     if (rows.length > 0)  {
         if (rows[0].uuid == uuid) {
-            if (rows[0].isadmin == true) {
-                result = true;
-            }
+            result = JSON.parse(rows[0].tags);
         }
     }
 
