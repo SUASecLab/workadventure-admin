@@ -34,9 +34,12 @@
     }
 
     $uuid = $_GET["uuid"];
-    $Statement = $DB->prepare("SELECT * FROM USERS WHERE uuid=:uuid;");
+    $Statement = $DB->prepare("SELECT * FROM users WHERE uuid=:uuid;");
     $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
-    if (!$Statement->execute()) {
+    try {
+        $Statement->execute();
+    }
+    catch (PDOException $exception) {
     ?>
         <div class="container alert alert-danger" role="alert">
           <p>Could not connect fetch user details</p>
@@ -51,34 +54,25 @@
     if (isset($_GET["newtag"])) {
         $newtag = $_GET["newtag"];
         if (!empty($newtag)) {
-            $tags = json_decode($row["tags"]);
-            if (!in_array($newtag, $tags, false)) {
-                array_push($tags, $newtag);
-                $tagsString = json_encode($tags);
-
-                $Statement = $DB->prepare("UPDATE USERS SET tags=:tags WHERE uuid=:uuid;");
-                $Statement->bindParam(":tags", $tagsString, PDO::PARAM_STR);
-                $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
-                if ($Statement->execute()) {
-                    ?>
-                    <div class="container alert alert-success" role="alert">
-                      The tag <?php echo $newtag; ?> has been added.
-                    </div>
-                    <?php
-                } else {
-                    ?>
-                    <div class="container alert alert-danger" role="alert">
-                      Could not add the tag <?php echo $newtag; ?>.
-                    </div>
-                    <?php
-                 }
-             } else {
+            $Statement = $DB->prepare("INSERT INTO tags (uuid, tag) VALUES (:uuid, :tag);");
+            $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
+            $Statement->bindParam(":tag", $newtag, PDO::PARAM_STR);
+            try {
+                $Statement->execute();
+                ?>
+                <div class="container alert alert-success" role="alert">
+                  The tag <?php echo "\"".$newtag."\""; ?> has been added.
+                </div>
+              <?php
+            }
+            catch (PDOException $exception)
+            {
                 ?>
                 <div class="container alert alert-danger" role="alert">
-                    The user has already the <?php echo $newtag; ?> tag.
+                  Could not add the tag <?php echo "\"".$newtag."\""; ?>
                 </div>
                 <?php
-             }
+            }
         }
     }
     
@@ -86,31 +80,20 @@
     if (isset($_GET["remtag"])) {
         $remtag = $_GET["remtag"];
         if (!empty($remtag)) {
-            $tags = json_decode($row["tags"]);
-            if (in_array($remtag, $tags, false)) {
-                $oldTags = $tags;
-                $tags = array();
-                foreach($oldTags as $tag) {
-                    if (!($tag == $remtag)) {
-                        array_push($tags, $tag);
-                    }
-                }
-            }
-            $tagsJson = json_encode($tags);
-
-            $Statement = $DB->prepare("UPDATE USERS SET tags=:tags WHERE uuid=:uuid;");
-            $Statement->bindParam(":tags", $tagsJson, PDO::PARAM_STR);
+            $Statement = $DB->prepare("DELETE FROM tags WHERE uuid=:uuid AND tag=:tag;");
             $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
-            if ($Statement->execute()) {
+            $Statement->bindParam(":tag", $remtag, PDO::PARAM_STR);
+            try {
+                $Statement->execute();
                 ?>
                 <div class="container alert alert-success" role="alert">
-                    The tag <?php echo $remtag; ?> has been removed.
+                    The tag <?php echo "\"".$remtag."\""; ?> has been removed.
                 </div>
                 <?php
-            } else {
+            } catch (PDOException $exception) {
                 ?>
                 <div class="container alert alert-danger" role="alert">
-                    Could not remove the tag <?php echo $remtag; ?>.
+                    Could not remove the tag <?php echo "\"".$remtag."\""; ?>.
                 </div>
                 <?php
             }
@@ -134,15 +117,15 @@
     <p>Tags (click to remove):</p>
     <?php
 
-      $Statement = $DB->prepare("SELECT * FROM USERS WHERE uuid=:uuid;");
+      $Statement = $DB->prepare("SELECT tag FROM tags WHERE uuid=:uuid;");
       $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
-      if (!$Statement->execute()) {
-        echo "";
+      try {
+          $Statement->execute();
+          while ($tagRow = $Statement->fetch(PDO::FETCH_ASSOC)) {
+              echo "<form action=\"edit_user.php\" method=\"get\"><input class=\"tag btn btn-primary\" type=\"submit\" value=\"".$tagRow["tag"]."\" name=\"remtag\"><input type=\"hidden\" name=\"uuid\" value=\"".$uuid."\"></form>";
+          }
       }
-      $row = $Statement->fetch(PDO::FETCH_ASSOC);
-      $tags = json_decode($row["tags"]);
-      foreach ($tags as $tag) {
-        echo "<form action=\"edit_user.php\" method=\"get\"><input class=\"tag btn btn-primary\" type=\"submit\" value=\"".$tag."\" name=\"remtag\"><input type=\"hidden\" name=\"uuid\" value=\"".$uuid."\"></form>";
+      catch (PDOException $exception) {
       }
     ?>
     <br>
