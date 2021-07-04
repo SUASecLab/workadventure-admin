@@ -9,7 +9,7 @@
   <title>Workadventure Administration</title>
 </head>
 <body>
-  <? include 'meta/toolbar.php'; ?>
+  <?php include 'meta/toolbar.php'; ?>
   
   <div class="container">
     <div class="row">

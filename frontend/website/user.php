@@ -9,25 +9,51 @@
   <title>Workadventure Administration</title>
 </head>
 <body>
-  <?
+  <?php
+
   // Connect to database
-  $mysqli = mysqli_connect("admin-db", getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'), getenv('DB_MYSQL_DATABASE'));
+  try
+  {
+    $DB = new PDO("mysql:dbname=".getenv('DB_MYSQL_DATABASE').";host=admin-db;port=3306",
+        getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));
+  }
+  catch (PDOException $exception)
+  {
+    echo "<div class=\"container alert alert-danger\" role=\"alert\">";
+    echo "Could not connect to database: ".$exception->getMessage();
+    echo "</div>";
+    return;
+  }
 
   // Get number of users
-  $result = $mysqli->query("SELECT count('uuid') as number FROM USERS;");
-  $row = mysqli_fetch_assoc($result);
+  $Statement = $DB->prepare("SELECT count('uuid') as number FROM USERS;");
+  if (!$Statement->execute()) {
+  ?>
+    <div class="container alert alert-danger" role="alert">
+      <p>Could not connect fetch user count</p>
+    </div>
+
+  <?php
+    return;
+  }
+  $row = $Statement->fetch(PDO::FETCH_ASSOC);
 
   include 'meta/toolbar.php';
-  ?>
   
-  <div class="container">
-  
-  <?
+  echo "<div class=\"container\">";
   echo "<p class=\"fs-3\">Listing ".$row["number"]." accounts</p>";
 
   // Get all users
-  $result = $mysqli->query("SELECT * FROM USERS;");
-  $rows = $result->fetch_all(MYSQLI_ASSOC);
+  $Statement = $DB->prepare("SELECT * FROM USERS;");
+  if (!$Statement->execute()) {
+  ?>
+    <div class="container alert alert-danger" role="alert">
+      <p>Could not connect fetch users</p>
+    </div>
+
+  <?php
+    return;
+  }
   
   // Display all accounts
   ?>
@@ -37,31 +63,28 @@
       <th scope="col">Tags</th>
       <th scope="col">Actions</th>
     </tr>
-  <?
-  foreach ($rows as $row) {
+
+  <?php
+  while($row = $Statement->fetch(PDO::FETCH_ASSOC)) {
     echo "<tr><td><p class=\"fw-normal\">".$row["name"]."</p></td><td>";
-    //if ($row["tags"]) {
-    ?>
-      <? 
         $tags = $row["tags"];
         $tags = json_decode($tags);
         foreach ($tags as $tag) {
           echo "<div class=\"badge rounded-pill bg-primary tag\">".$tag."</div>";
         }
-      ?>
-    <?
-   // }
     ?>
     </td>
     <td>
-    <form action="edit_user.php" method="get">
-    <input type="hidden" name="uuid" value="<? echo $row["uuid"]; ?>">
-    <input type="submit" class="btn btn-dark" value="Edit">
-    </form>
+      <form action="edit_user.php" method="get">
+        <input type="hidden" name="uuid" value="<?php echo $row["uuid"]; ?>">
+        <input type="submit" class="btn btn-dark" value="Edit">
+      </form>
     </td>
-    <?
+
+    <?php
   }
-  ?>
+    $DB = NULL;
+    ?>
     </div>
   </table>
 </body>
