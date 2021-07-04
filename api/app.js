@@ -200,7 +200,7 @@ async function userExists(uuid) {
     connection = await createConnection();
     await connection.connect();
 
-    const[rows, files] = await connection.execute('SELECT * FROM `USERS` WHERE `uuid` = ?', [uuid]);
+    const[rows, files] = await connection.execute('SELECT * FROM `users` WHERE `uuid` = ?', [uuid]);
     if (rows.length > 0) {
         console.log('Found uuid ' + rows[0].uuid);
         result = true;
@@ -218,7 +218,7 @@ async function writeUuidToDatabase(uuid) {
     connection = await createConnection();
     await connection.connect();
 
-    await connection.execute('INSERT INTO `USERS` (`uuid`, `name`, `email`, `tags`) VALUES (?, ?, ?, ?)', [uuid, 'anonymous', 'anonymous@example.com', JSON.stringify([])]);
+    await connection.execute('INSERT INTO `users` (`uuid`, `name`, `email`) VALUES (?, ?, ?)', [uuid, 'anonymous', 'anonymous@example.com']);
     await connection.end();
 }
 
@@ -227,11 +227,11 @@ async function getTags(uuid) {
     connection = await createConnection();
     await connection.connect();
 
-    const[rows, files] = await connection.execute('SELECT * FROM `USERS` WHERE `uuid` = ?', [uuid]);
+    const[rows, files] = await connection.execute('SELECT * FROM `tags` WHERE `uuid` = ?', [uuid]);
     if (rows.length > 0)  {
-        if (rows[0].uuid == uuid) {
-            result = JSON.parse(rows[0].tags);
-        }
+        rows.forEach(row => {
+            result.push(row.tag);
+        });
     }
 
     await connection.end();
