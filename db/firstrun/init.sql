@@ -10,3 +10,12 @@ CREATE TABLE tags (
   tag varchar(15) NOT NULL,
   PRIMARY KEY (uuid, tag)
 );
+
+CREATE TABLE reports (
+    report_id integer NOT NULL AUTO_INCREMENT,
+    reportedUserUuid varchar(36) NOT NULL,
+    reportedUserComment varchar(1000) NOT NULL,
+    reporterUserUuid varchar(36) NOT NULL,
+    reportWorldSlug varchar(20) NOT NULL,
+    PRIMARY KEY (report_id)
+);
