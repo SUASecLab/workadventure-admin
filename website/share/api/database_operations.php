@@ -1,12 +1,4 @@
 <?php
-// Connect to database
-try {
-    $DB = new PDO("mysql:dbname=".getenv('DB_MYSQL_DATABASE').";host=admin-db;port=3306",
-        getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));
-}
-catch (PDOException $exception) {
-    return;
-}
 
 function userExists($uuid) {
     GLOBAL $DB;
@@ -61,9 +53,7 @@ function reportUser($reportedUserUuid, $reportedUserComment, $reporterUserUuid, 
     try {
         $Statement->execute();
     } catch (PDOException $exception) {
-    shell_exec("echo ".$exception." > /var/www/html/le.txt");
     }
 }
-$DB = NULL;
 
 ?>

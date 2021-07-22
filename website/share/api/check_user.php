@@ -5,7 +5,21 @@ as of now, only the uuid and the http status code of the result are being evalua
 if this API method is being called
 */
 header("Content-Type:application/json");
+require 'authentication.php';
 require 'database_operations.php';
+
+try {
+    $DB = new PDO("mysql:dbname=".getenv('DB_MYSQL_DATABASE').";host=admin-db;port=3306",
+        getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));
+}
+catch (PDOException $exception) {
+    return;
+}
+
+if (!isAuthorized()) {
+    http_response_code(403);
+    die();
+}
 
 if (isset($_GET["token"])) {
     $uuid = $_GET["token"];
@@ -29,4 +43,6 @@ if (isset($_GET["token"])) {
     http_response_code(400);
     die();
 }
+
+$DB = NULL;
 ?>
