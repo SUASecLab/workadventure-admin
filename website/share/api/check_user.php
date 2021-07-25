@@ -29,7 +29,7 @@ if (isset($_GET["token"])) {
     $tags = getTags($uuid);
 
     $result['organizationSlug'] = "hsm";
-    $result['worldSlug'] = "computerscience";
+    $result['worldSlug'] = getenv('DOMAIN');
     $result['roomSlug'] = "laboratory";
     $result['mapUrlStart'] = "maps/gaming/map.json";
     $result['tags'] = $tags;
