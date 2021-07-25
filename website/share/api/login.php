@@ -32,7 +32,7 @@ if (isset($_GET["token"])) {
     $result['organizationSlug'] = "org";
     $result['worldSlug'] = getenv('DOMAIN');
     $result['roomSlug'] = "laboratory";
-    $result['mapUrlStart'] = "maps/gaming/map.json";
+    $result['mapUrlStart'] = "https://lab.itsec.hs-sm.de/maps/hsm/work/map.json";
     $result['tags'] = $tags;
     $result['policy_type'] = 1;
     $result['userUuid'] = $uuid;

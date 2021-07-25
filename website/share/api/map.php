@@ -31,8 +31,11 @@ if ((isset($_GET["organizationSlug"])) && (isset($_GET["worldSlug"])) && (isset(
 
     if ($roomSlug == "laboratory") {
         $result['mapUrl'] =  "https://lab.itsec.hs-sm.de/maps/hsm/work/map.json";
-    } else {
+    } else if ($roomSlug == "relaxation") {
         $result['mapUrl'] =  "https://lab.itsec.hs-sm.de/maps/hsm/gaming/map.json";
+    } else {
+        http_response_code(404);
+        die();
     }
 
     echo json_encode($result);
