@@ -19,3 +19,9 @@ CREATE TABLE reports (
     reportWorldSlug varchar(20) NOT NULL,
     PRIMARY KEY (report_id)
 );
+
+CREATE TABLE banned_users (
+    uuid varchar(36) NOT NULL,
+    ban_message varchar(50) NOT NULL,
+    PRIMARY KEY (uuid)
+);

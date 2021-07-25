@@ -27,8 +27,16 @@ if ((isset($_GET["organization"])) && (isset($_GET["world"])) && (isset($_GET["i
     $ipAddress = $_GET["ipAddress"];
     $uuid = $_GET["token"];
 
-    $result['is_banned'] = false;
-    $result['message'] = array();
+    // find out whether user is banned
+    $isBanned = isBanned($uuid);
+    $result['is_banned'] = $isBanned;
+
+    // get ban message if user is banned
+    if ($isBanned) {
+        $result['message'] = getBanMessage($uuid);
+    } else {
+        $result['message'] = "";
+    }
 
     echo json_encode($result);
 } else {

@@ -11,6 +11,7 @@
 <body>
   <?php
     include 'meta/toolbar.php';
+    include 'api/database_operations.php';
   
     // Connect to database
     try {
@@ -99,6 +100,45 @@
             }
         }
     }
+
+    // Ban user if requested
+    if (isset($_GET["ban"])) {
+      if ((isset($_GET["message"])) && (!empty($_GET["message"])) && ($_GET["ban"] == "true")) {
+        if (banUser($uuid, $_GET["message"])) {
+          ?>
+            <div class="container alert alert-success" role="alert">
+              This user has been banned.
+            </div>
+          <?php
+        } else {
+          ?>
+            <div class="container alert alert-danger" role="alert">
+              Could not ban this user.
+            </div>
+          <?php
+        }
+      } else if ($_GET["ban"] == "false") {
+        if (liftBan($uuid)) {
+          ?>
+            <div class="container alert alert-success" role="alert">
+              This user's ban has been lifted.
+            </div>
+          <?php
+        } else {
+          ?>
+            <div class="container alert alert-danger" role="alert">
+              Could not lift this user's ban.
+            </div>
+          <?php
+        }
+      } else {
+        ?>
+            <div class="container alert alert-danger" role="alert">
+              Ban message required.
+            </div>
+          <?php
+      }
+    }
   ?>
 <div class="container">
   <div class="mb-3">
@@ -135,6 +175,37 @@
       <input class="btn btn-primary" type="submit" value="Add tag">
       <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
     </form>
+    <?php
+        if (isBanned($uuid)) {
+    ?>
+      <br>
+      <p>This user has been banned!</p>
+      <div class="mb-3">
+        <label for="ban_reason" class="form-label">Reason:</label>
+        <input type="text" class="form-control" id="ban_reason" value="<?php echo getBanMessage($uuid); ?>" readonly>
+      </div>
+      <form action="edit_user.php" method="get">
+        <input class="btn btn-danger" type="submit" value="Lift ban">
+        <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
+        <input type="hidden" name="ban" value="false">
+      </form>
+    <?php
+        } else {
+    ?>
+      <br>
+      <p>Ban this user:</p>
+      <form action="edit_user.php" method="get">
+        <div class="mb-3">
+          <label for="ban_reason" class="form-label">Reason:</label>
+          <input type="text" class="form-control" id="ban_reason" name="message">
+        </div>
+        <input class="btn btn-danger" type="submit" value="Ban">
+        <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
+        <input type="hidden" name="ban" value="true">
+      </form>
+    <?php
+        }
+    ?>
   </div>
   <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
   <a class="btn btn-primary" href="user.php" role="button">Go back</a> 

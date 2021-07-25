@@ -56,4 +56,50 @@ function reportUser($reportedUserUuid, $reportedUserComment, $reporterUserUuid, 
     }
 }
 
+function isBanned($uuid) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT * FROM banned_users WHERE uuid=:uuid;");
+    $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
+    if ($Statement->execute()) {
+        if ($Statement->rowCount() > 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function getBanMessage($uuid) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT * FROM banned_users WHERE uuid=:uuid;");
+    $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
+    if ($Statement->execute()) {
+        $row = $Statement->fetch(PDO::FETCH_ASSOC);
+        return $row["ban_message"];
+    }
+    return "";
+}
+
+function banUser($uuid, $banMessage) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("INSERT INTO banned_users (uuid, ban_message) VALUES (:uuid, :ban_message)");
+    $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
+    $Statement->bindParam(":ban_message", $banMessage, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        return true;
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+function liftBan($uuid) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("DELETE FROM banned_users WHERE uuid=:uuid;");
+    $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
+    if ($Statement->execute()) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 ?>
