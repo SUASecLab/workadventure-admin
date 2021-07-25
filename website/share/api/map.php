@@ -26,9 +26,14 @@ if ((isset($_GET["organizationSlug"])) && (isset($_GET["worldSlug"])) && (isset(
     $roomSlug = $_GET["roomSlug"];
 
     $result['roomSlug'] = $roomSlug;
-    $result['mapUrl'] =  "https://lab.itsec.hs-sm.de/maps/hsm/work/map.json";
     $result['policy_type'] = 1;
     $result['tags'] = array();
+
+    if ($roomSlug == "laboratory") {
+        $result['mapUrl'] =  "https://lab.itsec.hs-sm.de/maps/hsm/work/map.json";
+    } else {
+        $result['mapUrl'] =  "https://lab.itsec.hs-sm.de/maps/hsm/gaming/map.json";
+    }
 
     echo json_encode($result);
 } else {
