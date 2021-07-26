@@ -20,18 +20,16 @@ if (!isAuthorized()) {
     die();
 }
 
-if ((isset($_GET["organizationSlug"])) && (isset($_GET["worldSlug"])) && (isset($_GET["roomSlug"]))) {
-    $organizationSlug = htmlspecialchars($_GET["organizationSlug"]);
-    $worldSlug = htmlspecialchars($_GET["worldSlug"]);
-    $roomSlug = htmlspecialchars($_GET["roomSlug"]);
+if (isset($_GET["playUri"])) {
+    $playUri = htmlspecialchars($_GET["playUri"]);
 
-    $result['roomSlug'] = $roomSlug;
     $result['policy_type'] = 1;
     $result['tags'] = array();
+    $result['textures'] = array();
 
-    if ($roomSlug == "laboratory") {
+    if ($playUri == "https://lab.itsec.hs-sm.de/@/org/lab.itsec.hs-sm.de/laboratory") {
         $result['mapUrl'] =  "https://lab.itsec.hs-sm.de/maps/hsm/work/map.json";
-    } else if ($roomSlug == "relaxation") {
+    } else if ($playUri == "https://lab.itsec.hs-sm.de/@/org/lab.itsec.hs-sm.de/relaxation") {
         $result['mapUrl'] =  "https://lab.itsec.hs-sm.de/maps/hsm/gaming/map.json";
     } else {
         http_response_code(404);

@@ -21,11 +21,10 @@ if (!isAuthorized()) {
     die();
 }
 
-if ((isset($_GET["organization"])) && (isset($_GET["world"])) && (isset($_GET["ipAddress"])) && (isset($_GET["token"]))) {
-    $organization = htmlspecialchars($_GET["organization"]);
-    $world = htmlspecialchars($_GET["world"]);
+if ((isset($_GET["ipAddress"])) && (isset($_GET["token"])) && (isset($_GET["roomUrl"]))) {
     $ipAddress = htmlspecialchars($_GET["ipAddress"]);
     $uuid = htmlspecialchars($_GET["token"]);
+    $roomUrl = htmlspecialchars($_GET["roomUrl"]);
 
     // find out whether user is banned
     $isBanned = isBanned($uuid);
