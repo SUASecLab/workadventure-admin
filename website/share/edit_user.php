@@ -34,7 +34,7 @@
     <?php
     }
 
-    $uuid = htmlentities($_GET["uuid"]);
+    $uuid = htmlspecialchars($_GET["uuid"]);
     $userData = getUserData($uuid);
     if ($userData == NULL) {
     ?>
@@ -48,7 +48,7 @@
         
     // Get new tag
     if (isset($_GET["newtag"])) {
-        $newTag = htmlentities($_GET["newtag"]);
+        $newTag = htmlspecialchars($_GET["newtag"]);
         if (!empty($newTag)) {
             $addTagResult = addTag($uuid, $newTag);
             if ($addTagResult == true) {
@@ -71,7 +71,7 @@
     
     // Get tag to remove
     if (isset($_GET["remtag"])) {
-        $remTag = htmlentities($_GET["remtag"]);
+        $remTag = htmlspecialchars($_GET["remtag"]);
         if (!empty($remTag)) {
             $remTagResult = removeTag($uuid, $remTag);
             if ($remTagResult == true) {
@@ -92,8 +92,8 @@
 
     // Ban user if requested
     if (isset($_GET["ban"])) {
-      if ((isset($_GET["message"])) && (!empty($_GET["message"])) && (htmlentities($_GET["ban"]) == "true")) {
-        if (banUser($uuid, htmlentities($_GET["message"]))) {
+      if ((isset($_GET["message"])) && (!empty($_GET["message"])) && (htmlspecialchars($_GET["ban"]) == "true")) {
+        if (banUser($uuid, htmlspecialchars($_GET["message"]))) {
           ?>
             <div class="container alert alert-success" role="alert">
               This user has been banned.
@@ -106,7 +106,7 @@
             </div>
           <?php
         }
-      } else if (htmlentities($_GET["ban"]) == "false") {
+      } else if (htmlspecialchars($_GET["ban"]) == "false") {
         if (liftBan($uuid)) {
           ?>
             <div class="container alert alert-success" role="alert">

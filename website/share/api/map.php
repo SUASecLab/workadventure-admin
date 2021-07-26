@@ -21,9 +21,9 @@ if (!isAuthorized()) {
 }
 
 if ((isset($_GET["organizationSlug"])) && (isset($_GET["worldSlug"])) && (isset($_GET["roomSlug"]))) {
-    $organizationSlug = htmlentities($_GET["organizationSlug"]);
-    $worldSlug = htmlentities($_GET["worldSlug"]);
-    $roomSlug = htmlentities($_GET["roomSlug"]);
+    $organizationSlug = htmlspecialchars($_GET["organizationSlug"]);
+    $worldSlug = htmlspecialchars($_GET["worldSlug"]);
+    $roomSlug = htmlspecialchars($_GET["roomSlug"]);
 
     $result['roomSlug'] = $roomSlug;
     $result['policy_type'] = 1;

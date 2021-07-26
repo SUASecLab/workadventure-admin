@@ -22,10 +22,10 @@ if (!isAuthorized()) {
 }
 
 if ((isset($_GET["organization"])) && (isset($_GET["world"])) && (isset($_GET["ipAddress"])) && (isset($_GET["token"]))) {
-    $organization = htmlentities($_GET["organization"]);
-    $world = htmlentities($_GET["world"]);
-    $ipAddress = htmlentities($_GET["ipAddress"]);
-    $uuid = htmlentities($_GET["token"]);
+    $organization = htmlspecialchars($_GET["organization"]);
+    $world = htmlspecialchars($_GET["world"]);
+    $ipAddress = htmlspecialchars($_GET["ipAddress"]);
+    $uuid = htmlspecialchars($_GET["token"]);
 
     // find out whether user is banned
     $isBanned = isBanned($uuid);
