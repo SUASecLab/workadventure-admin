@@ -34,6 +34,7 @@ if ((isset($_GET["uuid"])) && (isset($_GET["roomId"]))) {
 
     $result['uuid'] = $uuid;
     $result['tags'] = $tags;
+    $result['visitCardUrl'] = NULL;
     $result['textures'] = array();
     $result['messages'] = array();
     $result['anonymous'] = false;
