@@ -23,10 +23,10 @@ if (!isAuthorized()) {
 }
 
 if ((isset($_POST["reportedUserUuid"])) && (isset($_POST["reportedUserComment"])) && (isset($_POST["reporterUserUuid"])) && (isset($_POST["reportWorldSlug"]))) {
-    $reportedUserUuid = $_POST["reportedUserUuid"];
-    $reportedUserComment = $_POST["reportedUserComment"];
-    $reporterUserUuid = $_POST["reporterUserUuid"];
-    $reportWorldSlug = $_POST["reportWorldSlug"];
+    $reportedUserUuid = htmlentities($_POST["reportedUserUuid"]);
+    $reportedUserComment = htmlentities($_POST["reportedUserComment"]);
+    $reporterUserUuid = htmlentities($_POST["reporterUserUuid"]);
+    $reportWorldSlug = htmlentities($_POST["reportWorldSlug"]);
     reportUser($reportedUserUuid, $reportedUserComment, $reporterUserUuid, $reportWorldSlug);
 } else {
     http_response_code(400);

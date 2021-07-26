@@ -22,7 +22,7 @@ if (!isAuthorized()) {
 }
 
 if (isset($_GET["token"])) {
-    $uuid = $_GET["token"];
+    $uuid = htmlentities($_GET["token"]);
 
     createAccountIfNotExistent($uuid);
 

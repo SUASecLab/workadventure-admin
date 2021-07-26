@@ -25,8 +25,8 @@ if (!isAuthorized()) {
 }
 
 if ((isset($_GET["uuid"])) && (isset($_GET["roomId"]))) {
-    $uuid = $_GET["uuid"];
-    $roomId = $_GET["roomId"];
+    $uuid = htmlentities($_GET["uuid"]);
+    $roomId = htmlentities($_GET["roomId"]);
 
     createAccountIfNotExistent($uuid);
 

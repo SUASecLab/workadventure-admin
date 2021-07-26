@@ -34,7 +34,7 @@
     <?php
     }
 
-    $uuid = $_GET["uuid"];
+    $uuid = htmlentities($_GET["uuid"]);
     $Statement = $DB->prepare("SELECT * FROM users WHERE uuid=:uuid;");
     $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
     try {
@@ -53,7 +53,7 @@
         
     // Get new tag
     if (isset($_GET["newtag"])) {
-        $newtag = $_GET["newtag"];
+        $newtag = htmlentities($_GET["newtag"]);
         if (!empty($newtag)) {
             $Statement = $DB->prepare("INSERT INTO tags (uuid, tag) VALUES (:uuid, :tag);");
             $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
@@ -79,7 +79,7 @@
     
     // Get tag to remote
     if (isset($_GET["remtag"])) {
-        $remtag = $_GET["remtag"];
+        $remtag = htmlentities($_GET["remtag"]);
         if (!empty($remtag)) {
             $Statement = $DB->prepare("DELETE FROM tags WHERE uuid=:uuid AND tag=:tag;");
             $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
@@ -103,8 +103,8 @@
 
     // Ban user if requested
     if (isset($_GET["ban"])) {
-      if ((isset($_GET["message"])) && (!empty($_GET["message"])) && ($_GET["ban"] == "true")) {
-        if (banUser($uuid, $_GET["message"])) {
+      if ((isset($_GET["message"])) && (!empty($_GET["message"])) && (htmlentities($_GET["ban"]) == "true")) {
+        if (banUser($uuid, htmlentities($_GET["message"]))) {
           ?>
             <div class="container alert alert-success" role="alert">
               This user has been banned.
@@ -117,7 +117,7 @@
             </div>
           <?php
         }
-      } else if ($_GET["ban"] == "false") {
+      } else if (htmlentities($_GET["ban"]) == "false") {
         if (liftBan($uuid)) {
           ?>
             <div class="container alert alert-success" role="alert">
