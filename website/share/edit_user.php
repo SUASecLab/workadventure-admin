@@ -35,12 +35,8 @@
     }
 
     $uuid = htmlentities($_GET["uuid"]);
-    $Statement = $DB->prepare("SELECT * FROM users WHERE uuid=:uuid;");
-    $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
-    try {
-        $Statement->execute();
-    }
-    catch (PDOException $exception) {
+    $userData = getUserData($uuid);
+    if ($userData == NULL) {
     ?>
         <div class="container alert alert-danger" role="alert">
           <p>Could not connect fetch user details</p>
@@ -49,52 +45,45 @@
         <?php
         return;
     }
-    $row = $Statement->fetch(PDO::FETCH_ASSOC);
         
     // Get new tag
     if (isset($_GET["newtag"])) {
-        $newtag = htmlentities($_GET["newtag"]);
-        if (!empty($newtag)) {
-            $Statement = $DB->prepare("INSERT INTO tags (uuid, tag) VALUES (:uuid, :tag);");
-            $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
-            $Statement->bindParam(":tag", $newtag, PDO::PARAM_STR);
-            try {
-                $Statement->execute();
+        $newTag = htmlentities($_GET["newtag"]);
+        if (!empty($newTag)) {
+            $addTagResult = addTag($uuid, $newTag);
+            if ($addTagResult == true) {
                 ?>
                 <div class="container alert alert-success" role="alert">
-                  The tag <?php echo "\"".$newtag."\""; ?> has been added.
+                  The tag <?php echo "\"".$newTag."\""; ?> has been added.
                 </div>
               <?php
             }
-            catch (PDOException $exception)
+            else
             {
                 ?>
                 <div class="container alert alert-danger" role="alert">
-                  Could not add the tag <?php echo "\"".$newtag."\""; ?>
+                  Could not add the tag <?php echo "\"".$newTag."\""; ?>
                 </div>
                 <?php
             }
         }
     }
     
-    // Get tag to remote
+    // Get tag to remove
     if (isset($_GET["remtag"])) {
-        $remtag = htmlentities($_GET["remtag"]);
-        if (!empty($remtag)) {
-            $Statement = $DB->prepare("DELETE FROM tags WHERE uuid=:uuid AND tag=:tag;");
-            $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
-            $Statement->bindParam(":tag", $remtag, PDO::PARAM_STR);
-            try {
-                $Statement->execute();
+        $remTag = htmlentities($_GET["remtag"]);
+        if (!empty($remTag)) {
+            $remTagResult = removeTag($uuid, $remTag);
+            if ($remTagResult == true) {
                 ?>
                 <div class="container alert alert-success" role="alert">
-                    The tag <?php echo "\"".$remtag."\""; ?> has been removed.
+                    The tag <?php echo "\"".$remTag."\""; ?> has been removed.
                 </div>
                 <?php
-            } catch (PDOException $exception) {
+            } else {
                 ?>
                 <div class="container alert alert-danger" role="alert">
-                    Could not remove the tag <?php echo "\"".$remtag."\""; ?>.
+                    Could not remove the tag <?php echo "\"".$remTag."\""; ?>.
                 </div>
                 <?php
             }
@@ -143,29 +132,22 @@
 <div class="container">
   <div class="mb-3">
     <label for="name" class="form-label">Name</label>
-    <input type="text" class="form-control" id="name" value="<?php echo $row["name"]; ?>" readonly>
+    <input type="text" class="form-control" id="name" value="<?php echo $userData["name"]; ?>" readonly>
   </div>
   <div class="mb-3">
     <label for="email" class="form-label">Email Address</label>
-    <input type="email" class="form-control" id="email" value="<?php echo $row["email"]; ?>" readonly>
+    <input type="email" class="form-control" id="email" value="<?php echo $userData["email"]; ?>" readonly>
   </div>
   <div class="mb-3">
     <label for="name" class="form-label">Access Link</label>
-    <input type="text" class="form-control" id="name" value="<?php echo "https://".getenv('DOMAIN')."/register/".$row["uuid"]; ?>" readonly>
+    <input type="text" class="form-control" id="name" value="<?php echo "https://".getenv('DOMAIN')."/register/".$userData["uuid"]; ?>" readonly>
   </div>
   <div class="mb-3">
     <p>Tags (click to remove):</p>
     <?php
-
-      $Statement = $DB->prepare("SELECT tag FROM tags WHERE uuid=:uuid;");
-      $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
-      try {
-          $Statement->execute();
-          while ($tagRow = $Statement->fetch(PDO::FETCH_ASSOC)) {
-              echo "<form action=\"edit_user.php\" method=\"get\"><input class=\"tag btn btn-primary\" type=\"submit\" value=\"".$tagRow["tag"]."\" name=\"remtag\"><input type=\"hidden\" name=\"uuid\" value=\"".$uuid."\"></form>";
-          }
-      }
-      catch (PDOException $exception) {
+      $tags = getTags($uuid);
+      foreach ($tags as $currentTag) {
+        echo "<form action=\"edit_user.php\" method=\"get\"><input class=\"tag btn btn-primary\" type=\"submit\" value=\"".$currentTag."\" name=\"remtag\"><input type=\"hidden\" name=\"uuid\" value=\"".$uuid."\"></form>";
       }
     ?>
     <br>

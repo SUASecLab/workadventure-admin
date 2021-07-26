@@ -25,38 +25,30 @@
     return;
   }
 
+  include 'api/database_operations.php';
+  include 'meta/toolbar.php';
+
   // Get number of users
-  $Statement = $DB->prepare("SELECT count('uuid') as number FROM users;");
-  try {
-      $Statement->execute();
-  }
-  catch (PDOException $exception) {
-  ?>
+  $nrOfUsers = getNumberOfUsers();
+  if ($nrOfUsers == NULL) {
+    ?>
     <div class="container alert alert-danger" role="alert">
       <p>Could not fetch user count</p>
     </div>
-
-  <?php
+    <?php
     return;
   }
-  $row = $Statement->fetch(PDO::FETCH_ASSOC);
 
-  include 'meta/toolbar.php';
-  
   echo "<div class=\"container\">";
-  echo "<p class=\"fs-3\">Listing ".$row["number"]." accounts</p>";
+  echo "<p class=\"fs-3\">Listing ".$nrOfUsers." accounts</p>";
 
   // Get all users
-  $Statement = $DB->prepare("SELECT * FROM users;");
-  try {
-      $Statement->execute();
-  }
-  catch (PDOException $exception) {
+  $users = getAllUsers();
+  if ($users == NULL) {
     ?>
     <div class="container alert alert-danger" role="alert">
       <p>Could not fetch users</p>
     </div>
-
   <?php
     return;
   }
@@ -71,18 +63,11 @@
     </tr>
 
   <?php
-  while($row = $Statement->fetch(PDO::FETCH_ASSOC)) {
+  while($row = $users->fetch(PDO::FETCH_ASSOC)) {
     echo "<tr><td><p class=\"fw-normal\">".$row["name"]."</p></td><td>";
-        // Get tags from database
-        $TagStatement = $DB->prepare("SELECT tag FROM tags WHERE uuid=:uuid");
-        $TagStatement->bindParam(":uuid", $row["uuid"], PDO::PARAM_STR);
-        try {
-            $TagStatement->execute();
-            while ($tagRow = $TagStatement->fetch(PDO::FETCH_ASSOC)) {
-                echo "<div class=\"badge rounded-pill bg-primary tag\">".$tagRow["tag"]."</div>";
-            }
-        }
-        catch (PDOException $exception) {
+        $tags = getTags($row["uuid"]);
+        foreach ($tags as $currentTag) {
+            echo "<div class=\"badge rounded-pill bg-primary tag\">".$currentTag."</div>";
         }
     ?>
     </td>
