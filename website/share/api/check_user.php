@@ -28,9 +28,7 @@ if (isset($_GET["token"])) {
 
     $tags = getTags($uuid);
 
-    $result['organizationSlug'] = "org";
-    $result['worldSlug'] = getenv('DOMAIN');
-    $result['roomSlug'] = "laboratory";
+    $result['roomUrl'] = "/@/org/lab.itsec.hs-sm.de/laboratory";
     $result['mapUrlStart'] = "https://lab.itsec.hs-sm.de/maps/hsm/work/map.json";
     $result['tags'] = $tags;
     $result['policy_type'] = 1;
