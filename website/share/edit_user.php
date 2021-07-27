@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -10,9 +13,8 @@
 </head>
 <body>
   <?php
-    include 'meta/toolbar.php';
-    include 'api/database_operations.php';
-  
+    require 'meta/toolbar.php';
+
     // Connect to database
     try {
         $DB = new PDO("mysql:dbname=".getenv('DB_MYSQL_DATABASE').";host=admin-db;port=3306",
@@ -23,6 +25,13 @@
         echo "Could not connect to database: ".$exception->getMessage();
         echo "</div>";
         return;
+    }
+    require_once 'api/database_operations.php';
+    require_once 'login_functions.php';
+
+    if(!isLoggedIn()) {
+        showLogin();
+        die();
     }
     
     // Get user details

@@ -176,4 +176,49 @@ function removeTag($uuid, $remTag) {
         return NULL;
     }
 }
+
+function websiteUserExists() {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT * FROM website");
+    try {
+        $Statement->execute();
+        if ($Statement->rowCount() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
+function createWebsiteUser($username, $hashedPassword) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("INSERT INTO website (username, hashed_password) VALUES (:username, :hashed_password);");
+    $Statement->bindParam(":username", $username, PDO::PARAM_STR);
+    $Statement->bindParam(":hashed_password", $hashedPassword, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        return true;
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
+function websiteUserValid($username, $hashedPassword) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT * FROM website WHERE username = :username AND hashed_password = :hashed_password;");
+    $Statement->bindParam(":username", $username, PDO::PARAM_STR);
+    $Statement->bindParam(":hashed_password", $hashedPassword, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        if ($Statement->rowCount() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
 ?>

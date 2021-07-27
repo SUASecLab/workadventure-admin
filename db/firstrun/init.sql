@@ -25,3 +25,9 @@ CREATE TABLE banned_users (
     ban_message varchar(50) NOT NULL,
     PRIMARY KEY (uuid)
 );
+
+CREATE TABLE website (
+    username varchar(16) NOT NULL,
+    hashed_password varchar(160) NOT NULL,
+    PRIMARY KEY (username)
+);
