@@ -37,23 +37,32 @@ session_start();
     if ((isset($_POST["map_url"])) && (isset($_POST["map_file_url"]))) {
         $mapUrl = htmlspecialchars($_POST["map_url"]);
         $mapFileUrl = htmlspecialchars($_POST["map_file_url"]);
-        $mapUrlPrefix = "/@/org/".getenv('DOMAIN')."/";
-        if (!str_starts_with($mapUrl, $mapUrlPrefix)) {
-            $mapUrl = $mapUrlPrefix.$mapUrl;
-        }
-        $storedMap = storeMapFileUrl($mapUrl, $mapFileUrl);
-        if (!$storedMap) {
-          ?>
-            <div class="container alert alert-danger" role="alert">
-              The map file url for the map <?php echo $mapUrl; ?> could not be stored.
-            </div>
+
+        if ((empty($mapUrl)) || (empty($mapFileUrl))) {
+            ?>
+              <div class="container alert alert-danger" role="alert">
+                The map data must not be empty.
+              </div>
             <?php
         } else {
-          ?>
-          <div class="container alert alert-success" role="alert">
-            The map file url for the map <?php echo $mapUrl; ?> has been stored.
-          </div>
-          <?php
+            $mapUrlPrefix = "/@/org/".getenv('DOMAIN')."/";
+            if (!str_starts_with($mapUrl, $mapUrlPrefix)) {
+                $mapUrl = $mapUrlPrefix.$mapUrl;
+            }
+            $storedMap = storeMapFileUrl($mapUrl, $mapFileUrl);
+            if (!$storedMap) {
+            ?>
+                <div class="container alert alert-danger" role="alert">
+                The map file url for the map <?php echo $mapUrl; ?> could not be stored.
+                </div>
+                <?php
+            } else {
+            ?>
+            <div class="container alert alert-success" role="alert">
+                The map file url for the map <?php echo $mapUrl; ?> has been stored.
+            </div>
+            <?php
+            }
         }
     }
 
