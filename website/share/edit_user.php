@@ -41,6 +41,7 @@ session_start();
           <p>User not specified</p>
         </div>
     <?php
+        die();
     }
 
     $uuid = htmlspecialchars($_POST["uuid"]);
