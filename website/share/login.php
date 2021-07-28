@@ -13,7 +13,6 @@ session_start();
 </head>
 <body>
 <?php
-require 'meta/toolbar.php';
 try {
     $DB = new PDO("mysql:dbname=".getenv('DB_MYSQL_DATABASE').";host=admin-db;port=3306",
         getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));    
@@ -38,6 +37,8 @@ if ((isset($_POST["username"])) && (isset($_POST["password"]))) {
 } else {
     $validLogin = false;
 }
+
+require 'meta/toolbar.php';
 
 if ($validLogin) {
 ?>
@@ -64,7 +65,7 @@ if ($validLogin) {
       <input type="text" class="form-control" id="username" name="username"><br>
       <label for="password" class="form-label">Password:</label>
       <input class="form-control" type="password" id="password" name="password"><br>
-      <input class="btn btn-primary" type="submit" value="Login">
+      <input class="btn btn-primary" type="submit" value="Log in">
     </form>
   </div>
 <?php

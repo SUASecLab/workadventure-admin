@@ -13,8 +13,6 @@ session_start();
 </head>
 <body>
   <?php
-    require 'meta/toolbar.php';
-
     // Connect to database
     try {
         $DB = new PDO("mysql:dbname=".getenv('DB_MYSQL_DATABASE').";host=admin-db;port=3306",
@@ -28,6 +26,7 @@ session_start();
     }
     require_once 'api/database_operations.php';
     require_once 'login_functions.php';
+    require 'meta/toolbar.php';
 
     if(!isLoggedIn()) {
         showLogin();

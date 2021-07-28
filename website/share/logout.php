@@ -13,8 +13,6 @@ session_start();
 </head>
 <body>
   <?php
-    require 'meta/toolbar.php';
-
     // Connect to database
     try {
         $DB = new PDO("mysql:dbname=".getenv('DB_MYSQL_DATABASE').";host=admin-db;port=3306",
@@ -30,6 +28,7 @@ session_start();
     require_once 'login_functions.php';
 
     if(!isLoggedIn()) {
+        require 'meta/toolbar.php';
     ?>
       <div class="container alert alert-danger" role="alert">
         You have not been logged in!
@@ -38,6 +37,7 @@ session_start();
     } else {
         session_unset();
         session_destroy();
+        require 'meta/toolbar.php';
         ?>
         <div class="container alert alert-success" role="alert">
           You have been logged out.
