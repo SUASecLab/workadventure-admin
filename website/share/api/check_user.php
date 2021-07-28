@@ -27,9 +27,10 @@ if (isset($_GET["token"])) {
     createAccountIfNotExistent($uuid);
 
     $tags = getTags($uuid);
+    $map = getenv('START_ROOM_URL');
 
-    $result['roomUrl'] = "/@/org/lab.itsec.hs-sm.de/laboratory";
-    $result['mapUrlStart'] = "https://lab.itsec.hs-sm.de/maps/hsm/work/map.json";
+    $result['roomUrl'] = $map;
+    $result['mapUrlStart'] = getMapFileUrl($map);
     $result['tags'] = $tags;
     $result['policy_type'] = 1;
     $result['userUuid'] = $uuid;

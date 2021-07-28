@@ -31,3 +31,9 @@ CREATE TABLE website (
     hashed_password varchar(160) NOT NULL,
     PRIMARY KEY (username)
 );
+
+CREATE TABLE maps (
+    map_url varchar(100) NOT NULL,
+    map_file_url varchar(100) NOT NULL,
+    PRIMARY KEY (map_url)
+);

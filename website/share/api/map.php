@@ -27,13 +27,14 @@ if (isset($_GET["playUri"])) {
     $result['tags'] = array();
     $result['textures'] = array();
 
-    if ($playUri == "https://lab.itsec.hs-sm.de/@/org/lab.itsec.hs-sm.de/laboratory") {
-        $result['mapUrl'] =  "https://lab.itsec.hs-sm.de/maps/hsm/work/map.json";
-    } else if ($playUri == "https://lab.itsec.hs-sm.de/@/org/lab.itsec.hs-sm.de/relaxation") {
-        $result['mapUrl'] =  "https://lab.itsec.hs-sm.de/maps/hsm/gaming/map.json";
-    } else {
+    $shortUri = substr($playUri, strlen("https://".getenv('DOMAIN')));
+    $resultMap = getMapFileUrl($shortUri);
+
+    if ($resultMap == NULL) {
         http_response_code(404);
         die();
+    } else {
+        $result['mapUrl'] =  $resultMap;
     }
 
     echo json_encode($result);

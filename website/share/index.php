@@ -41,8 +41,8 @@ session_start();
         <div class="card" style="width: 18 rem; height: 13rem;">
           <div class="card-body">
             <h5 class="card-title">Room Management</h5>
-            <p class="card-text">Here, you can adjust the room settings. Furthermore, you can restrict the access to the room</p>
-            <a href="#" class="btn btn-primary">Go to Room Management</a>
+            <p class="card-text">Here, you can adjust the room settings. Furthermore, you can restrict the access to the rooms.</p>
+            <a href="rooms.php" class="btn btn-primary">Go to Room Management</a>
           </div>
         </div>
       </div>

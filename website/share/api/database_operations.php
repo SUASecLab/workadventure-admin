@@ -221,4 +221,57 @@ function websiteUserValid($username, $hashedPassword) {
         return false;
     }
 }
+
+function getMapFileUrl($map) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT * FROM maps WHERE map_url = :map_url;");
+    $Statement->bindParam(":map_url", $map, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        if ($Statement->rowCount() > 0) {
+            $row = $Statement->fetch(PDO::FETCH_ASSOC);
+            return "https://".$row["map_file_url"];
+        } else {
+            return NULL;
+        }
+    } catch (PDOException $exception) {
+        return NULL;
+    }
+}
+
+function storeMapFileUrl($mapUrl, $mapFileUrl) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("INSERT INTO maps (map_url, map_file_url) VALUES (:map_url, :map_file_url);");
+    $Statement->bindParam(":map_url", $mapUrl, PDO::PARAM_STR);
+    $Statement->bindParam(":map_file_url", $mapFileUrl, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        return true;
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
+function getAllMaps() {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT * FROM maps;");
+    try {
+        $Statement->execute();
+        return $Statement;
+    } catch (PDOException $exception) {
+        return NULL;
+    }
+}
+
+function removeMap($mapUrl) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("DELETE FROM maps WHERE map_url = :map_url;");
+    $Statement->bindParam(":map_url", $mapUrl, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        return true;
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
 ?>
