@@ -78,7 +78,7 @@ session_start();
     ?>
     </td>
     <td>
-      <form action="edit_user.php" method="get">
+      <form action="edit_user.php" method="post">
         <input type="hidden" name="uuid" value="<?php echo $row["uuid"]; ?>">
         <input type="submit" class="btn btn-dark" value="Edit">
       </form>

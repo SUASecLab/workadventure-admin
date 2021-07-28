@@ -35,7 +35,7 @@ session_start();
     }
     
     // Get user details
-    if (!isset($_GET["uuid"])) {
+    if (!isset($_POST["uuid"])) {
     ?>
         <div class="container alert alert-danger" role="alert">
           <p>User not specified</p>
@@ -43,7 +43,7 @@ session_start();
     <?php
     }
 
-    $uuid = htmlspecialchars($_GET["uuid"]);
+    $uuid = htmlspecialchars($_POST["uuid"]);
     $userData = getUserData($uuid);
     if ($userData == NULL) {
     ?>
@@ -56,8 +56,8 @@ session_start();
     }
         
     // Get new tag
-    if (isset($_GET["newtag"])) {
-        $newTag = htmlspecialchars($_GET["newtag"]);
+    if (isset($_POST["newtag"])) {
+        $newTag = htmlspecialchars($_POST["newtag"]);
         if (!empty($newTag)) {
             $addTagResult = addTag($uuid, $newTag);
             if ($addTagResult == true) {
@@ -79,8 +79,8 @@ session_start();
     }
     
     // Get tag to remove
-    if (isset($_GET["remtag"])) {
-        $remTag = htmlspecialchars($_GET["remtag"]);
+    if (isset($_POST["remtag"])) {
+        $remTag = htmlspecialchars($_POST["remtag"]);
         if (!empty($remTag)) {
             $remTagResult = removeTag($uuid, $remTag);
             if ($remTagResult == true) {
@@ -100,9 +100,9 @@ session_start();
     }
 
     // Ban user if requested
-    if (isset($_GET["ban"])) {
-      if ((isset($_GET["message"])) && (!empty($_GET["message"])) && (htmlspecialchars($_GET["ban"]) == "true")) {
-        if (banUser($uuid, htmlspecialchars($_GET["message"]))) {
+    if (isset($_POST["ban"])) {
+      if ((isset($_POST["message"])) && (!empty($_POST["message"])) && (htmlspecialchars($_POST["ban"]) == "true")) {
+        if (banUser($uuid, htmlspecialchars($_POST["message"]))) {
           ?>
             <div class="container alert alert-success" role="alert">
               This user has been banned.
@@ -115,7 +115,7 @@ session_start();
             </div>
           <?php
         }
-      } else if (htmlspecialchars($_GET["ban"]) == "false") {
+      } else if (htmlspecialchars($_POST["ban"]) == "false") {
         if (liftBan($uuid)) {
           ?>
             <div class="container alert alert-success" role="alert">
@@ -156,12 +156,12 @@ session_start();
     <?php
       $tags = getTags($uuid);
       foreach ($tags as $currentTag) {
-        echo "<form action=\"edit_user.php\" method=\"get\"><input class=\"tag btn btn-primary\" type=\"submit\" value=\"".$currentTag."\" name=\"remtag\"><input type=\"hidden\" name=\"uuid\" value=\"".$uuid."\"></form>";
+        echo "<form action=\"edit_user.php\" method=\"post\"><input class=\"tag btn btn-primary\" type=\"submit\" value=\"".$currentTag."\" name=\"remtag\"><input type=\"hidden\" name=\"uuid\" value=\"".$uuid."\"></form>";
       }
     ?>
     <br>
     <p>Add tag:</p>
-    <form action="edit_user.php" method="get">
+    <form action="edit_user.php" method="post">
       <input class="form-control" type="text" name="newtag"><br>
       <input class="btn btn-primary" type="submit" value="Add tag">
       <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
@@ -175,7 +175,7 @@ session_start();
         <label for="ban_reason" class="form-label">Reason:</label>
         <input type="text" class="form-control" id="ban_reason" value="<?php echo getBanMessage($uuid); ?>" readonly>
       </div>
-      <form action="edit_user.php" method="get">
+      <form action="edit_user.php" method="post">
         <input class="btn btn-danger" type="submit" value="Lift ban">
         <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
         <input type="hidden" name="ban" value="false">
@@ -185,7 +185,7 @@ session_start();
     ?>
       <br>
       <p>Ban this user:</p>
-      <form action="edit_user.php" method="get">
+      <form action="edit_user.php" method="post">
         <div class="mb-3">
           <label for="ban_reason" class="form-label">Reason:</label>
           <input type="text" class="form-control" id="ban_reason" name="message">
