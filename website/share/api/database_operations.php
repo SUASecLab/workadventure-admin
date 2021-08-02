@@ -49,6 +49,22 @@ function getTags($uuid) {
     return $result;
 }
 
+function hasTags($uuid) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT * FROM tags WHERE uuid=:uuid");
+    $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        if ($Statement->rowCount() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
 function reportUser($reportedUserUuid, $reportedUserComment, $reporterUserUuid, $reportWorldSlug) {
     GLOBAL $DB;
     $Statement = $DB->prepare("INSERT INTO reports (reportedUserUuid, reportedUserComment, reporterUserUuid, reportWorldSlug) VALUES (:reportedUserUuid, :reportedUserComment, :reporterUserUuid, :reportWorldSlug)");

@@ -152,14 +152,18 @@ session_start();
     <input type="text" class="form-control" id="name" value="<?php echo "https://".getenv('DOMAIN')."/register/".$userData["uuid"]; ?>" readonly>
   </div>
   <div class="mb-3">
-    <p>Tags (click to remove):</p>
     <?php
-      $tags = getTags($uuid);
-      foreach ($tags as $currentTag) {
-        echo "<form action=\"edit_user.php\" method=\"post\"><input class=\"tag btn btn-primary\" type=\"submit\" value=\"".$currentTag."\" name=\"remtag\"><input type=\"hidden\" name=\"uuid\" value=\"".$uuid."\"></form>";
+     if (hasTags($uuid)) {
+      ?>
+      <p>Tags (click to remove):</p>
+      <?php
+        $tags = getTags($uuid);
+        foreach ($tags as $currentTag) {
+          echo "<form action=\"edit_user.php\" method=\"post\"><input class=\"tag btn btn-primary\" type=\"submit\" value=\"".$currentTag."\" name=\"remtag\"><input type=\"hidden\" name=\"uuid\" value=\"".$uuid."\"></form>";
+        }
+        echo "<br>";
       }
     ?>
-    <br>
     <p>Add tag:</p>
     <form action="edit_user.php" method="post">
       <input class="form-control" type="text" name="newtag"><br>
