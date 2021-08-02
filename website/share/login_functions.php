@@ -14,12 +14,6 @@ function isLoggedIn() {
     return true;
 }
 
-function loginValid($user, $password) {
-    GLOBAL $DB;
-    // check whether stored session data is valid
-    return true;
-}
-
 function showLogin() {
     echo "<div class=\"container alert alert-danger\" role=\"alert\">";
     echo "You are not logged in. Please log in to continue.";
