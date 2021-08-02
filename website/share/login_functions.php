@@ -3,11 +3,11 @@ function isLoggedIn() {
     if (!isset($_SESSION["user"])) {
         return false;
     }
-    $user = $_SESSION["user"];
+    $user = htmlspecialchars($_SESSION["user"]);
     if (!isset($_SESSION["password"])) {
         return false;
     }
-    $password = $_SESSION["password"];
+    $password = htmlspecialchars($_SESSION["password"]);
     if (!websiteUserValid($user, $password)) {
         return false;
     }
@@ -24,7 +24,7 @@ function showLogin() {
 function getHash($data) {
     $salt = getenv('ADMIN_API_SALT');
     $saltWithAlgorithm = '$6$rounds=5000$'.$salt.'$';
-    return crypt($data, $saltWithAlgorithm);
+    return htmlspecialchars(crypt($data, $saltWithAlgorithm));
 }
 
 function login($user, $password) {
