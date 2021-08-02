@@ -28,6 +28,20 @@ function writeUuidToDatabase($uuid) {
     }
 }
 
+function updateUserData($uuid, $name, $email) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("UPDATE users SET name = :name, email = :email WHERE uuid = :uuid;");
+    $Statement->bindParam(":name", $name, PDO::PARAM_STR);
+    $Statement->bindParam(":email", $email, PDO::PARAM_STR);
+    $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        return true;
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
 function createAccountIfNotExistent($uuid) {
     if (!userExists($uuid)) {
         return writeUuidToDatabase($uuid);

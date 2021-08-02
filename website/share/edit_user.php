@@ -33,7 +33,7 @@ session_start();
         die();
     }
     
-    // Get user details
+    // Get user's uuid
     if (!isset($_POST["uuid"])) {
     ?>
         <div class="container alert alert-danger" role="alert">
@@ -44,16 +44,6 @@ session_start();
     }
 
     $uuid = htmlspecialchars($_POST["uuid"]);
-    $userData = getUserData($uuid);
-    if ($userData == NULL) {
-    ?>
-        <div class="container alert alert-danger" role="alert">
-          <p>Could not connect fetch user details</p>
-        </div>
-    
-        <?php
-        return;
-    }
         
     // Get new tag
     if (isset($_POST["newtag"])) {
@@ -137,16 +127,66 @@ session_start();
           <?php
       }
     }
+
+    // Update userdata if requested
+    if (isset($_POST["update-data"])) {
+        if ((isset($_POST["name"])) && (isset($_POST["email"]))) {
+            $name = htmlspecialchars($_POST["name"]);
+            $email = htmlspecialchars($_POST["email"]);
+            if ((empty($name)) || (empty($email))) {
+            ?>
+                <div class="container alert alert-danger" role="alert">
+                New user data must not be empty.
+                </div>
+            <?php
+            } else {
+                if (updateUserData($uuid, $name, $email)) {
+                ?>
+                    <div class="container alert alert-success" role="alert">
+                      User data has been updated.
+                    </div>
+                <?php
+                } else {
+                ?>
+                    <div class="container alert alert-danger" role="alert">
+                      User data could not be updated.
+                    </div>
+                <?php
+                }
+            }
+        } else {
+        ?>
+            <div class="container alert alert-danger" role="alert">
+              New user data could not be fetched.
+            </div>
+        <?php
+        }
+    }
+
+    // get current user data
+    $userData = getUserData($uuid);
+    if ($userData == NULL) {
+    ?>
+        <div class="container alert alert-danger" role="alert">
+          <p>Could not connect fetch user details</p>
+        </div>
+        <?php
+        die();
+    }
   ?>
 <div class="container">
-  <div class="mb-3">
-    <label for="name" class="form-label">Name</label>
-    <input type="text" class="form-control" id="name" value="<?php echo $userData["name"]; ?>" readonly>
-  </div>
-  <div class="mb-3">
-    <label for="email" class="form-label">Email Address</label>
-    <input type="email" class="form-control" id="email" value="<?php echo $userData["email"]; ?>" readonly>
-  </div>
+  <form action="edit_user.php" method="post" style="margin-bottom: 1rem;">
+    <div class="mb-3">
+      <label for="name" class="form-label">Name</label>
+      <input type="text" class="form-control" id="name" name="name" value="<?php echo $userData["name"]; ?>">
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email Address</label>
+      <input type="email" class="form-control" id="email" name="email" value="<?php echo $userData["email"]; ?>">
+    </div>
+    <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
+    <input class="btn btn-primary" type="submit" value="Update" name="update-data">
+  </form>
   <div class="mb-3">
     <label for="name" class="form-label">Access Link</label>
     <input type="text" class="form-control" id="name" value="<?php echo "https://".getenv('DOMAIN')."/register/".$userData["uuid"]; ?>" readonly>
