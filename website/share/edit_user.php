@@ -159,9 +159,9 @@ session_start();
       <?php
         $tags = getTags($uuid);
         foreach ($tags as $currentTag) {
-          echo "<form action=\"edit_user.php\" method=\"post\"><input class=\"tag btn btn-primary\" type=\"submit\" value=\"".$currentTag."\" name=\"remtag\"><input type=\"hidden\" name=\"uuid\" value=\"".$uuid."\"></form>";
+          echo "<form action=\"edit_user.php\" method=\"post\" class=\"sameline-form\"><input class=\"tag btn btn-primary\" type=\"submit\" value=\"".$currentTag."\" name=\"remtag\"><input type=\"hidden\" name=\"uuid\" value=\"".$uuid."\"></form>";
         }
-        echo "<br>";
+        echo "<br><br>";
       }
     ?>
     <p>Add tag:</p>

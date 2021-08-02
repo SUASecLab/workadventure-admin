@@ -15,3 +15,7 @@
 .element {
     margin: 1rem;
 }
+
+.sameline-form {
+    display: inline-block;
+}
