@@ -24,15 +24,15 @@ if (!isAuthorized()) {
     die();
 }
 
-if ((isset($_GET["uuid"])) && (isset($_GET["roomId"]))) {
-    $uuid = htmlspecialchars($_GET["uuid"]);
+if ((isset($_GET["userIdentifier"])) && (isset($_GET["roomId"])) && (isset($_GET["ipAddress"]))) {
+    $userUuid = htmlspecialchars($_GET["userIdentifier"]);
     $roomId = htmlspecialchars($_GET["roomId"]);
 
-    createAccountIfNotExistent($uuid);
+    createAccountIfNotExistent($userUuid);
 
-    $tags = getTags($uuid);
+    $tags = getTags($userUuid);
 
-    $result['uuid'] = $uuid;
+    $result['userUuid'] = $userUuid;
     $result['tags'] = $tags;
     $result['visitCardUrl'] = NULL;
     $result['textures'] = array();
