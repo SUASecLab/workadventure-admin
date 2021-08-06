@@ -28,16 +28,16 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["roomId"])) && (isset($_GET
     $userUuid = htmlspecialchars($_GET["userIdentifier"]);
     $roomId = htmlspecialchars($_GET["roomId"]);
 
-    createAccountIfNotExistent($userUuid);
-
-    $tags = getTags($userUuid);
+    if (allowedToCreateNewUser()) {
+        createAccountIfNotExistent($userUuid);
+    }
 
     $result['userUuid'] = $userUuid;
-    $result['tags'] = $tags;
+    $result['tags'] = getTags($userUuid);
     $result['visitCardUrl'] = NULL;
     $result['textures'] = array();
     $result['messages'] = array();
-    $result['anonymous'] = false;
+    $result['anonymous'] = !userExists($userUuid);
 
     echo json_encode($result);
 } else {

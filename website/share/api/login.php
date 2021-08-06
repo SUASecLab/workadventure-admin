@@ -25,16 +25,17 @@ if (!isAuthorized()) {
 if (isset($_GET["token"])) {
     $uuid = htmlspecialchars($_GET["token"]);
 
-    createAccountIfNotExistent($uuid);
+    if (allowedToCreateNewUser()) {
+        createAccountIfNotExistent($uuid);
+    }
 
-    $tags = getTags($uuid);
     $map = getenv('START_ROOM_URL');
 
     $result['roomUrl'] = $map;
     $result['email'] = NULL;
     $result['mapUrlStart'] = getMapFileUrl($map);
-    $result['tags'] = $tags;
-    $result['policy_type'] = 1;
+    $result['tags'] = getTags($uuid);
+    $result['policy_type'] = getMapPolicy($map);
     $result['userUuid'] = $uuid;
     $result['messages'] = array();
     $result['textures'] = array();

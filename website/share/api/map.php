@@ -23,8 +23,6 @@ if (!isAuthorized()) {
 if (isset($_GET["playUri"])) {
     $playUri = htmlspecialchars($_GET["playUri"]);
 
-    $result['policy_type'] = 1;
-    $result['tags'] = array();
     $result['textures'] = array();
 
     $shortUri = substr($playUri, strlen("https://".getenv('DOMAIN')));
@@ -34,7 +32,9 @@ if (isset($_GET["playUri"])) {
         http_response_code(404);
         die();
     } else {
+        $result['policy_type'] = getMapPolicy($shortUri);
         $result['mapUrl'] =  $resultMap;
+        $result['tags'] = getMapTags($shortUri);
     }
 
     echo json_encode($result);

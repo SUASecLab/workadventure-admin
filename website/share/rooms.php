@@ -9,6 +9,7 @@ session_start();
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/style.css" rel="stylesheet">
   <script src="js/bootstrap.min.js"></script>
+
   <title>Workadventure Administration</title>
 </head>
 <body>
@@ -45,23 +46,58 @@ session_start();
               </div>
             <?php
         } else {
+            $invalidData = false;
+            $tags = array();
             $mapUrlPrefix = "/@/org/".getenv('DOMAIN')."/";
             if (!str_starts_with($mapUrl, $mapUrlPrefix)) {
                 $mapUrl = $mapUrlPrefix.$mapUrl;
             }
-            $storedMap = storeMapFileUrl($mapUrl, $mapFileUrl);
-            if (!$storedMap) {
-            ?>
-                <div class="container alert alert-danger" role="alert">
-                The map file url for the map <?php echo $mapUrl; ?> could not be stored.
+            $policyNumber = 2;
+            $policy = htmlspecialchars($_POST["radio"]);
+            if ($policy == "public") {
+              $policyNumber = 1;
+            } else if ($policy == "members") {
+              $policyNumber = 2;
+            } else {
+              $policyNumber = 3;
+              if ((isset($_POST["tags"])) && (!strlen(htmlspecialchars($_POST["tags"])) == 0)) {
+                    $tagsList = htmlspecialchars($_POST["tags"]);
+                    $tagsArray = explode(",", $tagsList);
+                    if (sizeof($tagsArray) > 0) {
+                        foreach ($tagsArray as $tag) {
+                            array_push($tags, trim($tag));
+                        }
+                    } else {
+                        $invalidData = true;
+                    }
+              } else {
+                $invalidData = true;
+              }
+            }
+            if (!$invalidData) {
+                $storedMap = storeMapFileUrl($mapUrl, $mapFileUrl, $policyNumber);
+                foreach ($tags as $tag) {
+                    addMapTag($mapUrl, $tag);
+                }
+                if (!$storedMap) {
+                ?>
+                    <div class="container alert alert-danger" role="alert">
+                    The map file url for the map <?php echo $mapUrl; ?> could not be stored.
+                    </div>
+                    <?php
+                } else {
+                ?>
+                <div class="container alert alert-success" role="alert">
+                    The map file url for the map <?php echo $mapUrl; ?> has been stored.
                 </div>
                 <?php
+                }
             } else {
-            ?>
-            <div class="container alert alert-success" role="alert">
-                The map file url for the map <?php echo $mapUrl; ?> has been stored.
-            </div>
-            <?php
+                ?>
+                <div class="container alert alert-danger" role="alert">
+                  No tags specified.
+                </div>
+                <?php
             }
         }
     }
@@ -69,6 +105,7 @@ session_start();
     // checkout whether map should be removed
     if ((isset($_POST["removemap"])) && (isset($_POST["map_url"]))) {
         $mapUrl = htmlspecialchars($_POST["map_url"]);
+        removeMapTags($mapUrl);
         $removedMap = removeMap($mapUrl);
         if ($removedMap) {
           ?>
@@ -97,12 +134,30 @@ session_start();
             <tr>
               <th scope="col">Map URL</th>
               <th scope="col">Map File URL</th>
+              <th scope="col">Access restriction</th>
               <th scope="col">Actions</th>
             </tr>
         <?php
         while($row = $maps->fetch(PDO::FETCH_ASSOC)) {
+            $restriction = $row["policy"];
+            if ($restriction == 1) {
+                $restriction = "Public";
+            } else if ($restriction == 2) {
+                $restriction = "Members";
+            } else if ($restriction == 3) {
+                $tags = getMapTags($row["map_url"]);
+                $tagsAsString = "";
+                foreach ($tags as $tag) {
+                    $tagsAsString = $tagsAsString."<div class=\"badge rounded-pill bg-primary tag\">".$tag."</div>";
+                }
+                $restriction = "Members with tags ".$tagsAsString;
+            } else {
+                $restriction = "Undefined value";
+            }
+
             echo "<tr><td><p class=\"fw-normal\">https://".getenv('DOMAIN').$row["map_url"]."</p></td>";
             echo "<td><p class=\"fw-normal\">https://".$row["map_file_url"]."</p></td>";
+            echo "<td><p class=\"fw-normal\">".$restriction."</p></td>";
             echo "<td><form action=\"rooms.php\" method=\"post\"><input class=\"tag btn btn-danger\" type=\"submit\" value=\"Remove\" name=\"removemap\"><input type=\"hidden\" name=\"map_url\" value=\"".$row["map_url"]."\"></form></td></tr>";
         }
         echo "</table></div>";
@@ -119,7 +174,22 @@ session_start();
               <span class="input-group-text" id="map_url_file_prefix">https://</span>
               <input type="text" class="form-control" id="map_url_file" aria-describedby="map_url_file_prefix" name="map_file_url">
             </div>
-            <input class="btn btn-primary" type="submit" value="Add map">
+            <p class="fs-6">Access restriction</p>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="radio" id="radioPublic" value="public"/>
+              <label class="form-check-label" for="radioPublic">Public</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="radio" id="radioMembers" value="members" checked/>
+              <label class="form-check-label" for="radioMembers">Members</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="radio" id="radioMembersTags" value="tags"/>
+              <label class="form-check-label" for="radioMembersTags">Members with tags</label>
+            </div>
+            <div id="tagsArea" class="input-group mb-3">
+            </div>
+            <input class="btn btn-primary" type="submit" style="margin-top: 1rem;" value="Add map">
           </form>
         <?php
     } else {
@@ -133,11 +203,61 @@ session_start();
             <span class="input-group-text" id="map_file_url">https://</span>
             <input type="text" class="form-control" id="map-file-url" aria-describedby="map_file_url" name="map_file_url">
           </div>
+          <p class="fs-6">Access restriction</p>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="radio" id="radioPublic" value="public"/>
+            <label class="form-check-label" for="radioPublic">Public</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="radio" id="radioMembers" value="members" checked/>
+            <label class="form-check-label" for="radioMembers">Members</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="radio" id="radioMembersTags" value="tags"/>
+            <label class="form-check-label" for="radioMembersTags">Members with tags</label>
+          </div>
+          <div id="tagsArea" class="input-group mb-3">
+          </div>
           <input type="hidden" name="map_url" value="<?php echo getenv('START_ROOM_URL'); ?>">
-          <input class="btn btn-primary" type="submit" value="Set URL">
+          <input class="btn btn-primary" type="submit" style="margin-top: 1rem;" value="Set URL">
         </form>
       <?php
     }
   ?>
+  <script>
+    var tagsElementsShown = false;
+
+    function addTagsElements() {
+        if (!tagsElementsShown) {
+            // create tags section
+            var container = document.getElementById('tagsArea');
+            var tagsArea = document.createElement('div');
+            tagsArea.id = 'tagsAreaDiv';
+            tagsArea.innerHTML = '<div class="mb-3" style="margin-top: 1rem;"><label for="tagsInput" class="form-label">Tags (comma separated): </label><input type="text" class="form-control" id="tagsInput" name="tags"></div>';
+            container.appendChild(tagsArea);
+        }
+        tagsElementsShown = true;
+    }
+
+    function removeTagsElements() {
+        if (tagsElementsShown) {
+            // remove tags section
+            var tagsArea = document.getElementById('tagsAreaDiv');
+            tagsArea.remove();
+        }
+        tagsElementsShown = false;
+    }
+
+    document.getElementById('radioPublic').onclick = function() {
+        removeTagsElements()
+    };
+
+    document.getElementById('radioMembers').onclick = function() {
+        removeTagsElements()
+    };
+    document.getElementById('radioMembersTags').onclick = function() {
+        addTagsElements()
+    };
+  </script>
 </body>
 </html>

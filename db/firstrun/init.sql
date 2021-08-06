@@ -30,14 +30,28 @@ CREATE TABLE banned_users (
   FOREIGN KEY (uuid) REFERENCES users(uuid)
 );
 
+CREATE TABLE maps (
+  map_url varchar(100) NOT NULL,
+  map_file_url varchar(100) NOT NULL,
+  policy integer NOT NULL,
+  PRIMARY KEY (map_url)
+);
+
+CREATE TABLE maps_tags (
+  map_url varchar(100) NOT NULL,
+  tag varchar(15) NOT NULL,
+  PRIMARY KEY (map_url, tag),
+  FOREIGN KEY (map_url) REFERENCES maps(map_url)
+);
+
 CREATE TABLE website (
   username varchar(16) NOT NULL,
   hashed_password varchar(160) NOT NULL,
   PRIMARY KEY (username)
 );
 
-CREATE TABLE maps (
-  map_url varchar(100) NOT NULL,
-  map_file_url varchar(100) NOT NULL,
-  PRIMARY KEY (map_url)
+CREATE TABLE preferences (
+  preference_key varchar(100) NOT NULL,
+  preference_value varchar(250) NOT NULL,
+  PRIMARY KEY (preference_key)
 );

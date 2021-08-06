@@ -269,11 +269,29 @@ function getMapFileUrl($map) {
     }
 }
 
-function storeMapFileUrl($mapUrl, $mapFileUrl) {
+function getMapPolicy($map) {
     GLOBAL $DB;
-    $Statement = $DB->prepare("INSERT INTO maps (map_url, map_file_url) VALUES (:map_url, :map_file_url);");
+    $Statement = $DB->prepare("SELECT * FROM maps WHERE map_url = :map_url;");
+    $Statement->bindParam(":map_url", $map, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        if ($Statement->rowCount() > 0) {
+            $row = $Statement->fetch(PDO::FETCH_ASSOC);
+            return (int) $row["policy"];
+        } else {
+            return NULL;
+        }
+    } catch (PDOException $exception) {
+        return NULL;
+    }
+}
+
+function storeMapFileUrl($mapUrl, $mapFileUrl, $policyNumber) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("INSERT INTO maps (map_url, map_file_url, policy) VALUES (:map_url, :map_file_url, :policy);");
     $Statement->bindParam(":map_url", $mapUrl, PDO::PARAM_STR);
     $Statement->bindParam(":map_file_url", $mapFileUrl, PDO::PARAM_STR);
+    $Statement->bindParam(":policy", $policyNumber, PDO::PARAM_INT);
     try {
         $Statement->execute();
         return true;
@@ -302,6 +320,81 @@ function removeMap($mapUrl) {
         return true;
     } catch (PDOException $exception) {
         return false;
+    }
+}
+
+function addMapTag($mapUrl, $mapTag) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("INSERT INTO maps_tags (map_url, tag) VALUES (:map_url, :tag);");
+    $Statement->bindParam(":map_url", $mapUrl, PDO::PARAM_STR);
+    $Statement->bindParam(":tag", $mapTag, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        return true;
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
+function getMapTags($mapUrl) {
+    GLOBAL $DB;
+    $result = array();
+    $Statement = $DB->prepare("SELECT tag from maps_tags WHERE map_url = :map_url;");
+    $Statement->bindParam(":map_url", $mapUrl, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        while ($row = $Statement->fetch(PDO::FETCH_ASSOC)) {
+            array_push($result, $row["tag"]);
+        }
+    } catch (PDOException $exception) {
+    }
+    return $result;
+}
+
+function removeMapTags($mapUrl) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("DELETE FROM maps_tags WHERE map_url = :map_url;");
+    $Statement->bindParam(":map_url", $mapUrl, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        return true;
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
+function allowedToCreateNewUser() {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT preference_key FROM preferences;");
+    try {
+        $Statement->execute();
+        if ($Statement->rowCount() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
+function setAllowedToCreateNewUser($allow) {
+    GLOBAL $DB;
+    if (allowedToCreateNewUser()) {
+        $Statement = $DB->prepare("DELETE FROM preferences WHERE preference_key = 'allowedToCreateNewUser';");
+        try {
+            $Statement->execute();
+        } catch (PDOException $exception) {
+        echo $exception;
+        }
+    }
+    if ($allow) {
+        $Statement = $DB->prepare("INSERT INTO preferences (preference_key, preference_value) VALUES ('allowedToCreateNewUser', 'true');");
+        try {
+            $Statement->execute();
+        } catch (PDOException $exception) {
+        echo $exception;
+        }
     }
 }
 ?>
