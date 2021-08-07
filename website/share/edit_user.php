@@ -44,6 +44,7 @@ session_start();
     }
 
     $uuid = htmlspecialchars($_POST["uuid"]);
+    createAccountIfNotExistent($uuid);
         
     // Get new tag
     if (isset($_POST["newtag"])) {

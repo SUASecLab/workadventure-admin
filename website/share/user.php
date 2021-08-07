@@ -24,6 +24,9 @@ session_start();
         echo "</div>";
         return;
     }
+    include_once(__DIR__.'/vendor/autoload.php');
+    use Ramsey\Uuid\Uuid;
+
     require_once 'api/database_operations.php';
     require_once 'login_functions.php';
     require 'meta/toolbar.php';
@@ -83,11 +86,13 @@ session_start();
       </form>
     </td>
 
-    <?php
-  }
-    $DB = NULL;
-    ?>
+    <?php }
+    $DB = NULL; ?>
     </div>
   </table>
+  <form action="edit_user.php" method="post">
+    <input type="submit" class="btn btn-primary" value="Create new user">
+    <input type="hidden" name="uuid" value="<?php echo trim(Uuid::uuid4()->toString()); ?>">
+  </form>
 </body>
 </html>
