@@ -17,8 +17,6 @@ if (!isAuthorized()) {
 }
 
 if (isset($_GET["roomUrl"])) {
-    $roomUrl = htmlspecialchars($_GET["roomUrl"]);
-
     $maps = getAllMaps();
     $result = array();
     while($row = $maps->fetch(PDO::FETCH_ASSOC)) {
