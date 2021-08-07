@@ -8,6 +8,7 @@ the mapUrlStart and the textures are being considered
 header("Content-Type:application/json");
 require 'authentication.php';
 require 'database_operations.php';
+require 'helper_functions.php';
 
 try {
     $DB = new PDO("mysql:dbname=".getenv('DB_MYSQL_DATABASE').";host=admin-db;port=3306",
@@ -37,7 +38,7 @@ if (isset($_GET["token"])) {
     $result['tags'] = getTags($uuid);
     $result['policy_type'] = getMapPolicy($map);
     $result['userUuid'] = $uuid;
-    $result['messages'] = array();
+    $result['messages'] = getGlobalMessagesForAdminAPI();
     $result['textures'] = array();
 
     echo json_encode($result);

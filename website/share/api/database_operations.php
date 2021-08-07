@@ -397,4 +397,55 @@ function setAllowedToCreateNewUser($allow) {
         }
     }
 }
+
+function globalMessagesExist() {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT * FROM global_messages;");
+    try {
+        $Statement->execute();
+        if ($Statement->rowCount() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
+function createNewGlobalMessage($message) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("INSERT INTO global_messages (message) VALUES (:message);");
+    $Statement->bindParam(":message", $message, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        return true;
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
+function getGlobalMessages() {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT * FROM global_messages;");
+    try {
+        $Statement->execute();
+        return $Statement;
+    } catch (PDOException $exception) {
+        return NULL;
+    }
+}
+
+function deleteGlobalMessage($id) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("DELETE FROM global_messages WHERE message_id = :id;");
+    $Statement->bindParam(":id", $id, PDO::PARAM_INT);
+    try {
+        $Statement->execute();
+        return true;
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
 ?>

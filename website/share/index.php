@@ -57,6 +57,15 @@ session_start();
       <div class="col-sm-6">
         <div class="card" style="width: 18 rem; height: 13rem; margin-top: 1rem;">
           <div class="card-body">
+            <h5 class="card-title">Global messages</h5>
+            <p class="card-text">Here you can send global messages</p>
+            <a href="messages.php" class="btn btn-primary">Go to global messages</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="card" style="width: 18 rem; height: 13rem; margin-top: 1rem;">
+          <div class="card-body">
             <h5 class="card-title">Settings</h5>
             <p class="card-text">Here, you can change some settings of the Admin API.</p>
             <a href="settings.php" class="btn btn-primary">Go to Settings</a>

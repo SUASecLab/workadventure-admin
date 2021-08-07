@@ -55,3 +55,9 @@ CREATE TABLE preferences (
   preference_value varchar(250) NOT NULL,
   PRIMARY KEY (preference_key)
 );
+
+CREATE TABLE global_messages (
+  message_id integer NOT NULL AUTO_INCREMENT,
+  message varchar(1000),
+  PRIMARY KEY (message_id)
+);

@@ -10,6 +10,7 @@ tags: 'admin' for sending world messages, furthermore a jitsi moderator tag can 
 header("Content-Type:application/json");
 require 'authentication.php';
 require 'database_operations.php';
+require 'helper_functions.php';
 
 try {
     $DB = new PDO("mysql:dbname=".getenv('DB_MYSQL_DATABASE').";host=admin-db;port=3306",
@@ -36,7 +37,7 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["roomId"])) && (isset($_GET
     $result['tags'] = getTags($userUuid);
     $result['visitCardUrl'] = NULL;
     $result['textures'] = array();
-    $result['messages'] = array();
+    $result['messages'] = getGlobalMessagesForAdminAPI();
     $result['anonymous'] = !userExists($userUuid);
 
     echo json_encode($result);
