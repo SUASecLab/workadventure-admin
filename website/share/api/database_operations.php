@@ -79,19 +79,6 @@ function hasTags($uuid) {
     }
 }
 
-function reportUser($reportedUserUuid, $reportedUserComment, $reporterUserUuid, $reportWorldSlug) {
-    GLOBAL $DB;
-    $Statement = $DB->prepare("INSERT INTO reports (reportedUserUuid, reportedUserComment, reporterUserUuid, reportWorldSlug) VALUES (:reportedUserUuid, :reportedUserComment, :reporterUserUuid, :reportWorldSlug)");
-    $Statement->bindParam(":reportedUserUuid", $reportedUserUuid, PDO::PARAM_STR);
-    $Statement->bindParam(":reportedUserComment", $reportedUserComment, PDO::PARAM_STR);
-    $Statement->bindParam(":reporterUserUuid", $reporterUserUuid, PDO::PARAM_STR);
-    $Statement->bindParam(":reportWorldSlug", $reportWorldSlug, PDO::PARAM_STR);
-    try {
-        $Statement->execute();
-    } catch (PDOException $exception) {
-    }
-}
-
 function isBanned($uuid) {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM banned_users WHERE uuid=:uuid;");

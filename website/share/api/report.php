@@ -16,22 +16,9 @@ try {
 catch (PDOException $exception) {
     return;
 }
-
 if (!isAuthorized()) {
     http_response_code(403);
     die();
 }
-
-if ((isset($_POST["reportedUserUuid"])) && (isset($_POST["reportedUserComment"])) && (isset($_POST["reporterUserUuid"])) && (isset($_POST["reportWorldSlug"]))) {
-    $reportedUserUuid = htmlspecialchars($_POST["reportedUserUuid"]);
-    $reportedUserComment = htmlspecialchars($_POST["reportedUserComment"]);
-    $reporterUserUuid = htmlspecialchars($_POST["reporterUserUuid"]);
-    $reportWorldSlug = htmlspecialchars($_POST["reportWorldSlug"]);
-    reportUser($reportedUserUuid, $reportedUserComment, $reporterUserUuid, $reportWorldSlug);
-} else {
-    http_response_code(400);
-    die();
-}
-
 $DB = NULL;
 ?>
