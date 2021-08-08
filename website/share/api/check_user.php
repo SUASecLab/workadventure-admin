@@ -31,7 +31,7 @@ if (isset($_GET["token"])) {
     }
 
     $result['roomUrl'] = $map;
-    $result['email'] = NULL;
+    $result['email'] = NULL; // no real use as of now
     $result['mapUrlStart'] = getMapFileUrl($map);
     $result['tags'] = getTags($uuid);
     $result['policy_type'] = getMapPolicy($map);
