@@ -61,3 +61,10 @@ CREATE TABLE global_messages (
   message varchar(1000),
   PRIMARY KEY (message_id)
 );
+
+CREATE TABLE user_messages (
+  message_id integer NOT NULL AUTO_INCREMENT,
+  user_uuid varchar(36) NOT NULL,
+  message varchar(1000),
+  PRIMARY KEY (message_id)
+);

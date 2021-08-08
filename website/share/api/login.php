@@ -38,7 +38,7 @@ if (isset($_GET["token"])) {
     $result['tags'] = getTags($uuid);
     $result['policy_type'] = getMapPolicy($map);
     $result['userUuid'] = $uuid;
-    $result['messages'] = getGlobalMessagesForAdminAPI();
+    $result['messages'] = getMessages($uuid);
     $result['textures'] = array();
 
     echo json_encode($result);

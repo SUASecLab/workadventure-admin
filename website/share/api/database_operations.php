@@ -448,4 +448,57 @@ function deleteGlobalMessage($id) {
     }
 }
 
+function userMessagesExist($uuid) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT * FROM user_messages WHERE user_uuid = :user_uuid;");
+    $Statement->bindParam(":user_uuid", $uuid, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        if ($Statement->rowCount() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
+function getUserMessages($uuid) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT * FROM user_messages WHERE user_uuid = :user_uuid;");
+    $Statement->bindParam(":user_uuid", $uuid, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        return $Statement;
+    } catch (PDOException $exception) {
+        return NULL;
+    }
+}
+
+function removeUserMessage($messageId) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("DELETE FROM user_messages WHERE message_id = :id;");
+    $Statement->bindParam(":id", $messageId, PDO::PARAM_INT);
+    try {
+        $Statement->execute();
+        return true;
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
+function storeUserMessage($userUuid, $message) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("INSERT INTO user_messages (user_uuid, message) VALUES (:user_uuid, :message);");
+    $Statement->bindParam(":user_uuid", $userUuid, PDO::PARAM_STR);
+    $Statement->bindParam(":message", $message, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        return true;
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
 ?>

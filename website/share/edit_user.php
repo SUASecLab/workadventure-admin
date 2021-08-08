@@ -164,6 +164,41 @@ session_start();
         }
     }
 
+    // remove message if requested
+    if ((isset($_POST["removemessage"])) && (isset($_POST["message_id"]))) {
+        $id = htmlspecialchars($_POST["message_id"]);
+        if (removeUserMessage($id)) { ?>
+          <div class="container alert alert-success" role="alert">
+            <p>Removed message</p>
+          </div>
+        <?php } else { ?>
+          <div class="container alert alert-danger" role="alert">
+            <p>Could not remove message</p>
+          </div>
+        <?php }
+    }
+
+    // send message if requested
+    if ((isset($_POST["sendMessage"])) && (isset($_POST["message"]))) {
+        $sendMessage = htmlspecialchars($_POST["sendMessage"]);
+        $message = htmlspecialchars($_POST["message"]);
+        if (($sendMessage == "true") && (strlen(trim($message)) > 0)) {
+            if (storeUserMessage($uuid, $message)) { ?>
+              <div class="container alert alert-success" role="alert">
+                <p>Stored user message</p>
+              </div>
+            <?php } else { ?>
+              <div class="container alert alert-danger" role="alert">
+                <p>Could not store message</p>
+              </div>
+        <?php }
+       } else { ?>
+          <div class="container alert alert-danger" role="alert">
+            <p>User message not valid</p>
+          </div>
+       <?php }
+    }
+
     // get current user data
     $userData = getUserData($uuid);
     if ($userData == NULL) {
@@ -211,9 +246,41 @@ session_start();
       <input class="btn btn-primary" type="submit" value="Add tag">
       <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
     </form>
-    <?php
-        if (isBanned($uuid)) {
-    ?>
+    <?php if (userMessagesExist($uuid)) {
+        $messages = getUserMessages($uuid);
+        if ($messages == NULL) { ?>
+          <div class="container alert alert-danger" role="alert">
+            <p>Could not fetch messages</p>
+          </div>
+        <?php } else { ?>
+        <div class="container alert alert-warning" role="alert">
+          <p>Only the top message will be shown to the user. If the user also receives a global message, the global message will be shown instead of the private one!</p>
+        </div>
+        <p class="fs-3">User messages:</p>
+        <table class="table">
+          <tr>
+            <th scope="col">Message</th>
+            <th scope="col">Actions</th>
+          </tr>
+        <?php
+          while($row = $messages->fetch(PDO::FETCH_ASSOC)) {
+              echo "<tr><td><p class=\"fw-normal\">".$row["message"]."</p></td>";
+              echo "<td><form action=\"edit_user.php\" method=\"post\"><input class=\"tag btn btn-danger\" type=\"submit\" value=\"Remove\" name=\"removemessage\"><input type=\"hidden\" name=\"message_id\" value=\"".$row["message_id"]."\"><input type=\"hidden\" name=\"uuid\" value=\"".$uuid."\"></form></td></tr>";
+         }
+         echo "</table>";
+      } } ?>
+      <br>
+      <p>Send new user message:</p>
+      <form action="edit_user.php" method="post">
+        <div class="mb-3">
+          <label for="messageInput" class="form-label">Message:</label>
+          <textarea class="form-control" id="messageInput" name="message" rows="3"></textarea>
+        </div>
+        <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
+        <input type="hidden" name="sendMessage" value="true">
+        <input type="submit" class="btn btn-primary" value="Send">
+      </form>
+    <?php if (isBanned($uuid)) { ?>
       <br>
       <p>This user has been banned!</p>
       <div class="mb-3">
@@ -225,9 +292,7 @@ session_start();
         <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
         <input type="hidden" name="ban" value="false">
       </form>
-    <?php
-        } else {
-    ?>
+    <?php } else { ?>
       <br>
       <p>Ban this user:</p>
       <form action="edit_user.php" method="post">
@@ -239,9 +304,7 @@ session_start();
         <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
         <input type="hidden" name="ban" value="true">
       </form>
-    <?php
-        }
-    ?>
+    <?php } ?>
   </div>
   <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
   <a class="btn btn-primary" href="user.php" role="button">Go back</a> 

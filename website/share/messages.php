@@ -77,7 +77,7 @@ session_start();
     echo "<p class=\"fs-3\">Global messages:</p>";
   ?>
     <div class="container alert alert-warning" role="alert">
-        <p>Only the top message will be shown to the user. If the user also receives a private message, the private message will be shown instead of the global one!</p>
+        <p>Only the top message will be shown to the user. If the user also receives a private message, the global message will be shown instead of the private one!</p>
     </div>
     <table class="table">
       <tr>

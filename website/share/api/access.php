@@ -37,7 +37,7 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["roomId"])) && (isset($_GET
     $result['tags'] = getTags($userUuid);
     $result['visitCardUrl'] = NULL;
     $result['textures'] = array();
-    $result['messages'] = getGlobalMessagesForAdminAPI();
+    $result['messages'] = getMessages($userUuid);
     $result['anonymous'] = !userExists($userUuid);
 
     echo json_encode($result);
