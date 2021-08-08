@@ -38,7 +38,7 @@ if (isset($_GET["token"])) {
     $result['tags'] = getTags($uuid);
     $result['policy_type'] = getMapPolicy($map);
     $result['userUuid'] = $uuid;
-    $result['messages'] = array(); // messages are being sent when caling the access function
+    $result['messages'] = array(); // messages are being sent when calling the access function
     $result['textures'] = array();
 
     echo json_encode($result);
