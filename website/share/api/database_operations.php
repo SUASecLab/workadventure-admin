@@ -18,8 +18,10 @@ function userExists($uuid) {
 
 function writeUuidToDatabase($uuid) {
     GLOBAL $DB;
-    $Statement = $DB->prepare("INSERT INTO users (uuid, name, email) VALUES (:uuid, 'anonymous', 'anonymous@example.com')");
+    $defaultEmail = getenv('ADMIN_API_DEFAULT_EMAIL');
+    $Statement = $DB->prepare("INSERT INTO users (uuid, name, email) VALUES (:uuid, 'anonymous', :email)");
     $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
+    $Statement->bindParam(":email", $defaultEmail, PDO::PARAM_STR);
     try {
         $Statement->execute();
         return true;
@@ -39,6 +41,24 @@ function updateUserData($uuid, $name, $email) {
         return true;
     } catch (PDOException $exception) {
         return false;
+    }
+}
+
+function getUserEmail($uuid) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT email FROM users WHERE uuid = :uuid");
+    $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        $row = $Statement->fetch(PDO::FETCH_ASSOC);
+        $email = $row["email"];
+        if ($email == getenv('ADMIN_API_DEFAULT_EMAIL')) {
+            return NULL;
+        } else {
+            return $email;
+        }
+    } catch (PDOException $exception) {
+        return NULL;
     }
 }
 

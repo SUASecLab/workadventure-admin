@@ -33,7 +33,7 @@ if (isset($_GET["token"])) {
     $map = getenv('START_ROOM_URL');
 
     $result['roomUrl'] = $map;
-    $result['email'] = NULL; // no real use as of now
+    $result['email'] = getUserEmail($uuid);
     $result['mapUrlStart'] = getMapFileUrl($map);
     $result['tags'] = getTags($uuid);
     $result['policy_type'] = getMapPolicy($map);
