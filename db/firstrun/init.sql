@@ -62,6 +62,14 @@ CREATE TABLE global_messages (
   PRIMARY KEY (message_id)
 );
 
+CREATE TABLE hidden_global_messages (
+  uuid varchar(36) NOT NULL,
+  message_id integer NOT NULL,
+  PRIMARY KEY (uuid, message_id),
+  FOREIGN KEY (uuid) REFERENCES users(uuid),
+  FOREIGN KEY (message_id) REFERENCES global_messages(message_id)
+);
+
 CREATE TABLE user_messages (
   message_id integer NOT NULL AUTO_INCREMENT,
   user_uuid varchar(36) NOT NULL,

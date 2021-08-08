@@ -438,13 +438,42 @@ function getGlobalMessages() {
 
 function deleteGlobalMessage($id) {
     GLOBAL $DB;
-    $Statement = $DB->prepare("DELETE FROM global_messages WHERE message_id = :id;");
-    $Statement->bindParam(":id", $id, PDO::PARAM_INT);
+    $Statement1 = $DB->prepare("DELETE FROM hidden_global_messages WHERE message_id = :id;");
+    $Statement1->bindParam(":id", $id, PDO::PARAM_INT);
+    $Statement2 = $DB->prepare("DELETE FROM global_messages WHERE message_id = :id;");
+    $Statement2->bindParam(":id", $id, PDO::PARAM_INT);
     try {
-        $Statement->execute();
+        $Statement1->execute();
+        $Statement2->execute();
         return true;
     } catch (PDOException $exception) {
         return false;
+    }
+}
+
+function getHiddenMessagesIds($uuid) {
+    GLOBAL $DB;
+    $result = array();
+    $Statement = $DB->prepare("SELECT * FROM hidden_global_messages WHERE uuid = :uuid;");
+    $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        while($row = $Statement->fetch(PDO::FETCH_ASSOC)) {
+            array_push($result, $row["message_id"]);
+        }
+    } catch (PDOException $exception) {
+    }
+    return $result;
+}
+
+function hideGlobalMessage($uuid, $messageId) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("INSERT INTO hidden_global_messages (uuid, message_id) VALUES (:uuid, :message_id);");
+    $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
+    $Statement->bindParam(":message_id", $messageId, PDO::PARAM_INT);
+    try {
+        $Statement->execute();
+    } catch (PDOException $exception) {
     }
 }
 
