@@ -637,4 +637,56 @@ function storeTexture($id, $level, $url, $rights, $notice) {
         return false;
     }
 }
+
+function reportUser($reportedUserUuid, $reportedUserComment, $reporterUserUuid, $reportWorldSlug) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("INSERT INTO reports (reportedUserUuid, reportedUserComment, reporterUserUuid, reportWorldSlug) VALUES (:reportedUserUuid, :reportedUserComment, :reporterUserUuid, :reportWorldSlug)");
+    $Statement->bindParam(":reportedUserUuid", $reportedUserUuid, PDO::PARAM_STR);
+    $Statement->bindParam(":reportedUserComment", $reportedUserComment, PDO::PARAM_STR);
+    $Statement->bindParam(":reporterUserUuid", $reporterUserUuid, PDO::PARAM_STR);
+    $Statement->bindParam(":reportWorldSlug", $reportWorldSlug, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+    } catch (PDOException $exception) {
+    }
+}
+
+function reportsStored() {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT * FROM reports;");
+    try {
+        $Statement->execute();
+        if ($Statement->rowCount() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
+function getReports() {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT * FROM reports;");
+    try {
+        $Statement->execute();
+        return $Statement;
+    } catch (PDOException $exception) {
+        return NULL;
+    }
+}
+
+function removeReport($reportId) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("DELETE FROM reports WHERE report_id = :id;");
+    $Statement->bindParam(":id", $reportId, PDO::PARAM_INT);
+    try {
+        $Statement->execute();
+        return true;
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
 ?>

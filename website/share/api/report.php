@@ -1,10 +1,4 @@
 <?php
-
-/*
-report player -> returns ?
-no result object -> not used by the client
-does not seem to work properly as of now
-*/
 header("Content-Type:application/json");
 require 'authentication.php';
 require 'database_operations.php';
@@ -16,9 +10,21 @@ try {
 catch (PDOException $exception) {
     return;
 }
+
 if (!isAuthorized()) {
     http_response_code(403);
     die();
 }
+
+$payload = file_get_contents("php://input");
+$decodedPayload = (array) json_decode($payload);
+
+$reportedUserUuid = htmlspecialchars($decodedPayload["reportedUserUuid"]);
+$reportedUserComment = htmlspecialchars($decodedPayload["reportedUserComment"]);
+$reporterUserUuid = htmlspecialchars($decodedPayload["reporterUserUuid"]);
+$reportWorldSlug = htmlspecialchars($decodedPayload["reportWorldSlug"]);
+
+reportUser($reportedUserUuid, $reportedUserComment, $reporterUserUuid, $reportWorldSlug);
+
 $DB = NULL;
 ?>
