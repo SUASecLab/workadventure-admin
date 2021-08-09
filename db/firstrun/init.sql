@@ -1,7 +1,7 @@
 CREATE TABLE users (
   uuid varchar(36) NOT NULL,
   name varchar(30) NOT NULL,
-  email varchar(30) NOT NULL,
+  email varchar(60) NOT NULL UNIQUE,
   visitCardUrl varchar(100),
   PRIMARY KEY (uuid)
 );

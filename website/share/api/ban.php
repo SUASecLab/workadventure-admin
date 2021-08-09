@@ -7,6 +7,7 @@ is_banned is used, message not but most likely equal to ban message
 header("Content-Type:application/json");
 require 'authentication.php';
 require 'database_operations.php';
+require 'helper_functions.php';
 
 try {
     $DB = new PDO("mysql:dbname=".getenv('DB_MYSQL_DATABASE').";host=admin-db;port=3306",
@@ -23,6 +24,7 @@ if (!isAuthorized()) {
 
 if ((isset($_GET["ipAddress"])) && (isset($_GET["token"])) && (isset($_GET["roomUrl"]))) {
     $uuid = htmlspecialchars($_GET["token"]);
+    $uuid = getUuid($uuid);
 
     // find out whether user is banned
     $isBanned = isBanned($uuid);

@@ -38,4 +38,16 @@ function getMessages($uuid) {
     }
     return $result;
 }
+
+function getUuid($userIdentifier) {
+    if (str_contains($userIdentifier, "@")) {
+        // email as unique identifier -> get uuid
+        $uuid = getUuidFromEmail($userIdentifier);
+    } else {
+        // uuid is already our identifier
+        $uuid = $userIdentifier;
+    }
+    return $uuid;
+}
+
 ?>

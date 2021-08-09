@@ -25,6 +25,7 @@ if (!isAuthorized()) {
 
 if (isset($_GET["token"])) {
     $uuid = htmlspecialchars($_GET["token"]);
+    $uuid = getUuid($uuid);
 
     if (allowedToCreateNewUser()) {
         createAccountIfNotExistent($uuid);

@@ -24,6 +24,7 @@ if (!isAuthorized()) {
 
 if (isset($_GET["token"])) {
     $uuid = htmlspecialchars($_GET["token"]);
+    $uuid = getUuid($uuid);
     $map = getenv('START_ROOM_URL');
 
     if (allowedToCreateNewUser()) {

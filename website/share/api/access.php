@@ -26,19 +26,19 @@ if (!isAuthorized()) {
 }
 
 if ((isset($_GET["userIdentifier"])) && (isset($_GET["roomId"])) && (isset($_GET["ipAddress"]))) {
-    $userUuid = htmlspecialchars($_GET["userIdentifier"]);
-    $roomId = htmlspecialchars($_GET["roomId"]);
+    $userIdentifier = htmlspecialchars($_GET["userIdentifier"]);
+    $uuid = getUuid($userIdentifier);
 
     if (allowedToCreateNewUser()) {
-        createAccountIfNotExistent($userUuid);
+        createAccountIfNotExistent($uuid);
     }
 
-    $result['userUuid'] = $userUuid;
-    $result['tags'] = getTags($userUuid);
-    $result['visitCardUrl'] = getUserVisitCardUrl($userUuid, true);
+    $result['userUuid'] = $uuid;
+    $result['tags'] = getTags($uuid);
+    $result['visitCardUrl'] = getUserVisitCardUrl($uuid, true);
     $result['textures'] = array();
-    $result['messages'] = getMessages($userUuid);
-    $result['anonymous'] = !userExists($userUuid);
+    $result['messages'] = getMessages($uuid);
+    $result['anonymous'] = !userExists($uuid);
 
     echo json_encode($result);
 } else {

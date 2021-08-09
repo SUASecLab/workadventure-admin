@@ -66,6 +66,23 @@ function getUserEmail($uuid) {
     }
 }
 
+function getUuidFromEmail($email) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT uuid FROM users WHERE email = :email");
+    $Statement->bindParam(":email", $email, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        $row = $Statement->fetch(PDO::FETCH_ASSOC);
+        if ($Statement->rowCount() > 0) {
+            return $uuid = $row["uuid"];
+        } else {
+            return NULL;
+        }
+    } catch (PDOException $exception) {
+        return NULL;
+    }
+}
+
 function getUserVisitCardUrl($uuid, $withPrefix = false) {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT visitCardUrl FROM users WHERE uuid = :uuid");
