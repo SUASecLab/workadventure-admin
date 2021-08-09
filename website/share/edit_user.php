@@ -208,7 +208,7 @@ session_start();
     if ($userData == NULL) {
     ?>
         <div class="container alert alert-danger" role="alert">
-          <p>Could not connect fetch user details</p>
+          <p>Could not fetch user details</p>
         </div>
         <?php
         die();

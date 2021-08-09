@@ -42,12 +42,11 @@ function getMessages($uuid) {
 function getUuid($userIdentifier) {
     if (str_contains($userIdentifier, "@")) {
         // email as unique identifier -> get uuid
-        $uuid = getUuidFromEmail($userIdentifier);
+        return getUuidFromEmail($userIdentifier);
     } else {
         // uuid is already our identifier
-        $uuid = $userIdentifier;
+        return $userIdentifier;
     }
-    return $uuid;
 }
 
 function getTextures() {

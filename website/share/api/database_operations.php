@@ -18,10 +18,10 @@ function userExists($uuid) {
 
 function writeUuidToDatabase($uuid) {
     GLOBAL $DB;
-    $defaultEmail = getenv('ADMIN_API_DEFAULT_EMAIL');
+    $email = $uuid."@".getenv('DOMAIN');
     $Statement = $DB->prepare("INSERT INTO users (uuid, name, email) VALUES (:uuid, 'anonymous', :email)");
     $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
-    $Statement->bindParam(":email", $defaultEmail, PDO::PARAM_STR);
+    $Statement->bindParam(":email", $email, PDO::PARAM_STR);
     try {
         $Statement->execute();
         return true;
@@ -56,7 +56,7 @@ function getUserEmail($uuid) {
         $Statement->execute();
         $row = $Statement->fetch(PDO::FETCH_ASSOC);
         $email = $row["email"];
-        if ($email == getenv('ADMIN_API_DEFAULT_EMAIL')) {
+        if (str_ends_with($email, getenv('DOMAIN'))) {
             return NULL;
         } else {
             return $email;
