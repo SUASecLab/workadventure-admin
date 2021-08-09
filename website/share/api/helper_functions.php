@@ -24,7 +24,7 @@ function getMessages($uuid) {
         if (!(in_array($row["message_id"], $hiddenMessagesIds))) {
             $messageArray = array(
                 "type" => "message",
-                "message" => json_encode(array("ops" => array(array("insert" => $row["message"]))))
+                "message" => htmlspecialchars_decode($row["message"])
             );
             array_push($result, $messageArray);
             array_push($globalMessagesIds, $row["message_id"]);

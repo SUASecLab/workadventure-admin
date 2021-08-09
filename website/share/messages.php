@@ -8,8 +8,30 @@ session_start();
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/style.css" rel="stylesheet">
+  <link href="css/quill.snow.css" rel="stylesheet">
+  <script src="js/quill.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <title>Workadventure Administration</title>
+  <script>
+  // quill toolbar settings should match the settings of Workadventure
+  // see front/src/Components/ConsoleGlobalMessageManager/InputTextGlobalMessage.svelte
+  const quillToolbarSettings = [
+        ['bold', 'italic', 'underline', 'strike'],
+        ['blockquote', 'code-block'],
+        [{'header': 1}, {'header': 2}],
+        [{'list': 'ordered'}, {'list': 'bullet'}],
+        [{'script': 'sub'}, {'script': 'super'}],
+        [{'indent': '-1'}, {'indent': '+1'}],
+        [{'direction': 'rtl'}],
+        [{'size': ['small', false, 'large', 'huge']}],
+        [{'header': [1, 2, 3, 4, 5, 6, false]}],
+        [{'color': []}, {'background': []}],
+        [{'font': []}],
+        [{'align': []}],
+        ['clean'],
+        ['link', 'image', 'video']
+    ];
+  </script>
 </head>
 <body>
   <?php
@@ -85,9 +107,23 @@ session_start();
         <th scope="col">Actions</th>
       </tr>
     <?php
-    while($row = $messages->fetch(PDO::FETCH_ASSOC)) {
-      echo "<tr><td><p class=\"fw-normal\">".$row["message"]."</p></td>";
+    $counter = 0;
+    while($row = $messages->fetch(PDO::FETCH_ASSOC)) { ?>
+      <tr><td>
+      <?php
+      echo "<div id=\"editor-container-".$counter."\" style=\"height: 150px;\"></div>"; ?>
+      <script>
+      var quill = new Quill('#editor-container-<?php echo $counter; ?>', {
+        modules: {
+            toolbar: false
+        },
+        theme: 'snow' });
+      quill.setContents(<?php echo htmlspecialchars_decode($row["message"]); ?>.ops);
+      quill.disable();
+      </script>
+      <?php
       echo "<td><form action=\"messages.php\" method=\"post\"><input class=\"tag btn btn-danger\" type=\"submit\" value=\"Remove\" name=\"removemessage\"><input type=\"hidden\" name=\"message_id\" value=\"".$row["message_id"]."\"></form></td></tr>";
+      $counter++;
     }
     echo "</table>";
     }
@@ -95,8 +131,22 @@ session_start();
   <p class="fs-3">Create new global message:</p>
   <form action="messages.php" method="post">
     <div class="mb-3">
-      <label for="messageInput" class="form-label">Message:</label>
-      <textarea class="form-control" id="messageInput" name="message" rows="3"></textarea>
+      <input type="hidden" name="message" id="message">
+      <div id="editor-container" style="height: 150px;"></div>
+      <script>
+      var quill = new Quill('#editor-container', {
+        modules: {
+            toolbar: quillToolbarSettings
+        },
+        placeholder: 'Enter global message here...',
+        theme: 'snow'
+      });
+
+      quill.on('text-change', function(delta, oldDelta, source) {
+        const text = JSON.stringify(quill.getContents(0, quill.getLength()));
+        document.getElementById('message').value = text;
+      });
+      </script>
     </div>
     <input type="submit" class="btn btn-primary" value="Create">
   </form>
