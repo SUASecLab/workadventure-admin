@@ -57,6 +57,15 @@ session_start();
       <div class="col-sm-6">
         <div class="card" style="width: 18 rem; height: 13rem; margin-top: 1rem;">
           <div class="card-body">
+            <h5 class="card-title">Textures</h5>
+            <p class="card-text">If you would like to add additional textures to your WorkAdventure instance, you can do this here</p>
+            <a href="textures.php" class="btn btn-primary">Go to textures settings</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="card" style="width: 18 rem; height: 13rem; margin-top: 1rem;">
+          <div class="card-body">
             <h5 class="card-title">Global messages</h5>
             <p class="card-text">Here you can send global messages</p>
             <a href="messages.php" class="btn btn-primary">Go to global messages</a>

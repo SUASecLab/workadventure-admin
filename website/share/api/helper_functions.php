@@ -50,4 +50,19 @@ function getUuid($userIdentifier) {
     return $uuid;
 }
 
+function getTextures() {
+    $result = array();
+    $textures = getCustomTextures();
+    while($row = $textures->fetch(PDO::FETCH_ASSOC)) {
+        $thisTexture = array(
+            "id" => (int) $row["texture_id"],
+            "level" => (int) $row["texture_level"],
+            "url" => "https://".$row["url"],
+            "rights" => $row["rights"]
+        );
+        array_push($result, $thisTexture);
+    }
+    return $result;
+}
+
 ?>

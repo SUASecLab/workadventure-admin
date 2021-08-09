@@ -77,3 +77,13 @@ CREATE TABLE user_messages (
   message varchar(1000),
   PRIMARY KEY (message_id)
 );
+
+CREATE TABLE textures (
+  texture_table_id integer NOT NULL AUTO_INCREMENT,
+  texture_id integer NOT NULL,
+  texture_level integer NOT NULL,
+  url varchar(100),
+  rights varchar(100),
+  notice varchar(250),
+  PRIMARY KEY (texture_table_id)
+);

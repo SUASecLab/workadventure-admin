@@ -584,4 +584,57 @@ function storeUserMessage($userUuid, $message) {
     }
 }
 
+function customTexturesStored() {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT * FROM textures;");
+    try {
+        $Statement->execute();
+        if ($Statement->rowCount() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
+function getCustomTextures() {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT * FROM textures;");
+    try {
+        $Statement->execute();
+        return $Statement;
+    } catch (PDOException $exception) {
+        return NULL;
+    }
+}
+
+function removeTexture($textureTableId) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("DELETE FROM textures WHERE texture_table_id = :id;");
+    $Statement->bindParam(":id", $textureTableId, PDO::PARAM_INT);
+    try {
+        $Statement->execute();
+        return true;
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
+function storeTexture($id, $level, $url, $rights, $notice) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("INSERT INTO textures (texture_id, texture_level, url, rights, notice) VALUES (:texture_id, :texture_level, :url, :rights, :notice);");
+    $Statement->bindParam(":texture_id", $id, PDO::PARAM_INT);
+    $Statement->bindParam(":texture_level", $level, PDO::PARAM_INT);
+    $Statement->bindParam(":url", $url, PDO::PARAM_STR);
+    $Statement->bindParam(":rights", $rights, PDO::PARAM_STR);
+    $Statement->bindParam(":notice", $notice, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        return true;
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
 ?>
