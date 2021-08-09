@@ -35,7 +35,7 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["roomId"])) && (isset($_GET
 
     $result['userUuid'] = $userUuid;
     $result['tags'] = getTags($userUuid);
-    $result['visitCardUrl'] = NULL;
+    $result['visitCardUrl'] = getUserVisitCardUrl($userUuid, true);
     $result['textures'] = array();
     $result['messages'] = getMessages($userUuid);
     $result['anonymous'] = !userExists($userUuid);

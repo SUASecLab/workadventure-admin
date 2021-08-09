@@ -141,7 +141,11 @@ session_start();
                 </div>
             <?php
             } else {
-                if (updateUserData($uuid, $name, $email)) {
+                $visitCardUrl = NULL;
+                if (isset($_POST["visitCardUrl"])) {
+                    $visitCardUrl = htmlspecialchars($_POST["visitCardUrl"]);
+                }
+                if (updateUserData($uuid, $name, $email, $visitCardUrl)) {
                 ?>
                     <div class="container alert alert-success" role="alert">
                       User data has been updated.
@@ -219,6 +223,11 @@ session_start();
     <div class="mb-3">
       <label for="email" class="form-label">Email Address</label>
       <input type="email" class="form-control" id="email" name="email" value="<?php echo $userData["email"]; ?>">
+    </div>
+    <label for="visitCardUrlLabel" class="form-label">Visit card URL</label>
+    <div class="input-group mb-3">
+      <span class="input-group-text" id="visitCardUrlPrefix">https://</span>
+      <input type="text" class="form-control" id="visitCardUrlLabel" aria-describedby="visitCardUrlPrefix" name="visitCardUrl" value="<?php echo getUserVisitCardUrl($uuid) == NULL ? "" : getUserVisitCardUrl($uuid); ?>">
     </div>
     <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
     <input class="btn btn-primary" type="submit" value="Update" name="update-data">

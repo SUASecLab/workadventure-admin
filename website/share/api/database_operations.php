@@ -30,12 +30,16 @@ function writeUuidToDatabase($uuid) {
     }
 }
 
-function updateUserData($uuid, $name, $email) {
+function updateUserData($uuid, $name, $email, $visitCardUrl) {
     GLOBAL $DB;
-    $Statement = $DB->prepare("UPDATE users SET name = :name, email = :email WHERE uuid = :uuid;");
+    if ((strlen($visitCardUrl) == 0) || ($visitCardUrl == NULL)) {
+        $visitCardUrl == "";
+    }
+    $Statement = $DB->prepare("UPDATE users SET name = :name, email = :email, visitCardUrl = :visitCardUrl WHERE uuid = :uuid;");
     $Statement->bindParam(":name", $name, PDO::PARAM_STR);
     $Statement->bindParam(":email", $email, PDO::PARAM_STR);
     $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
+    $Statement->bindParam(":visitCardUrl", $visitCardUrl, PDO::PARAM_STR);
     try {
         $Statement->execute();
         return true;
@@ -56,6 +60,32 @@ function getUserEmail($uuid) {
             return NULL;
         } else {
             return $email;
+        }
+    } catch (PDOException $exception) {
+        return NULL;
+    }
+}
+
+function getUserVisitCardUrl($uuid, $withPrefix = false) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT visitCardUrl FROM users WHERE uuid = :uuid");
+    $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        if ($Statement->rowCount() > 0) {
+            $row = $Statement->fetch(PDO::FETCH_ASSOC);
+            $visitCard = $row["visitCardUrl"];
+            if (($visitCard == NULL) || (strlen($visitCard) == 0)) {
+                return NULL;
+            } else {
+                if ($withPrefix) {
+                    return "https://".$visitCard;
+                } else {
+                    return $visitCard;
+                }
+            }
+        } else {
+            return NULL;
         }
     } catch (PDOException $exception) {
         return NULL;
