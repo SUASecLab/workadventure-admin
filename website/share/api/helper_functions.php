@@ -33,7 +33,7 @@ function getMessages($uuid) {
 
     if (sizeof($globalMessagesIds) > 0) {
         hideGlobalMessage($uuid, $globalMessagesIds[0]);
-    } else {
+    } else if (sizeof($privateMessagesIds) > 0) {
         removeUserMessage($privateMessagesIds[0]);
     }
     return $result;
