@@ -5,7 +5,7 @@ upstream php-handler {
 server {
     listen       80;
     listen  [::]:80;
-    server_name  lab.itsec.hs-sm.de;
+    server_name  ${DOMAIN};
 
     index  index.php;
     root /var/www/html;
