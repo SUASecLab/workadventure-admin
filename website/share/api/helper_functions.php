@@ -49,17 +49,26 @@ function getUuid($userIdentifier) {
     }
 }
 
-function getTextures() {
+function getTextures($uuid = NULL) {
     $result = array();
+    $userTags = array();
     $textures = getCustomTextures();
+    if (($uuid != NULL) && (userExists($uuid))) {
+        $userTags = getTags($uuid);
+    }
+
     while($row = $textures->fetch(PDO::FETCH_ASSOC)) {
-        $thisTexture = array(
-            "id" => (int) $row["texture_id"],
-            "level" => (int) $row["texture_level"],
-            "url" => "https://".$row["url"],
-            "rights" => $row["rights"]
-        );
-        array_push($result, $thisTexture);
+        $textureId = $row["texture_table_id"];
+        $textureTags = getTextureTags($textureId);
+        if ((empty($textureTags)) || (!empty(array_intersect($textureTags, $userTags)))) {
+            $thisTexture = array(
+                "id" => (int) $row["texture_id"],
+                "level" => (int) $row["texture_level"],
+                "url" => "https://".$row["url"],
+                "rights" => $row["rights"]
+            );
+            array_push($result, $thisTexture);
+        }
     }
     return $result;
 }

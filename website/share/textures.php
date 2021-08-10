@@ -57,15 +57,40 @@ session_start();
             $textureUrl = htmlspecialchars($_POST["textureUrl"]);
             $textureRights = htmlspecialchars($_POST["textureRights"]);
             $textureNotice = htmlspecialchars($_POST["textureNotice"]);
-            if (storeTexture($textureId, $textureLevel, $textureUrl, $textureRights, $textureNotice)) { ?>
-              <div class="container alert alert-success" role="alert">
-                <p>Stored texture</p>
-              </div> 
-            <?php } else { ?>
+            $error = false;
+            if (storeTexture($textureId, $textureLevel, $textureUrl, $textureRights, $textureNotice)) {
+                if ((isset($_POST["textureTags"])) && (!strlen(htmlspecialchars($_POST["textureTags"])) == 0)) {
+                    $tagsList = htmlspecialchars($_POST["textureTags"]);
+                    $tagsArray = explode(",", $tagsList);
+                    $lastTexture = getLastTextureId();
+                    if ($lastTexture != -1) {
+                        if (sizeof($tagsArray) > 0) {
+                            foreach ($tagsArray as $tag) {
+                                if (!storeTextureTag($lastTexture, trim($tag))) {
+                                    $error = true;
+                                }
+                            }
+                        } else {
+                            $error = true;
+                        }
+                    } else {
+                        $error = true;
+                    }
+                }
+            } else {
+                $error = true;
+            }
+            if ($error) { ?>
               <div class="container alert alert-danger" role="alert">
                 <p>Could not store texture</p>
               </div> 
-            <?php }
+            <?php } else {
+                ?>
+                <div class="container alert alert-success" role="alert">
+                    <p>Stored texture</p>
+                </div>
+                <?php
+            }
         } else { ?>
             <div class="container alert alert-danger" role="alert">
               <p>No URL specified</p>
@@ -89,15 +114,26 @@ session_start();
               <th scope="col">Url</th>
               <th scope="col">Rights</th>
               <th scope="col">Notice</th>
+              <th scope="col">Restriction</th>
               <th scope="col">Action</th>
              </tr>
         <?php
             while($row = $textures->fetch(PDO::FETCH_ASSOC)) {
+                $tags = getTextureTags($row["texture_table_id"]);
                 echo "<tr><td><p class=\"fw-normal\">".$row["texture_id"]."</p></td>";
                 echo "<td><p class=\"fw-normal\">".$row["texture_level"]."</p></td>";
                 echo "<td><p class=\"fw-normal\">https://".$row["url"]."</p></td>";
                 echo "<td><p class=\"fw-normal\">".$row["rights"]."</p></td>";
                 echo "<td><p class=\"fw-normal\">".$row["notice"]."</p></td>";
+                if (empty($tags)) {
+                    echo "<td><p class=\"fw-normal\">Public</p></td>";
+                } else {
+                    $tagsAsString = "";
+                    foreach ($tags as $tag) {
+                        $tagsAsString = $tagsAsString."<div class=\"badge rounded-pill bg-primary tag\">".$tag."</div>";
+                    }
+                    echo "<td>".$tagsAsString."</td>";
+                }
                 echo "<td><form action=\"textures.php\" method=\"post\"><input class=\"tag btn btn-danger\" type=\"submit\" value=\"Remove\" name=\"removetexture\"><input type=\"hidden\" name=\"texture_table_id\" value=\"".$row["texture_table_id"]."\"></form></td></tr>";
             }
             echo "</table></div>";
@@ -127,6 +163,10 @@ session_start();
       <div class="mb-3">
         <label for="notice" class="form-label">Notice</label>
         <input type="text" class="form-control" id="notice" name="textureNotice">
+      </div>
+      <div class="mb-3">
+        <label for="tagsInput" class="form-label">Tags (comma separated):</label>
+        <input type="text" class="form-control" id="tagsInput" name="textureTags">
       </div>
       <input class="btn btn-primary" type="submit" value="Add texture" name="addtexture">
     </div>

@@ -87,3 +87,10 @@ CREATE TABLE textures (
   notice varchar(250),
   PRIMARY KEY (texture_table_id)
 );
+
+CREATE TABLE textures_restrictions (
+    texture_table_id integer NOT NULL,
+    tag varchar(15) NOT NULL,
+    PRIMARY KEY(texture_table_id, tag),
+    FOREIGN KEY(texture_table_id) REFERENCES textures(texture_table_id)
+);

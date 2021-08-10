@@ -612,10 +612,13 @@ function getCustomTextures() {
 
 function removeTexture($textureTableId) {
     GLOBAL $DB;
-    $Statement = $DB->prepare("DELETE FROM textures WHERE texture_table_id = :id;");
-    $Statement->bindParam(":id", $textureTableId, PDO::PARAM_INT);
+    $Statement1 = $DB->prepare("DELETE FROM textures_restrictions  WHERE texture_table_id = :id;");
+    $Statement2 = $DB->prepare("DELETE FROM textures WHERE texture_table_id = :id;");
+    $Statement1->bindParam(":id", $textureTableId, PDO::PARAM_INT);
+    $Statement2->bindParam(":id", $textureTableId, PDO::PARAM_INT);
     try {
-        $Statement->execute();
+        $Statement1->execute();
+        $Statement2->execute();
         return true;
     } catch (PDOException $exception) {
         return false;
@@ -635,6 +638,51 @@ function storeTexture($id, $level, $url, $rights, $notice) {
         return true;
     } catch (PDOException $exception) {
         return false;
+    }
+}
+
+function storeTextureTag($textureId, $textureTag) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("INSERT INTO textures_restrictions (texture_table_id, tag) VALUES (:texture_table_id, :tag);");
+    $Statement->bindParam(":texture_table_id", $textureId, PDO::PARAM_INT);
+    $Statement->bindParam(":tag", $textureTag, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        return true;
+    } catch (PDOException $exception) {
+        return false;
+    }
+}
+
+function getTextureTags($textureId) {
+    GLOBAL $DB;
+    $result = array();
+    $Statement = $DB->prepare("SELECT tag FROM textures_restrictions WHERE texture_table_id = :texture_table_id;");
+    $Statement->bindParam(":texture_table_id", $textureId, PDO::PARAM_INT);
+    try {
+        $Statement->execute();
+        while($row = $Statement->fetch(PDO::FETCH_ASSOC)) {
+            array_push($result, $row["tag"]);
+        }
+        return $result;
+    } catch (PDOException $exception) {
+        return $result;
+    }
+}
+
+function getLastTextureId() {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT texture_table_id FROM textures ORDER BY texture_table_id DESC LIMIT 1;");
+    try {
+        $Statement->execute();
+        if ($Statement->rowCount() > 0) {
+            $row = $Statement->fetch(PDO::FETCH_ASSOC);
+            return $row["texture_table_id"];
+        } else {
+            return -1;
+        }
+    } catch (PDOException $exception) {
+        return -1;
     }
 }
 
