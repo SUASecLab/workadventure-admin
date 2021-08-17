@@ -16,12 +16,17 @@ function userExists($uuid) {
     }
 }
 
-function writeUuidToDatabase($uuid) {
+function writeUuidToDatabase($uuid, $byMiddleware = false) {
     GLOBAL $DB;
     $email = $uuid."@".getenv('DOMAIN');
-    $Statement = $DB->prepare("INSERT INTO users (uuid, name, email) VALUES (:uuid, 'anonymous', :email)");
+    $createdByMiddleware = 0;
+    if ($byMiddleware) {
+        $createdByMiddleware = 1;
+    }
+    $Statement = $DB->prepare("INSERT INTO users (uuid, name, email, createdByMiddleware) VALUES (:uuid, 'anonymous', :email, :byMiddleware)");
     $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
     $Statement->bindParam(":email", $email, PDO::PARAM_STR);
+    $Statement->bindParam(":byMiddleware", $createdByMiddleware, PDO::PARAM_INT);
     try {
         $Statement->execute();
         return true;
@@ -109,9 +114,9 @@ function getUserVisitCardUrl($uuid, $withPrefix = false) {
     }
 }
 
-function createAccountIfNotExistent($uuid) {
+function createAccountIfNotExistent($uuid, $byMiddleware = false) {
     if (!userExists($uuid)) {
-        return writeUuidToDatabase($uuid);
+        return writeUuidToDatabase($uuid, $byMiddleware);
     }
 }
 
