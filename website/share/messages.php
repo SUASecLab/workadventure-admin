@@ -129,23 +129,26 @@ session_start();
     }
   ?>
   <p class="fs-3">Create new global message:</p>
-  <form action="messages.php" method="post">
+  <form action="messages.php" method="post" id="create-new-message">
     <div class="mb-3">
       <input type="hidden" name="message" id="message">
       <div id="editor-container" style="height: 150px;"></div>
       <script>
-      var quill = new Quill('#editor-container', {
-        modules: {
-            toolbar: quillToolbarSettings
-        },
-        placeholder: 'Enter global message here...',
-        theme: 'snow'
-      });
+        var quill = new Quill('#editor-container', {
+            modules: {
+                toolbar: quillToolbarSettings
+            },
+            placeholder: 'Enter global message here...',
+            theme: 'snow'
+        });
 
-      quill.on('text-change', function(delta, oldDelta, source) {
-        const text = JSON.stringify(quill.getContents(0, quill.getLength()));
-        document.getElementById('message').value = text;
-      });
+        var form = document.getElementById("create-new-message");
+        form.addEventListener("submit", quillSubmit);
+
+        function quillSubmit() {
+            const text = JSON.stringify(quill.getContents(0, quill.getLength()));
+            document.getElementById('message').value = text;
+        }
       </script>
     </div>
     <input type="submit" class="btn btn-primary" value="Create">
