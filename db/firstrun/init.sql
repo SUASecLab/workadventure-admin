@@ -19,7 +19,7 @@ CREATE TABLE reports (
   reportedUserUuid varchar(36) NOT NULL,
   reportedUserComment varchar(1000) NOT NULL,
   reporterUserUuid varchar(36) NOT NULL,
-  reportWorldSlug varchar(30) NOT NULL,
+  reportWorldSlug varchar(100) NOT NULL,
   PRIMARY KEY (report_id),
   FOREIGN KEY (reportedUserUuid) REFERENCES users(uuid),
   FOREIGN KEY (reporterUserUuid) REFERENCES users(uuid)
