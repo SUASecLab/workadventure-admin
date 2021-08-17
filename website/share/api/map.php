@@ -13,6 +13,7 @@ try {
         getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));
 }
 catch (PDOException $exception) {
+    error_log($exception);
     return;
 }
 

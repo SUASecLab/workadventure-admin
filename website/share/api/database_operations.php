@@ -12,6 +12,7 @@ function userExists($uuid) {
             return false;
         }
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -31,6 +32,7 @@ function writeUuidToDatabase($uuid, $byMiddleware = false) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -49,6 +51,7 @@ function updateUserData($uuid, $name, $email, $visitCardUrl) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -67,6 +70,7 @@ function getUserEmail($uuid) {
             return $email;
         }
     } catch (PDOException $exception) {
+        error_log($exception);
         return NULL;
     }
 }
@@ -84,6 +88,7 @@ function getUuidFromEmail($email) {
             return NULL;
         }
     } catch (PDOException $exception) {
+        error_log($exception);
         return NULL;
     }
 }
@@ -110,6 +115,7 @@ function getUserVisitCardUrl($uuid, $withPrefix = false) {
             return NULL;
         }
     } catch (PDOException $exception) {
+        error_log($exception);
         return NULL;
     }
 }
@@ -131,6 +137,7 @@ function getTags($uuid) {
             array_push($result, $row["tag"]);
         }
     } catch (PDOException $exception) {
+        error_log($exception);
     }
     return $result;
 }
@@ -147,6 +154,7 @@ function hasTags($uuid) {
             return false;
         }
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -163,6 +171,7 @@ function isBanned($uuid) {
             return false;
         }
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -176,6 +185,7 @@ function getBanMessage($uuid) {
         $row = $Statement->fetch(PDO::FETCH_ASSOC);
         return $row["ban_message"];
     } catch (PDOException $exception) {
+        error_log($exception);
         return "";
     }
 }
@@ -189,6 +199,7 @@ function banUser($uuid, $banMessage) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -201,6 +212,7 @@ function liftBan($uuid) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -213,6 +225,7 @@ function getNumberOfUsers() {
         $row = $Statement->fetch(PDO::FETCH_ASSOC);
         return $row["number"];
     } catch (PDOException $exception) {
+        error_log($exception);
         return NULL;
     }
 }
@@ -224,6 +237,7 @@ function getAllUsers() {
         $Statement->execute();
         return $Statement;
     } catch (PDOException $exception) {
+        error_log($exception);
         return NULL;
     }
 }
@@ -236,6 +250,7 @@ function getUserData($uuid) {
         $Statement->execute();
         return $Statement->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $exception) {
+        error_log($exception);
         return NULL;
     }
 }
@@ -249,6 +264,7 @@ function addTag($uuid, $newTag) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return NULL;
     }
 }
@@ -262,6 +278,7 @@ function removeTag($uuid, $remTag) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return NULL;
     }
 }
@@ -277,6 +294,7 @@ function websiteUserExists() {
             return false;
         }
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -290,6 +308,7 @@ function createWebsiteUser($username, $hashedPassword) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -307,6 +326,7 @@ function websiteUserValid($username, $hashedPassword) {
             return false;
         }
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -324,6 +344,7 @@ function getMapFileUrl($map) {
             return NULL;
         }
     } catch (PDOException $exception) {
+        error_log($exception);
         return NULL;
     }
 }
@@ -341,6 +362,7 @@ function getMapPolicy($map) {
             return NULL;
         }
     } catch (PDOException $exception) {
+        error_log($exception);
         return NULL;
     }
 }
@@ -355,6 +377,7 @@ function storeMapFileUrl($mapUrl, $mapFileUrl, $policyNumber) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -366,6 +389,7 @@ function getAllMaps() {
         $Statement->execute();
         return $Statement;
     } catch (PDOException $exception) {
+        error_log($exception);
         return NULL;
     }
 }
@@ -378,6 +402,7 @@ function removeMap($mapUrl) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -391,6 +416,7 @@ function addMapTag($mapUrl, $mapTag) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -406,6 +432,7 @@ function getMapTags($mapUrl) {
             array_push($result, $row["tag"]);
         }
     } catch (PDOException $exception) {
+        error_log($exception);
     }
     return $result;
 }
@@ -418,6 +445,7 @@ function removeMapTags($mapUrl) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -433,6 +461,7 @@ function allowedToCreateNewUser() {
             return false;
         }
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -444,7 +473,7 @@ function setAllowedToCreateNewUser($allow) {
         try {
             $Statement->execute();
         } catch (PDOException $exception) {
-        echo $exception;
+            error_log($exception);
         }
     }
     if ($allow) {
@@ -452,7 +481,7 @@ function setAllowedToCreateNewUser($allow) {
         try {
             $Statement->execute();
         } catch (PDOException $exception) {
-        echo $exception;
+            error_log($exception);
         }
     }
 }
@@ -468,6 +497,7 @@ function globalMessagesExist() {
             return false;
         }
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -480,6 +510,7 @@ function createNewGlobalMessage($message) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -491,6 +522,7 @@ function getGlobalMessages() {
         $Statement->execute();
         return $Statement;
     } catch (PDOException $exception) {
+        error_log($exception);
         return NULL;
     }
 }
@@ -506,6 +538,7 @@ function deleteGlobalMessage($id) {
         $Statement2->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -521,6 +554,7 @@ function getHiddenMessagesIds($uuid) {
             array_push($result, $row["message_id"]);
         }
     } catch (PDOException $exception) {
+        error_log($exception);
     }
     return $result;
 }
@@ -533,6 +567,7 @@ function hideGlobalMessage($uuid, $messageId) {
     try {
         $Statement->execute();
     } catch (PDOException $exception) {
+        error_log($exception);
     }
 }
 
@@ -548,6 +583,7 @@ function userMessagesExist($uuid) {
             return false;
         }
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -560,6 +596,7 @@ function getUserMessages($uuid) {
         $Statement->execute();
         return $Statement;
     } catch (PDOException $exception) {
+        error_log($exception);
         return NULL;
     }
 }
@@ -572,6 +609,7 @@ function removeUserMessage($messageId) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -585,6 +623,7 @@ function storeUserMessage($userUuid, $message) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -600,6 +639,7 @@ function customTexturesStored() {
             return false;
         }
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -611,6 +651,7 @@ function getCustomTextures() {
         $Statement->execute();
         return $Statement;
     } catch (PDOException $exception) {
+        error_log($exception);
         return NULL;
     }
 }
@@ -626,6 +667,7 @@ function removeTexture($textureTableId) {
         $Statement2->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -642,6 +684,7 @@ function storeTexture($id, $level, $url, $rights, $notice) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -655,6 +698,7 @@ function storeTextureTag($textureId, $textureTag) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -671,6 +715,7 @@ function getTextureTags($textureId) {
         }
         return $result;
     } catch (PDOException $exception) {
+        error_log($exception);
         return $result;
     }
 }
@@ -687,6 +732,7 @@ function getLastTextureId() {
             return -1;
         }
     } catch (PDOException $exception) {
+        error_log($exception);
         return -1;
     }
 }
@@ -701,6 +747,7 @@ function reportUser($reportedUserUuid, $reportedUserComment, $reporterUserUuid, 
     try {
         $Statement->execute();
     } catch (PDOException $exception) {
+        error_log($exception);
     }
 }
 
@@ -715,6 +762,7 @@ function reportsStored() {
             return false;
         }
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
@@ -726,6 +774,7 @@ function getReports() {
         $Statement->execute();
         return $Statement;
     } catch (PDOException $exception) {
+        error_log($exception);
         return NULL;
     }
 }
@@ -738,6 +787,7 @@ function removeReport($reportId) {
         $Statement->execute();
         return true;
     } catch (PDOException $exception) {
+        error_log($exception);
         return false;
     }
 }
