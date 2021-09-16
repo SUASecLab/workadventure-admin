@@ -41,5 +41,4 @@ function login($user, $password) {
     }    
     return false;
 }
-
 ?>

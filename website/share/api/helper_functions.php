@@ -72,5 +72,4 @@ function getTextures($uuid = NULL) {
     }
     return $result;
 }
-
 ?>

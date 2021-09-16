@@ -788,5 +788,4 @@ function removeReport($reportId) {
         return false;
     }
 }
-
 ?>

@@ -3,6 +3,7 @@ session_start();
 ?>
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,27 +12,30 @@ session_start();
   <script src="js/bootstrap.min.js"></script>
   <title>Workadventure Administration</title>
 </head>
+
 <body>
   <?php
-    // Connect to database
-    try {
-        $DB = new PDO("mysql:dbname=".getenv('DB_MYSQL_DATABASE').";host=admin-db;port=3306",
-        getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));
-    }
-    catch (PDOException $exception) {
-        echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
-        echo "Could not connect to database: ".$exception->getMessage();
-        echo "</aside>";
-        return;
-    }
-    require_once 'api/database_operations.php';
-    require_once 'login_functions.php';
-    require 'meta/toolbar.php';
+  // Connect to database
+  try {
+    $DB = new PDO(
+      "mysql:dbname=" . getenv('DB_MYSQL_DATABASE') . ";host=admin-db;port=3306",
+      getenv('DB_MYSQL_USER'),
+      getenv('DB_MYSQL_PASSWORD')
+    );
+  } catch (PDOException $exception) {
+    echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
+    echo "Could not connect to database: " . $exception->getMessage();
+    echo "</aside>";
+    return;
+  }
+  require_once 'api/database_operations.php';
+  require_once 'login_functions.php';
+  require 'meta/toolbar.php';
 
-    if(!isLoggedIn()) {
-        showLogin();
-        die();
-    }
+  if (!isLoggedIn()) {
+    showLogin();
+    die();
+  }
   ?>
   <main class="container">
     <div class="row">
@@ -92,4 +96,5 @@ session_start();
     </div>
   </main>
 </body>
+
 </html>
