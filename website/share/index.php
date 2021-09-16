@@ -37,55 +37,55 @@ session_start();
   <div class="container">
     <div class="row">
       <div class="col-sm-6">
-        <div class="card" style="width: 18 rem; height: 13rem;">
+        <div class="card card-style">
           <div class="card-body">
             <h5 class="card-title">Room Management</h5>
-            <p class="card-text">Here, you can adjust the room settings. Furthermore, you can restrict the access to the rooms.</p>
+            <p class="card-text">Room settings can be adjusted here</p>
             <a href="rooms.php" class="btn btn-primary">Go to Room Management</a>
           </div>
         </div>
       </div>
       <div class="col-sm-6">
-        <div class="card" style="width: 18 rem; height: 13rem;">
+        <div class="card card-style">
           <div class="card-body">
             <h5 class="card-title">User Management</h5>
-            <p class="card-text">Here, you can manage the user accounts. You can also set user tags here and ban users or lift the bans.</p>
-            <a href="user.php" class="btn btn-primary">User Management</a>
+            <p class="card-text">User accounts can be managed here</p>
+            <a href="user.php" class="btn btn-primary">Go to User Management</a>
           </div>
         </div>
       </div>
       <div class="col-sm-6">
-        <div class="card" style="width: 18 rem; height: 13rem; margin-top: 1rem;">
+        <div class="card card-style">
           <div class="card-body">
             <h5 class="card-title">Textures</h5>
-            <p class="card-text">If you would like to add additional textures to your WorkAdventure instance, you can do this here</p>
+            <p class="card-text">Additional textures can be added here</p>
             <a href="textures.php" class="btn btn-primary">Go to textures settings</a>
           </div>
         </div>
       </div>
       <div class="col-sm-6">
-        <div class="card" style="width: 18 rem; height: 13rem; margin-top: 1rem;">
+        <div class="card card-style">
           <div class="card-body">
             <h5 class="card-title">Global messages</h5>
-            <p class="card-text">Here you can send global messages</p>
+            <p class="card-text">Global messages can be sent here</p>
             <a href="messages.php" class="btn btn-primary">Go to global messages</a>
           </div>
         </div>
       </div>
       <div class="col-sm-6">
-        <div class="card" style="width: 18 rem; height: 13rem; margin-top: 1rem;">
+        <div class="card card-style">
           <div class="card-body">
             <h5 class="card-title">Reports</h5>
-            <p class="card-text">Here, you can view user reports</p>
+            <p class="card-text">Reports can be reviewed and managed here</p>
             <a href="reports.php" class="btn btn-primary">Go to reports</a>
           </div>
         </div>
       </div>
       <div class="col-sm-6">
-        <div class="card" style="width: 18 rem; height: 13rem; margin-top: 1rem;">
+        <div class="card card-style">
           <div class="card-body">
             <h5 class="card-title">Settings</h5>
-            <p class="card-text">Here, you can change some settings of the Admin API.</p>
+            <p class="card-text">Admin API settings can be adjusted here</p>
             <a href="settings.php" class="btn btn-primary">Go to Settings</a>
           </div>
         </div>

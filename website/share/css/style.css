@@ -19,3 +19,8 @@
 .sameline-form {
     display: inline-block;
 }
+
+.card-style {
+    height: 13rem;
+    margin-top: 1rem;
+}
