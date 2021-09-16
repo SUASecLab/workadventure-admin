@@ -72,8 +72,8 @@ session_start();
                 echo "<td><p class=\"fw-normal\">".$row["reportedUserComment"]."</p></td>";
                 echo "<td>";
                 echo "<form action=\"reports.php\" method=\"post\" class=\"sameline-form\"><input class=\"tag btn btn-danger\" type=\"submit\" value=\"Remove report\" name=\"removereport\"><input type=\"hidden\" name=\"reportId\" value=\"".$row["report_id"]."\"></form>";
-                echo "<form action=\"edit_user.php\" method=\"post\" class=\"sameline-form\"><input class=\"tag btn btn-danger\" type=\"submit\" value=\"Go to reported user\"><input type=\"hidden\" name=\"uuid\" value=\"".$row["reportedUserUuid"]."\"></form>";
-                echo "<form action=\"edit_user.php\" method=\"post\" class=\"sameline-form\"><input class=\"tag btn btn-danger\" type=\"submit\" value=\"Go to reporter\"><input type=\"hidden\" name=\"uuid\" value=\"".$row["reporterUserUuid"]."\"></form>";
+                echo "<form target=\"_blank\" action=\"edit_user.php\" method=\"post\" class=\"sameline-form\"><input class=\"tag btn btn-danger\" type=\"submit\" value=\"Go to reported user\"><input type=\"hidden\" name=\"uuid\" value=\"".$row["reportedUserUuid"]."\"></form>";
+                echo "<form target=\"_blank\" action=\"edit_user.php\" method=\"post\" class=\"sameline-form\"><input class=\"tag btn btn-danger\" type=\"submit\" value=\"Go to reporter\"><input type=\"hidden\" name=\"uuid\" value=\"".$row["reporterUserUuid"]."\"></form>";
                 echo "</td></tr>";
             }
         }
