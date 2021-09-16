@@ -19,9 +19,9 @@ session_start();
         getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));
     }
     catch (PDOException $exception) {
-        echo "<div class=\"container alert alert-danger\" role=\"alert\">";
+        echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
         echo "Could not connect to database: ".$exception->getMessage();
-        echo "</div>";
+        echo "</aside>";
         return;
     }
     require_once 'api/database_operations.php';
@@ -30,18 +30,18 @@ session_start();
     if(!isLoggedIn()) {
         require 'meta/toolbar.php';
     ?>
-      <div class="container alert alert-danger" role="alert">
+      <main class="container alert alert-danger" role="alert">
         You have not been logged in!
-      </div>
+      </main>
     <?php
     } else {
         session_unset();
         session_destroy();
         require 'meta/toolbar.php';
         ?>
-        <div class="container alert alert-success" role="alert">
+        <main class="container alert alert-success" role="alert">
           You have been logged out.
-        </div>
+        </main>
       <?php
     }
   ?>

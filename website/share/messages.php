@@ -41,9 +41,9 @@ session_start();
         getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));
     }
     catch (PDOException $exception) {
-        echo "<div class=\"container alert alert-danger\" role=\"alert\">";
+        echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
         echo "Could not connect to database: ".$exception->getMessage();
-        echo "</div>";
+        echo "</aside>";
         return;
     }
     require_once 'api/database_operations.php';
@@ -59,13 +59,13 @@ session_start();
     if ((isset($_POST["removemessage"])) && (isset($_POST["message_id"]))) {
         $id = htmlspecialchars($_POST["message_id"]);
         if (deleteGlobalMessage($id)) { ?>
-          <div class="container alert alert-success" role="alert">
+          <aside class="container alert alert-success" role="alert">
             <p>Removed message</p>
-          </div>
+          </aside>
         <?php } else { ?>
-            <div class="container alert alert-danger" role="alert">
+            <aside class="container alert alert-danger" role="alert">
               <p>Could not remove message</p>
-            </div>
+            </aside>
         <?php
         }
     }
@@ -74,33 +74,35 @@ session_start();
     if (isset($_POST["message"])) {
         $message = htmlspecialchars($_POST["message"]);
         if (createNewGlobalMessage($message)) { ?>
-          <div class="container alert alert-success" role="alert">
+          <aside class="container alert alert-success" role="alert">
             <p>Created new message</p>
-          </div>
+          </aside>
         <?php } else { ?>
-            <div class="container alert alert-danger" role="alert">
+            <aside class="container alert alert-danger" role="alert">
               <p>Could not create new message</p>
-            </div>
+            </aside>
           <?php
         }
     }
     
-    echo "<div class=\"container\">";
+    echo "<main class=\"container\">";
 
     // Get all messages
     $messages = getGlobalMessages();
     if ($messages == NULL) {
   ?>
-    <div class="container alert alert-danger" role="alert">
+    <aside class="container alert alert-danger" role="alert">
       <p>Could not fetch global messages</p>
-    </div>
+    </aside>
   <?php die(); }
+    echo "<article>";
    if (globalMessagesExist()) {
     echo "<p class=\"fs-3\">Global messages:</p>";
   ?>
-    <div class="container alert alert-warning" role="alert">
+    <section class="container alert alert-warning" role="alert">
         <p>Only the top message will be shown to the user. If the user also receives a private message, the global message will be shown instead of the private one!</p>
-    </div>
+   </section>
+   <section>
     <table class="table">
       <tr>
         <th scope="col">Message</th>
@@ -125,9 +127,10 @@ session_start();
       echo "<td><form action=\"messages.php\" method=\"post\"><input class=\"tag btn btn-danger\" type=\"submit\" value=\"Remove\" name=\"removemessage\"><input type=\"hidden\" name=\"message_id\" value=\"".$row["message_id"]."\"></form></td></tr>";
       $counter++;
     }
-    echo "</table>";
+    echo "</table></section>";
     }
   ?>
+  <section>
   <p class="fs-3">Create new global message:</p>
   <form action="messages.php" method="post" id="create-new-message">
     <div class="mb-3">
@@ -153,6 +156,9 @@ session_start();
     </div>
     <input type="submit" class="btn btn-primary" value="Create">
   </form>
+  </section>
+  </article>
+  </main>
   <?php $DB = NULL; ?>
 </body>
 </html>

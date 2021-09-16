@@ -18,9 +18,9 @@ try {
         getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));    
 }
 catch (PDOException $exception) {
-    echo "<div class=\"container alert alert-danger\" role=\"alert\">";
+    echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
     echo "Could not connect to database: ".$exception->getMessage();
-    echo "</div>";
+    echo "</aside>";
     return;
 }
 require_once 'api/database_operations.php';
@@ -42,24 +42,24 @@ require 'meta/toolbar.php';
 
 if ($validLogin) {
 ?>
-  <div class="container">
-    <div class="alert alert-success" role="alert">
+  <main class="container">
+    <section class="alert alert-success" role="alert">
        Welcome back, <?php echo htmlspecialchars($_POST["username"]); ?>
-    </div>
+    </section>
     <br>
     <a class="btn btn-primary" href="index.php" role="button">Go to the administration panel</a> 
-  </div>
+  </main>
 <?php
 } else {
     if ($triedToLogin) {
     ?>
-      <div class="container alert alert-danger" role="alert">
+      <aside class="container alert alert-danger" role="alert">
         Invalid credentials.
-      </div>
+      </aside>
     <?php
     }
 ?>
-  <div class="container">
+  <main class="container">
     <form action="login.php" method="post">
       <label for="username" class="form-label">Username:</label>
       <input type="text" class="form-control" id="username" name="username"><br>
@@ -67,7 +67,7 @@ if ($validLogin) {
       <input class="form-control" type="password" id="password" name="password"><br>
       <input class="btn btn-primary" type="submit" value="Log in">
     </form>
-  </div>
+  </main>
 <?php
 }
 ?>

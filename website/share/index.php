@@ -19,9 +19,9 @@ session_start();
         getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));
     }
     catch (PDOException $exception) {
-        echo "<div class=\"container alert alert-danger\" role=\"alert\">";
+        echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
         echo "Could not connect to database: ".$exception->getMessage();
-        echo "</div>";
+        echo "</aside>";
         return;
     }
     require_once 'api/database_operations.php';
@@ -33,8 +33,7 @@ session_start();
         die();
     }
   ?>
-  
-  <div class="container">
+  <main class="container">
     <div class="row">
       <div class="col-sm-6">
         <div class="card card-style">
@@ -90,5 +89,7 @@ session_start();
           </div>
         </div>
       </div>
+    </div>
+  </main>
 </body>
 </html>

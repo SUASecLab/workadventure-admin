@@ -20,9 +20,9 @@ session_start();
         getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));
     }
     catch (PDOException $exception) {
-        echo "<div class=\"container alert alert-danger\" role=\"alert\">";
+        echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
         echo "Could not connect to database: ".$exception->getMessage();
-        echo "</div>";
+        echo "</aside>";
         return;
     }
     require_once 'api/database_operations.php';
@@ -38,13 +38,13 @@ session_start();
     if ((isset($_POST["removetexture"])) && (isset($_POST["texture_table_id"]))) {
         $textureToRemoveId = htmlspecialchars($_POST["texture_table_id"]);
         if(removeTexture($textureToRemoveId)) { ?>
-            <div class="container alert alert-success" role="alert">
+            <aside class="container alert alert-success" role="alert">
               <p>Texture has been removed</p>
-            </div> 
+            </aside> 
         <?php } else { ?>
-            <div class="container alert alert-danger" role="alert">
+            <aside class="container alert alert-danger" role="alert">
               <p>Could not remove texture</p>
-            </div> 
+            </aside> 
         <?php }
     }
 
@@ -81,20 +81,20 @@ session_start();
                 $error = true;
             }
             if ($error) { ?>
-              <div class="container alert alert-danger" role="alert">
+              <aside class="container alert alert-danger" role="alert">
                 <p>Could not store texture</p>
-              </div> 
+              </aside> 
             <?php } else {
                 ?>
-                <div class="container alert alert-success" role="alert">
+                <aside class="container alert alert-success" role="alert">
                     <p>Stored texture</p>
-                </div>
+                </aside>
                 <?php
             }
         } else { ?>
-            <div class="container alert alert-danger" role="alert">
+            <aside class="container alert alert-danger" role="alert">
               <p>No URL specified</p>
-            </div> 
+            </aside> 
           <?php
         }
     }
@@ -102,11 +102,13 @@ session_start();
     if (customTexturesStored()) {
         $textures = getCustomTextures();
         if ($textures == NULL) { ?>
-            <div class="container alert alert-danger" role="alert">
+            <aside class="container alert alert-danger" role="alert">
               <p>Could not fetch custom textures</p>
-            </div> 
+            </aside> 
+            <main>
         <?php } else {
-            echo "<div class=\"container\"><p class=\"fs-3\">Custom textures:</p>"; ?>
+            echo "<main>";
+            echo "<article class=\"container\"><p class=\"fs-3\">Custom textures:</p>"; ?>
            <table class="table">
              <tr>
               <th scope="col">ID</th>
@@ -136,11 +138,11 @@ session_start();
                 }
                 echo "<td><form action=\"textures.php\" method=\"post\"><input class=\"tag btn btn-danger\" type=\"submit\" value=\"Remove\" name=\"removetexture\"><input type=\"hidden\" name=\"texture_table_id\" value=\"".$row["texture_table_id"]."\"></form></td></tr>";
             }
-            echo "</table></div>";
+            echo "</table></article>";
         }
     }
     ?>
-    <div class="container">
+    <article class="container">
       <p class="fs-3">Add custom texture</p>
       <form action="textures.php" method="post" style="margin-bottom: 1rem;">
       <div class="mb-3">
@@ -169,6 +171,7 @@ session_start();
         <input type="text" class="form-control" id="tagsInput" name="textureTags">
       </div>
       <input class="btn btn-primary" type="submit" value="Add texture" name="addtexture">
-    </div>
+      </form>
+    </article>
   </body>
 </html>

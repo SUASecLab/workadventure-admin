@@ -15,10 +15,11 @@ function isLoggedIn() {
 }
 
 function showLogin() {
-    echo "<div class=\"container alert alert-danger\" role=\"alert\">";
+    echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
     echo "You are not logged in. Please log in to continue.";
-    echo "</div>";
+    echo "</aside>";
     echo "<a href=\"login.php\" class=\"element btn btn-primary\">Log in</a>";
+    echo "</body></html>";
 }
 
 function getHash($data) {

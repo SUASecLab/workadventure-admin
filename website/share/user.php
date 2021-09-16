@@ -19,9 +19,9 @@ session_start();
         getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));
     }
     catch (PDOException $exception) {
-        echo "<div class=\"container alert alert-danger\" role=\"alert\">";
+        echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
         echo "Could not connect to database: ".$exception->getMessage();
-        echo "</div>";
+        echo "</aside>";
         return;
     }
     include_once(__DIR__.'/vendor/autoload.php');
@@ -40,29 +40,30 @@ session_start();
   $nrOfUsers = getNumberOfUsers();
   if ($nrOfUsers == NULL) {
     ?>
-    <div class="container alert alert-danger" role="alert">
+    <aside class="container alert alert-danger" role="alert">
       <p>Could not fetch user count</p>
-    </div>
+    </aside>
     <?php
     return;
   }
 
-  echo "<div class=\"container\">";
+  echo "<main class=\"container\">";
   echo "<p class=\"fs-3\">Listing ".$nrOfUsers." accounts</p>";
 
   // Get all users
   $users = getAllUsers();
   if ($users == NULL) {
     ?>
-    <div class="container alert alert-danger" role="alert">
+    <aside class="container alert alert-danger" role="alert">
       <p>Could not fetch users</p>
-    </div>
+    </aside>
   <?php
     return;
   }
   
   // Display all accounts
   ?>
+  <article>
   <table class="table">
     <tr>
       <th scope="col">Name</th>
@@ -88,11 +89,12 @@ session_start();
 
     <?php }
     $DB = NULL; ?>
-    </div>
   </table>
   <form action="edit_user.php" method="post">
     <input type="submit" class="btn btn-primary" value="Create new user">
     <input type="hidden" name="uuid" value="<?php echo trim(Uuid::uuid4()->toString()); ?>">
   </form>
+  </article>
+  </main>
 </body>
 </html>

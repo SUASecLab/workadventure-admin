@@ -19,9 +19,9 @@ session_start();
         getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));
     }
     catch (PDOException $exception) {
-        echo "<div class=\"container alert alert-danger\" role=\"alert\">";
+        echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
         echo "Could not connect to database: ".$exception->getMessage();
-        echo "</div>";
+        echo "</aside>";
         return;
     }
     require_once 'api/database_operations.php';
@@ -36,9 +36,9 @@ session_start();
     // Get user's uuid
     if (!isset($_POST["uuid"])) {
     ?>
-        <div class="container alert alert-danger" role="alert">
+        <aside class="container alert alert-danger" role="alert">
           <p>User not specified</p>
-        </div>
+        </aside>
     <?php
         die();
     }
@@ -53,17 +53,17 @@ session_start();
             $addTagResult = addTag($uuid, $newTag);
             if ($addTagResult == true) {
                 ?>
-                <div class="container alert alert-success" role="alert">
+                <aside class="container alert alert-success" role="alert">
                   The tag <?php echo "\"".$newTag."\""; ?> has been added.
-                </div>
+                </aside>
               <?php
             }
             else
             {
                 ?>
-                <div class="container alert alert-danger" role="alert">
+                <aside class="container alert alert-danger" role="alert">
                   Could not add the tag <?php echo "\"".$newTag."\""; ?>
-                </div>
+                </aside>
                 <?php
             }
         }
@@ -76,15 +76,15 @@ session_start();
             $remTagResult = removeTag($uuid, $remTag);
             if ($remTagResult == true) {
                 ?>
-                <div class="container alert alert-success" role="alert">
+                <aside class="container alert alert-success" role="alert">
                     The tag <?php echo "\"".$remTag."\""; ?> has been removed.
-                </div>
+                </aside>
                 <?php
             } else {
                 ?>
-                <div class="container alert alert-danger" role="alert">
+                <aside class="container alert alert-danger" role="alert">
                     Could not remove the tag <?php echo "\"".$remTag."\""; ?>.
-                </div>
+                </aside>
                 <?php
             }
         }
@@ -95,36 +95,36 @@ session_start();
       if ((isset($_POST["message"])) && (!empty($_POST["message"])) && (htmlspecialchars($_POST["ban"]) == "true")) {
         if (banUser($uuid, htmlspecialchars($_POST["message"]))) {
           ?>
-            <div class="container alert alert-success" role="alert">
+            <aside class="container alert alert-success" role="alert">
               This user has been banned.
-            </div>
+            </aside>
           <?php
         } else {
           ?>
-            <div class="container alert alert-danger" role="alert">
+            <aside class="container alert alert-danger" role="alert">
               Could not ban this user.
-            </div>
+            </aside>
           <?php
         }
       } else if (htmlspecialchars($_POST["ban"]) == "false") {
         if (liftBan($uuid)) {
           ?>
-            <div class="container alert alert-success" role="alert">
+            <aside class="container alert alert-success" role="alert">
               This user's ban has been lifted.
-            </div>
+            </aside>
           <?php
         } else {
           ?>
-            <div class="container alert alert-danger" role="alert">
+            <aside class="container alert alert-danger" role="alert">
               Could not lift this user's ban.
-            </div>
+            </aside>
           <?php
         }
       } else {
         ?>
-            <div class="container alert alert-danger" role="alert">
+            <aside class="container alert alert-danger" role="alert">
               Ban message required.
-            </div>
+            </aside>
           <?php
       }
     }
@@ -136,9 +136,9 @@ session_start();
             $email = htmlspecialchars($_POST["email"]);
             if ((empty($name)) || (empty($email))) {
             ?>
-                <div class="container alert alert-danger" role="alert">
+                <aside class="container alert alert-danger" role="alert">
                 New user data must not be empty.
-                </div>
+                </aside>
             <?php
             } else {
                 $visitCardUrl = NULL;
@@ -147,23 +147,23 @@ session_start();
                 }
                 if (updateUserData($uuid, $name, $email, $visitCardUrl)) {
                 ?>
-                    <div class="container alert alert-success" role="alert">
+                    <aside class="container alert alert-success" role="alert">
                       User data has been updated.
-                    </div>
+                    </aside>
                 <?php
                 } else {
                 ?>
-                    <div class="container alert alert-danger" role="alert">
+                    <aside class="container alert alert-danger" role="alert">
                       User data could not be updated.
-                    </div>
+                    </aside>
                 <?php
                 }
             }
         } else {
         ?>
-            <div class="container alert alert-danger" role="alert">
+            <aside class="container alert alert-danger" role="alert">
               New user data could not be fetched.
-            </div>
+            </aside>
         <?php
         }
     }
@@ -172,13 +172,13 @@ session_start();
     if ((isset($_POST["removemessage"])) && (isset($_POST["message_id"]))) {
         $id = htmlspecialchars($_POST["message_id"]);
         if (removeUserMessage($id)) { ?>
-          <div class="container alert alert-success" role="alert">
+          <aside class="container alert alert-success" role="alert">
             <p>Removed message</p>
-          </div>
+          </aside>
         <?php } else { ?>
-          <div class="container alert alert-danger" role="alert">
+          <aside class="container alert alert-danger" role="alert">
             <p>Could not remove message</p>
-          </div>
+          </aside>
         <?php }
     }
 
@@ -188,18 +188,18 @@ session_start();
         $message = htmlspecialchars($_POST["message"]);
         if (($sendMessage == "true") && (strlen(trim($message)) > 0)) {
             if (storeUserMessage($uuid, $message)) { ?>
-              <div class="container alert alert-success" role="alert">
+              <aside class="container alert alert-success" role="alert">
                 <p>Stored user message</p>
-              </div>
+              </aside>
             <?php } else { ?>
-              <div class="container alert alert-danger" role="alert">
+              <aside class="container alert alert-danger" role="alert">
                 <p>Could not store message</p>
-              </div>
+              </aside>
         <?php }
        } else { ?>
-          <div class="container alert alert-danger" role="alert">
+          <aside class="container alert alert-danger" role="alert">
             <p>User message not valid</p>
-          </div>
+          </aside>
        <?php }
     }
 
@@ -207,14 +207,15 @@ session_start();
     $userData = getUserData($uuid);
     if ($userData == NULL) {
     ?>
-        <div class="container alert alert-danger" role="alert">
+        <aside class="container alert alert-danger" role="alert">
           <p>Could not fetch user details</p>
-        </div>
+        </aside>
         <?php
         die();
     }
   ?>
-<div class="container">
+<main class="container">
+  <section>
   <form action="edit_user.php" method="post" style="margin-bottom: 1rem;">
     <div class="mb-3">
       <label for="name" class="form-label">Name</label>
@@ -232,11 +233,12 @@ session_start();
     <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
     <input class="btn btn-primary" type="submit" value="Update" name="update-data">
   </form>
-  <div class="mb-3">
+  <section>
+  <section class="mb-3">
     <label for="name" class="form-label">Access Link</label>
     <input type="text" class="form-control" id="name" value="<?php echo "https://".getenv('DOMAIN')."/register/".$userData["uuid"]; ?>" readonly>
-  </div>
-  <div class="mb-3">
+  </section>
+  <section class="mb-3">
     <?php
      if (hasTags($uuid)) {
       ?>
@@ -249,12 +251,16 @@ session_start();
         echo "<br><br>";
       }
     ?>
+    </section>
+    <section>
     <p>Add tag:</p>
     <form action="edit_user.php" method="post">
       <input class="form-control" type="text" name="newtag"><br>
       <input class="btn btn-primary" type="submit" value="Add tag">
       <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
     </form>
+    </section>
+    <section>
     <?php if (userMessagesExist($uuid)) {
         $messages = getUserMessages($uuid);
         if ($messages == NULL) { ?>
@@ -278,7 +284,9 @@ session_start();
          }
          echo "</table>";
       } } ?>
+      </section>
       <br>
+      <section>
       <p>Send new user message:</p>
       <form action="edit_user.php" method="post">
         <div class="mb-3">
@@ -289,6 +297,8 @@ session_start();
         <input type="hidden" name="sendMessage" value="true">
         <input type="submit" class="btn btn-primary" value="Send">
       </form>
+    </section>
+    <section>
     <?php if (isBanned($uuid)) { ?>
       <br>
       <p>This user has been banned!</p>
@@ -314,10 +324,11 @@ session_start();
         <input type="hidden" name="ban" value="true">
       </form>
     <?php } ?>
-  </div>
+    </section>
+    <br>
   <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
   <a class="btn btn-primary" href="user.php" role="button">Go back</a> 
   <?php $DB = NULL; ?>
-</div>
+ </main>
 </body>
 </html>

@@ -19,9 +19,9 @@ session_start();
         getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));
     }
     catch (PDOException $exception) {
-        echo "<div class=\"container alert alert-danger\" role=\"alert\">";
+        echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
         echo "Could not connect to database: ".$exception->getMessage();
-        echo "</div>";
+        echo "</aside>";
         return;
     }
     require_once 'api/database_operations.php';
@@ -42,6 +42,7 @@ session_start();
     }
 
     ?>
+    <main>
     <form class="container" action="settings.php?edit=true" method="post">
       <p class="fs-3">Settings</p>
       <div class="form-check form-switch">
@@ -59,6 +60,7 @@ session_start();
       <br>
       <input class="btn btn-primary" type="submit" value="Update settings">
     </form>
+    </main>
     <?php
     $DB = NULL;
   ?>

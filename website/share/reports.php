@@ -19,9 +19,9 @@ session_start();
         getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));
     }
     catch (PDOException $exception) {
-        echo "<div class=\"container alert alert-danger\" role=\"alert\">";
+        echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
         echo "Could not connect to database: ".$exception->getMessage();
-        echo "</div>";
+        echo "</aside>";
         return;
     }
     require_once 'api/database_operations.php';
@@ -36,24 +36,24 @@ session_start();
     if ((isset($_POST["removereport"])) && (isset($_POST["reportId"]))) {
         $reportId = htmlspecialchars($_POST["reportId"]);
         if (removeReport($reportId)) { ?>
-            <div class="container alert alert-success" role="alert">
+            <aside class="container alert alert-success" role="alert">
               Removed report.
-            </div>
+            </aside>
         <?php } else { ?>
-            <div class="container alert alert-danger" role="alert">
+            <aside class="container alert alert-danger" role="alert">
               Could not remove report.
-            </div>
+            </aside>
         <?php }
     }
 
     if (reportsStored()) {
         $reports = getReports();
         if ($reports == NULL) { ?>
-            <div class="container alert alert-danger" role="alert">
+            <aside class="container alert alert-danger" role="alert">
               Could not load reports.
-            </div>
+            </aside>
         <?php } else { ?>
-          <div class="container">
+          <main class="container">
             <table class="table">
               <tr>
                 <th scope="col">Reported user</th>
@@ -77,11 +77,11 @@ session_start();
                 echo "</td></tr>";
             }
         }
-        echo "</table></div>";
+        echo "</table></main>";
     } else { ?>
-        <div class="container alert alert-primary" role="alert">
+        <main class="container alert alert-primary" role="alert">
           No reports stored.
-        </div>
+        </main>
     <?php }
 
     $DB = NULL; ?>

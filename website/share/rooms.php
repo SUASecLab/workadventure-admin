@@ -20,9 +20,9 @@ session_start();
         getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));
     }
     catch (PDOException $exception) {
-        echo "<div class=\"container alert alert-danger\" role=\"alert\">";
+        echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
         echo "Could not connect to database: ".$exception->getMessage();
-        echo "</div>";
+        echo "</aside>";
         return;
     }
     require_once 'api/database_operations.php';
@@ -41,9 +41,9 @@ session_start();
 
         if ((empty($mapUrl)) || (empty($mapFileUrl))) {
             ?>
-              <div class="container alert alert-danger" role="alert">
+              <aside class="container alert alert-danger" role="alert">
                 The map data must not be empty.
-              </div>
+              </aside>
             <?php
         } else {
             $invalidData = false;
@@ -81,22 +81,22 @@ session_start();
                 }
                 if (!$storedMap) {
                 ?>
-                    <div class="container alert alert-danger" role="alert">
+                    <aside class="container alert alert-danger" role="alert">
                     The map file url for the map <?php echo $mapUrl; ?> could not be stored.
-                    </div>
+                    </aside>
                     <?php
                 } else {
                 ?>
-                <div class="container alert alert-success" role="alert">
+                <aside class="container alert alert-success" role="alert">
                     The map file url for the map <?php echo $mapUrl; ?> has been stored.
-                </div>
+                </aside>
                 <?php
                 }
             } else {
                 ?>
-                <div class="container alert alert-danger" role="alert">
+                <aside class="container alert alert-danger" role="alert">
                   No tags specified.
-                </div>
+                </aside>
                 <?php
             }
         }
@@ -109,23 +109,25 @@ session_start();
         $removedMap = removeMap($mapUrl);
         if ($removedMap) {
           ?>
-          <div class="container alert alert-success" role="alert">
+          <aside class="container alert alert-success" role="alert">
             The map <?php echo $mapUrl; ?> has been removed.
-          </div>
+          </aside>
           <?php
         } else {
           ?>
-          <div class="container alert alert-danger" role="alert">
+          <aside class="container alert alert-danger" role="alert">
             The map <?php echo $mapUrl; ?> could not be removed.
-          </div>
+          </aside>
           <?php
         }
     }
     
+    echo "<main class=\"container\">";
+
     // check whether start map entry exists
     if (getMapFileUrl(getenv('START_ROOM_URL'))) {
         ?>
-          <div class="container">
+          <article>
           <p class="fs-3">Enumeration of existing rooms</p>
         <?php
         $maps = getAllMaps();
@@ -160,8 +162,9 @@ session_start();
             echo "<td><p class=\"fw-normal\">".$restriction."</p></td>";
             echo "<td><form action=\"rooms.php\" method=\"post\"><input class=\"tag btn btn-danger\" type=\"submit\" value=\"Remove\" name=\"removemap\"><input type=\"hidden\" name=\"map_url\" value=\"".$row["map_url"]."\"></form></td></tr>";
         }
-        echo "</table></div>";
+        echo "</table></article>";
         ?>
+          <article>
           <form class="container" action="rooms.php" method="post">
             <p class="fs-3">Add a new room</p>
             <label for="map_url" class="form-label">Map URL</label>
@@ -191,12 +194,15 @@ session_start();
             </div>
             <input class="btn btn-primary" type="submit" style="margin-top: 1rem;" value="Add map">
           </form>
+      </article>
         <?php
     } else {
       ?>
-        <div class="container alert alert-danger" role="alert">
+        <article>
+        <section class="container alert alert-danger" role="alert">
             The map file for the start room has not been set so far!
-        </div>
+        </section>
+        <section>
         <form class="container" action="rooms.php" method="post">
           <label for="map-file-url" class="form-label">URL for the start room map (<?php echo getenv('START_ROOM_URL'); ?>):</label>
           <div class="input-group mb-3">
@@ -221,6 +227,8 @@ session_start();
           <input type="hidden" name="map_url" value="<?php echo getenv('START_ROOM_URL'); ?>">
           <input class="btn btn-primary" type="submit" style="margin-top: 1rem;" value="Set URL">
         </form>
+        </section>
+        </article>
       <?php
     }
   ?>
@@ -259,5 +267,6 @@ session_start();
         addTagsElements()
     };
   </script>
+  </main>
 </body>
 </html>
