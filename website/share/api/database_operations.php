@@ -20,11 +20,9 @@ function userExists($uuid) {
 function writeUuidToDatabase($uuid) {
     GLOBAL $DB;
     $email = $uuid."@".getenv('DOMAIN');
-    $createdByMiddleware = 0;
-    $Statement = $DB->prepare("INSERT INTO users (uuid, name, email, createdByMiddleware) VALUES (:uuid, 'anonymous', :email, :byMiddleware)");
+    $Statement = $DB->prepare("INSERT INTO users (uuid, name, email) VALUES (:uuid, 'anonymous', :email)");
     $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
     $Statement->bindParam(":email", $email, PDO::PARAM_STR);
-    $Statement->bindParam(":byMiddleware", $createdByMiddleware, PDO::PARAM_INT);
     try {
         $Statement->execute();
         return true;

@@ -3,7 +3,6 @@ CREATE TABLE users (
   name varchar(30) NOT NULL,
   email varchar(80) NOT NULL UNIQUE,
   visitCardUrl varchar(150),
-  createdByMiddleware tinyint NOT NULL,
   PRIMARY KEY (uuid)
 );
 

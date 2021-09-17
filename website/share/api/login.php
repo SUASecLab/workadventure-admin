@@ -28,12 +28,6 @@ if (isset($_GET["token"])) {
     $uuid = htmlspecialchars($_GET["token"]);
     $uuid = getUuid($uuid);
     $userData = getUserData($uuid);
-    if (getenv('USE_STUDIP_CONNECTOR') == "true") {
-        if ($userData["createdByMiddleware"] == "1") {
-            http_response_code(403);
-            die();
-        }
-    }
 
     if (allowedToCreateNewUser()) {
         createAccountIfNotExistent($uuid);
@@ -41,7 +35,6 @@ if (isset($_GET["token"])) {
 
     $map = getenv('START_ROOM_URL');
 
-    $result["test"] = $userData["createdByMiddleware"];
     $result['roomUrl'] = $map;
     $result['email'] = getUserEmail($uuid);
     $result['mapUrlStart'] = getMapFileUrl($map);
