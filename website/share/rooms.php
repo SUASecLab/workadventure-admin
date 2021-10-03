@@ -10,6 +10,8 @@ session_start();
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/style.css" rel="stylesheet">
   <script src="js/bootstrap.min.js"></script>
+  <script src="js/ajax/jquery-3.6.0.min.js"></script>
+  <script src="js/ajax/rooms.js"></script>
 
   <title>Workadventure Administration</title>
 </head>
@@ -27,7 +29,7 @@ session_start();
     echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
     echo "Could not connect to database: " . $exception->getMessage();
     echo "</aside>";
-    return;
+    die();
   }
   require_once 'api/database_operations.php';
   require_once 'login_functions.php';
@@ -38,240 +40,50 @@ session_start();
     die();
   }
 
-  // check whether map should be stored
-  if ((isset($_POST["map_url"])) && (isset($_POST["map_file_url"]))) {
-    $mapUrl = htmlspecialchars($_POST["map_url"]);
-    $mapFileUrl = htmlspecialchars($_POST["map_file_url"]);
-
-    if ((empty($mapUrl)) || (empty($mapFileUrl))) {
   ?>
-      <aside class="container alert alert-danger" role="alert">
-        The map data must not be empty.
-      </aside>
-      <?php
-    } else {
-      $invalidData = false;
-      $tags = array();
-      $mapUrlPrefix = "/@/org/" . getenv('DOMAIN') . "/";
-      if (!str_starts_with($mapUrl, $mapUrlPrefix)) {
-        $mapUrl = $mapUrlPrefix . $mapUrl;
-      }
-      $policyNumber = 2;
-      $policy = htmlspecialchars($_POST["radio"]);
-      if ($policy == "public") {
-        $policyNumber = 1;
-      } else if ($policy == "members") {
-        $policyNumber = 2;
-      } else {
-        $policyNumber = 3;
-        if ((isset($_POST["tags"])) && (!strlen(htmlspecialchars($_POST["tags"])) == 0)) {
-          $tagsList = htmlspecialchars($_POST["tags"]);
-          $tagsArray = explode(",", $tagsList);
-          if (sizeof($tagsArray) > 0) {
-            foreach ($tagsArray as $tag) {
-              array_push($tags, trim($tag));
-            }
-          } else {
-            $invalidData = true;
-          }
-        } else {
-          $invalidData = true;
-        }
-      }
-      if (!$invalidData) {
-        $storedMap = storeMapFileUrl($mapUrl, $mapFileUrl, $policyNumber);
-        foreach ($tags as $tag) {
-          addMapTag($mapUrl, $tag);
-        }
-        if (!$storedMap) {
-      ?>
-          <aside class="container alert alert-danger" role="alert">
-            The map file url for the map <?php echo $mapUrl; ?> could not be stored.
-          </aside>
-        <?php
-        } else {
-        ?>
-          <aside class="container alert alert-success" role="alert">
-            The map file url for the map <?php echo $mapUrl; ?> has been stored.
-          </aside>
-        <?php
-        }
-      } else {
-        ?>
-        <aside class="container alert alert-danger" role="alert">
-          No tags specified.
-        </aside>
-      <?php
-      }
-    }
-  }
 
-  // checkout whether map should be removed
-  if ((isset($_POST["removemap"])) && (isset($_POST["map_url"]))) {
-    $mapUrl = htmlspecialchars($_POST["map_url"]);
-    removeMapTags($mapUrl);
-    $removedMap = removeMap($mapUrl);
-    if ($removedMap) {
-      ?>
-      <aside class="container alert alert-success" role="alert">
-        The map <?php echo $mapUrl; ?> has been removed.
-      </aside>
-    <?php
-    } else {
-    ?>
-      <aside class="container alert alert-danger" role="alert">
-        The map <?php echo $mapUrl; ?> could not be removed.
-      </aside>
-    <?php
-    }
-  }
+  <!-- ajax -->
+  <aside id="alert" class="container alert" role="alert">
+  </aside>
 
-  echo "<main class=\"container\">";
+  <main class="container">
 
-  // check whether start map entry exists
-  if (getMapFileUrl(getenv('START_ROOM_URL'))) {
-    ?>
+    <!-- ajax -->
+    <article id="maps">
+    </article>
+
     <article>
-      <p class="fs-3">Enumeration of existing rooms</p>
-      <?php
-      $maps = getAllMaps();
-      ?>
-      <table class="table">
-        <tr>
-          <th scope="col">Map URL</th>
-          <th scope="col">Map File URL</th>
-          <th scope="col">Access restriction</th>
-          <th scope="col">Actions</th>
-        </tr>
-        <?php
-        while ($row = $maps->fetch(PDO::FETCH_ASSOC)) {
-          $restriction = $row["policy"];
-          if ($restriction == 1) {
-            $restriction = "Public";
-          } else if ($restriction == 2) {
-            $restriction = "Members";
-          } else if ($restriction == 3) {
-            $tags = getMapTags($row["map_url"]);
-            $tagsAsString = "";
-            foreach ($tags as $tag) {
-              $tagsAsString = $tagsAsString . "<div class=\"badge rounded-pill bg-primary tag\">" . $tag . "</div>";
-            }
-            $restriction = "Members with tags " . $tagsAsString;
-          } else {
-            $restriction = "Undefined value";
-          }
-
-          echo "<tr><td><p class=\"fw-normal\">https://" . getenv('DOMAIN') . $row["map_url"] . "</p></td>";
-          echo "<td><p class=\"fw-normal\">https://" . $row["map_file_url"] . "</p></td>";
-          echo "<td><p class=\"fw-normal\">" . $restriction . "</p></td>";
-          echo "<td><form action=\"rooms.php\" method=\"post\"><input class=\"tag btn btn-danger\" type=\"submit\" value=\"Remove\" name=\"removemap\"><input type=\"hidden\" name=\"map_url\" value=\"" . $row["map_url"] . "\"></form></td></tr>";
-        }
-        echo "</table></article>";
-        ?>
-        <article>
-          <form class="container" action="rooms.php" method="post">
-            <p class="fs-3">Add a new room</p>
-            <label for="map_url" class="form-label">Map URL</label>
-            <div class="input-group mb-3">
-              <span class="input-group-text" id="map_url_prefix"><?php echo "https://" . getenv('DOMAIN') . "/@/org/" . getenv('DOMAIN') . "/"; ?></span>
-              <input type="text" class="form-control" id="map_url" aria-describedby="map_url_prefix" name="map_url">
-            </div>
-            <label for="map_url_file" class="form-label">Map URL File</label>
-            <div class="input-group mb-3">
-              <span class="input-group-text" id="map_url_file_prefix">https://</span>
-              <input type="text" class="form-control" id="map_url_file" aria-describedby="map_url_file_prefix" name="map_file_url">
-            </div>
-            <p class="fs-6">Access restriction</p>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="radio" id="radioPublic" value="public" />
-              <label class="form-check-label" for="radioPublic">Public</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="radio" id="radioMembers" value="members" checked />
-              <label class="form-check-label" for="radioMembers">Members</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="radio" id="radioMembersTags" value="tags" />
-              <label class="form-check-label" for="radioMembersTags">Members with tags</label>
-            </div>
-            <div id="tagsArea" class="input-group mb-3">
-            </div>
-            <input class="btn btn-primary" type="submit" style="margin-top: 1rem;" value="Add map">
-          </form>
-        </article>
-      <?php
-    } else {
-      ?>
-        <article>
-          <section class="container alert alert-danger" role="alert">
-            The map file for the start room has not been set so far!
-          </section>
-          <section>
-            <form class="container" action="rooms.php" method="post">
-              <label for="map-file-url" class="form-label">URL for the start room map (<?php echo getenv('START_ROOM_URL'); ?>):</label>
-              <div class="input-group mb-3">
-                <span class="input-group-text" id="map_file_url">https://</span>
-                <input type="text" class="form-control" id="map-file-url" aria-describedby="map_file_url" name="map_file_url">
-              </div>
-              <p class="fs-6">Access restriction</p>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="radio" id="radioPublic" value="public" />
-                <label class="form-check-label" for="radioPublic">Public</label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="radio" id="radioMembers" value="members" checked />
-                <label class="form-check-label" for="radioMembers">Members</label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="radio" id="radioMembersTags" value="tags" />
-                <label class="form-check-label" for="radioMembersTags">Members with tags</label>
-              </div>
-              <div id="tagsArea" class="input-group mb-3">
-              </div>
-              <input type="hidden" name="map_url" value="<?php echo getenv('START_ROOM_URL'); ?>">
-              <input class="btn btn-primary" type="submit" style="margin-top: 1rem;" value="Set URL">
-            </form>
-          </section>
-        </article>
-      <?php
-    }
-      ?>
-      <script>
-        var tagsElementsShown = false;
-
-        function addTagsElements() {
-          if (!tagsElementsShown) {
-            // create tags section
-            var container = document.getElementById('tagsArea');
-            var tagsArea = document.createElement('div');
-            tagsArea.id = 'tagsAreaDiv';
-            tagsArea.innerHTML = '<div class="mb-3" style="margin-top: 1rem;"><label for="tagsInput" class="form-label">Tags (comma separated): </label><input type="text" class="form-control" id="tagsInput" name="tags"></div>';
-            container.appendChild(tagsArea);
-          }
-          tagsElementsShown = true;
-        }
-
-        function removeTagsElements() {
-          if (tagsElementsShown) {
-            // remove tags section
-            var tagsArea = document.getElementById('tagsAreaDiv');
-            tagsArea.remove();
-          }
-          tagsElementsShown = false;
-        }
-
-        document.getElementById('radioPublic').onclick = function() {
-          removeTagsElements()
-        };
-
-        document.getElementById('radioMembers').onclick = function() {
-          removeTagsElements()
-        };
-        document.getElementById('radioMembersTags').onclick = function() {
-          addTagsElements()
-        };
-      </script>
-      </main>
+      <form action="javascript:void(0)">
+        <p class="fs-3" id="add-map-paragraph">Add a new room</p>
+        <label for="mapURL" class="form-label">Map URL</label>
+        <div class="input-group mb-3">
+          <span class="input-group-text" id="map_url_prefix"><?php echo "https://" . getenv('DOMAIN') . "/@/org/" . getenv('DOMAIN') . "/"; ?></span>
+          <input type="text" class="form-control" id="mapURL" aria-describedby="map_url_prefix" name="map_url">
+        </div>
+        <label for="mapURLFile" class="form-label">Map File URL</label>
+        <div class="input-group mb-3">
+          <span class="input-group-text" id="map_url_file_prefix">https://</span>
+          <input type="text" class="form-control" id="mapURLFile" aria-describedby="map_url_file_prefix" name="map_file_url">
+        </div>
+        <p class="fs-6">Access restriction</p>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="radio" id="radioPublic" value="public" />
+          <label class="form-check-label" for="radioPublic">Public</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="radio" id="radioMembers" value="members" checked />
+          <label class="form-check-label" for="radioMembers">Members</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="radio" id="radioMembersTags" value="tags" />
+          <label class="form-check-label" for="radioMembersTags">Members with tags</label>
+        </div>
+        <div id="tagsArea" class="input-group mb-3">
+        </div>
+        <button class="btn btn-primary" id="addMapButton" style="margin-top: 1rem;">Add map</button>
+      </form>
+    </article>
+  </main>
 </body>
 
 </html>
