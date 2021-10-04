@@ -10,6 +10,8 @@ session_start();
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/style.css" rel="stylesheet">
   <script src="js/bootstrap.min.js"></script>
+  <script src="js/ajax/jquery-3.6.0.min.js"></script>
+  <script src="js/ajax/user.js"></script>
   <title>Workadventure Administration</title>
 </head>
 
@@ -26,7 +28,7 @@ session_start();
     echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
     echo "Could not connect to database: " . $exception->getMessage();
     echo "</aside>";
-    return;
+    die();
   }
   require_once 'api/database_operations.php';
   require_once 'login_functions.php';
@@ -40,175 +42,26 @@ session_start();
   // Get user's uuid
   if (!isset($_POST["uuid"])) {
   ?>
-    <aside class="container alert alert-danger" role="alert">
+    <aside class="container alert alert-danger" role="alert" id="alert">
       <p>User not specified</p>
     </aside>
-    <?php
+  <?php
     die();
+  } else { ?>
+    <aside class="container alert" role="alert" id="alert">
+    </aside>
+  <?php
   }
 
   $uuid = htmlspecialchars($_POST["uuid"]);
+
+  //this is safe here, as an admin account is needed to access this
   createAccountIfNotExistent($uuid);
-
-  // Get new tag
-  if (isset($_POST["newtag"])) {
-    $newTag = htmlspecialchars($_POST["newtag"]);
-    if (!empty($newTag)) {
-      $addTagResult = addTag($uuid, $newTag);
-      if ($addTagResult == true) {
-    ?>
-        <aside class="container alert alert-success" role="alert">
-          The tag <?php echo "\"" . $newTag . "\""; ?> has been added.
-        </aside>
-      <?php
-      } else {
-      ?>
-        <aside class="container alert alert-danger" role="alert">
-          Could not add the tag <?php echo "\"" . $newTag . "\""; ?>
-        </aside>
-      <?php
-      }
-    }
-  }
-
-  // Get tag to remove
-  if (isset($_POST["remtag"])) {
-    $remTag = htmlspecialchars($_POST["remtag"]);
-    if (!empty($remTag)) {
-      $remTagResult = removeTag($uuid, $remTag);
-      if ($remTagResult == true) {
-      ?>
-        <aside class="container alert alert-success" role="alert">
-          The tag <?php echo "\"" . $remTag . "\""; ?> has been removed.
-        </aside>
-      <?php
-      } else {
-      ?>
-        <aside class="container alert alert-danger" role="alert">
-          Could not remove the tag <?php echo "\"" . $remTag . "\""; ?>.
-        </aside>
-      <?php
-      }
-    }
-  }
-
-  // Ban user if requested
-  if (isset($_POST["ban"])) {
-    if ((isset($_POST["message"])) && (!empty($_POST["message"])) && (htmlspecialchars($_POST["ban"]) == "true")) {
-      if (banUser($uuid, htmlspecialchars($_POST["message"]))) {
-      ?>
-        <aside class="container alert alert-success" role="alert">
-          This user has been banned.
-        </aside>
-      <?php
-      } else {
-      ?>
-        <aside class="container alert alert-danger" role="alert">
-          Could not ban this user.
-        </aside>
-      <?php
-      }
-    } else if (htmlspecialchars($_POST["ban"]) == "false") {
-      if (liftBan($uuid)) {
-      ?>
-        <aside class="container alert alert-success" role="alert">
-          This user's ban has been lifted.
-        </aside>
-      <?php
-      } else {
-      ?>
-        <aside class="container alert alert-danger" role="alert">
-          Could not lift this user's ban.
-        </aside>
-      <?php
-      }
-    } else {
-      ?>
-      <aside class="container alert alert-danger" role="alert">
-        Ban message required.
-      </aside>
-      <?php
-    }
-  }
-
-  // Update userdata if requested
-  if (isset($_POST["update-data"])) {
-    if ((isset($_POST["name"])) && (isset($_POST["email"]))) {
-      $name = htmlspecialchars($_POST["name"]);
-      $email = htmlspecialchars($_POST["email"]);
-      if ((empty($name)) || (empty($email))) {
-      ?>
-        <aside class="container alert alert-danger" role="alert">
-          New user data must not be empty.
-        </aside>
-        <?php
-      } else {
-        $visitCardUrl = NULL;
-        if (isset($_POST["visitCardUrl"])) {
-          $visitCardUrl = htmlspecialchars($_POST["visitCardUrl"]);
-        }
-        if (updateUserData($uuid, $name, $email, $visitCardUrl)) {
-        ?>
-          <aside class="container alert alert-success" role="alert">
-            User data has been updated.
-          </aside>
-        <?php
-        } else {
-        ?>
-          <aside class="container alert alert-danger" role="alert">
-            User data could not be updated.
-          </aside>
-      <?php
-        }
-      }
-    } else {
-      ?>
-      <aside class="container alert alert-danger" role="alert">
-        New user data could not be fetched.
-      </aside>
-    <?php
-    }
-  }
-
-  // remove message if requested
-  if ((isset($_POST["removemessage"])) && (isset($_POST["message_id"]))) {
-    $id = htmlspecialchars($_POST["message_id"]);
-    if (removeUserMessage($id)) { ?>
-      <aside class="container alert alert-success" role="alert">
-        <p>Removed message</p>
-      </aside>
-    <?php } else { ?>
-      <aside class="container alert alert-danger" role="alert">
-        <p>Could not remove message</p>
-      </aside>
-      <?php }
-  }
-
-  // send message if requested
-  if ((isset($_POST["sendMessage"])) && (isset($_POST["message"]))) {
-    $sendMessage = htmlspecialchars($_POST["sendMessage"]);
-    $message = htmlspecialchars($_POST["message"]);
-    if (($sendMessage == "true") && (strlen(trim($message)) > 0)) {
-      if (storeUserMessage($uuid, $message)) { ?>
-        <aside class="container alert alert-success" role="alert">
-          <p>Stored user message</p>
-        </aside>
-      <?php } else { ?>
-        <aside class="container alert alert-danger" role="alert">
-          <p>Could not store message</p>
-        </aside>
-      <?php }
-    } else { ?>
-      <aside class="container alert alert-danger" role="alert">
-        <p>User message not valid</p>
-      </aside>
-    <?php }
-  }
 
   // get current user data
   $userData = getUserData($uuid);
   if ($userData == NULL) {
-    ?>
+  ?>
     <aside class="container alert alert-danger" role="alert">
       <p>Could not fetch user details</p>
     </aside>
@@ -218,10 +71,14 @@ session_start();
   ?>
   <main class="container">
     <section>
-      <form action="edit_user.php" method="post" style="margin-bottom: 1rem;">
+      <form action="javascript:void(0)" method="post" style="margin-bottom: 1rem;">
         <div class="mb-3">
-          <label for="name" class="form-label">Name</label>
-          <input type="text" class="form-control" id="name" name="name" value="<?php echo $userData["name"]; ?>">
+          <label for="uuid" class="form-label">UUID</label>
+          <input type="text" class="form-control" id="uuid" value="<?php echo $uuid; ?>" disabled>
+        </div>
+        <div class="mb-3">
+          <label for="username" class="form-label">Name</label>
+          <input type="text" class="form-control" id="username" name="name" value="<?php echo $userData["name"]; ?>">
         </div>
         <div class="mb-3">
           <label for="email" class="form-label">Email Address</label>
@@ -233,36 +90,41 @@ session_start();
           <input type="text" class="form-control" id="visitCardUrlLabel" aria-describedby="visitCardUrlPrefix" name="visitCardUrl" value="<?php echo getUserVisitCardUrl($uuid) == NULL ? "" : getUserVisitCardUrl($uuid); ?>">
         </div>
         <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
-        <input class="btn btn-primary" type="submit" value="Update" name="update-data">
+        <input class="btn btn-primary" type="submit" value="Update" name="update-data" id="buttonUpdateMainInformation">
       </form>
       <section>
         <section class="mb-3">
           <label for="name" class="form-label">Access Link</label>
           <input type="text" class="form-control" id="name" value="<?php echo "https://" . getenv('DOMAIN') . "/register/" . $userData["uuid"]; ?>" readonly>
         </section>
-        <section class="mb-3">
+        <section class="mb-3" id="tagsSection">
           <?php
           if (hasTags($uuid)) {
           ?>
             <p>Tags (click to remove):</p>
-          <?php
+            <?php
             $tags = getTags($uuid);
             foreach ($tags as $currentTag) {
-              echo "<form action=\"edit_user.php\" method=\"post\" class=\"sameline-form\"><input class=\"tag btn btn-primary\" type=\"submit\" value=\"" . $currentTag . "\" name=\"remtag\"><input type=\"hidden\" name=\"uuid\" value=\"" . $uuid . "\"></form>";
+            ?>
+              <form action="javascript:void(0)" method="post" class="sameline-form">
+                <input class="tag btn btn-primary" type="submit" value="<?php echo $currentTag; ?>" name="removeTag">
+                <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
+              </form>
+            <?php
             }
             echo "<br><br>";
-          }
+          } else { ?>
+            <p>Tags:</p>
+          <?php }
           ?>
         </section>
         <section>
-          <p>Add tag:</p>
-          <form action="edit_user.php" method="post">
-            <input class="form-control" type="text" name="newtag"><br>
-            <input class="btn btn-primary" type="submit" value="Add tag">
-            <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
+          <form class="input-group mb-3" style="margin-top: 1rem;" action="javascript:void(0)" method="post">
+            <input type="text" class="form-control" placeholder="Tag" aria-label="Tag" aria-describedby="buttonTag" id="tagInput" name="newTag">
+            <button class="btn btn-primary" type="button" type="submit" id="buttonTag">Add</button>
           </form>
         </section>
-        <section>
+        <section id="messagesSection">
           <?php if (userMessagesExist($uuid)) {
             $messages = getUserMessages($uuid);
             if ($messages == NULL) { ?>
@@ -275,56 +137,57 @@ session_start();
               </div>
               <p class="fs-3">User messages:</p>
               <table class="table">
-                <tr>
-                  <th scope="col">Message</th>
-                  <th scope="col">Actions</th>
-                </tr>
-            <?php
-              while ($row = $messages->fetch(PDO::FETCH_ASSOC)) {
-                echo "<tr><td><p class=\"fw-normal\">" . $row["message"] . "</p></td>";
-                echo "<td><form action=\"edit_user.php\" method=\"post\"><input class=\"tag btn btn-danger\" type=\"submit\" value=\"Remove\" name=\"removemessage\"><input type=\"hidden\" name=\"message_id\" value=\"" . $row["message_id"] . "\"><input type=\"hidden\" name=\"uuid\" value=\"" . $uuid . "\"></form></td></tr>";
-              }
-              echo "</table>";
+                <thead>
+                  <tr>
+                    <th>Message</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+              </table>
+          <?php
             }
           } ?>
         </section>
         <br>
         <section>
           <p>Send new user message:</p>
-          <form action="edit_user.php" method="post">
+          <form action="javascript:void(0)" method="post">
             <div class="mb-3">
               <label for="messageInput" class="form-label">Message:</label>
               <textarea class="form-control" id="messageInput" name="message" rows="3"></textarea>
             </div>
             <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
             <input type="hidden" name="sendMessage" value="true">
-            <input type="submit" class="btn btn-primary" value="Send">
+            <input type="submit" class="btn btn-primary" id="sendMessage" value="Send">
           </form>
         </section>
         <section>
           <?php if (isBanned($uuid)) { ?>
             <br>
-            <p>This user has been banned!</p>
+            <p id="banHeader">This user has been banned!</p>
             <div class="mb-3">
-              <label for="ban_reason" class="form-label">Reason:</label>
-              <input type="text" class="form-control" id="ban_reason" value="<?php echo getBanMessage($uuid); ?>" readonly>
+              <label for="banReason" class="form-label">Reason:</label>
+              <input type="text" class="form-control" id="banReason" value="<?php echo getBanMessage($uuid); ?>" disabled>
             </div>
-            <form action="edit_user.php" method="post">
-              <input class="btn btn-danger" type="submit" value="Lift ban">
+            <form action="javascript:void(0)" method="post">
+              <input class="btn btn-danger" type="submit" id="banButton" value="Lift ban">
               <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
               <input type="hidden" name="ban" value="false">
             </form>
           <?php } else { ?>
             <br>
-            <p>Ban this user:</p>
-            <form action="edit_user.php" method="post">
+            <p id="banHeader">Ban this user:</p>
+            <form action="javascript:void(0)" method="post">
               <div class="mb-3">
-                <label for="ban_reason" class="form-label">Reason:</label>
-                <input type="text" class="form-control" id="ban_reason" name="message">
+                <label for="banReason" class="form-label">Reason:</label>
+                <input type="text" class="form-control" id="banReason" name="message">
               </div>
-              <input class="btn btn-danger" type="submit" value="Ban">
+              <input class="btn btn-danger" type="submit" id="banButton" value="Ban">
               <input type="hidden" name="uuid" value="<?php echo $uuid; ?>">
               <input type="hidden" name="ban" value="true">
+
             </form>
           <?php } ?>
         </section>

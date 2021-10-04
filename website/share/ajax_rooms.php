@@ -118,3 +118,4 @@ if (isset($_GET["removeMap"])) {
 }
 echo json_encode($result);
 $DB = NULL;
+?>
