@@ -1,7 +1,13 @@
-See compose-addition.txt for instructions.
+FOSS Implementation of the WorkAdventure Admin Services
+========================================================
 
-This is a proof of work only so far. 
+This is a open source reimplementation of the WorkAdventure Admin Services.
+The features include (but are not limited to) map and access control, sending global messages and uploading custom character textures.
 
-The Admin API calls and their messages are located in pusher/src/Services/AdminApi.ts
+This software is distributed under the GPL v3.0 (including all commits, also those before this license was added).
 
-Use the admin docker-compose file for setting up WA with admin API
+Usage
+-------
+
+The services can be started by creating a .env file from the env.example file.
+The docker-compose file shows how the containers are set up and connected.
