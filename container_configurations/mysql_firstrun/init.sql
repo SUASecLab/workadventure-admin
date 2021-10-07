@@ -26,7 +26,7 @@ CREATE TABLE reports (
 
 CREATE TABLE banned_users (
   uuid varchar(36) NOT NULL,
-  ban_message varchar(75) NOT NULL,
+  ban_message varchar(300) NOT NULL,
   PRIMARY KEY (uuid),
   FOREIGN KEY (uuid) REFERENCES users(uuid)
 );
