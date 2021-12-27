@@ -19,6 +19,7 @@ session_start();
 <body>
   <?php
   // Connect to database
+  $DB = NULL;
   try {
     $DB = new PDO(
       "mysql:dbname=" . getenv('DB_MYSQL_DATABASE') . ";host=admin-db;port=3306",
@@ -40,6 +41,7 @@ session_start();
     die();
   }
 
+  $DB = NULL;
   ?>
 
   <main class="container">
