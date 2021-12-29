@@ -1,5 +1,31 @@
 <?php
-
+function getDatabaseHandle() {
+    $handle = NULL;
+    try {
+        $handle = new PDO("mysql:dbname=" . getenv('DB_MYSQL_DATABASE') . ";host=admin-db;port=3306", getenv('DB_MYSQL_USER'), getenv('DB_MYSQL_PASSWORD'));
+    }
+    catch(PDOException $exception) {
+        error_log($exception);
+    }
+    return $handle;
+}
+function getDatabaseHandleOrDie() {
+    $handle = getDatabaseHandle();
+    if ($handle == NULL) {
+        die();
+    }
+    return $handle;
+}
+function getDatabaseHandleOrPrintError() {
+    $handle = getDatabaseHandle();
+    if ($handle == NULL) {
+        echo "<aside class=\"alert alert-danger\" role=\"alert\">";
+        echo "Could not connect to database";
+        echo "</aside>";
+        die();
+    }
+    return $handle;
+}
 function userExists($uuid) {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM users WHERE uuid=:uuid;");
@@ -11,27 +37,27 @@ function userExists($uuid) {
         } else {
             return false;
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function writeUuidToDatabase($uuid) {
     GLOBAL $DB;
-    $email = $uuid."@".getenv('DOMAIN');
+    $email = $uuid . "@" . getenv('DOMAIN');
     $Statement = $DB->prepare("INSERT INTO users (uuid, name, email) VALUES (:uuid, 'anonymous', :email)");
     $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
     $Statement->bindParam(":email", $email, PDO::PARAM_STR);
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function updateUserData($uuid, $name, $email, $visitCardUrl) {
     GLOBAL $DB;
     if ((strlen($visitCardUrl) == 0) || ($visitCardUrl == NULL)) {
@@ -45,12 +71,12 @@ function updateUserData($uuid, $name, $email, $visitCardUrl) {
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function getUserEmail($uuid) {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT email FROM users WHERE uuid = :uuid");
@@ -64,12 +90,12 @@ function getUserEmail($uuid) {
         } else {
             return $email;
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return NULL;
     }
 }
-
 function getUuidFromEmail($email) {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT uuid FROM users WHERE email = :email");
@@ -82,12 +108,12 @@ function getUuidFromEmail($email) {
         } else {
             return NULL;
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return NULL;
     }
 }
-
 function getUserVisitCardUrl($uuid, $withPrefix = false) {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT visitCardUrl FROM users WHERE uuid = :uuid");
@@ -101,7 +127,7 @@ function getUserVisitCardUrl($uuid, $withPrefix = false) {
                 return NULL;
             } else {
                 if ($withPrefix) {
-                    return "https://".$visitCard;
+                    return "https://" . $visitCard;
                 } else {
                     return $visitCard;
                 }
@@ -109,18 +135,17 @@ function getUserVisitCardUrl($uuid, $withPrefix = false) {
         } else {
             return NULL;
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return NULL;
     }
 }
-
 function createAccountIfNotExistent($uuid) {
     if (!userExists($uuid)) {
         return writeUuidToDatabase($uuid);
     }
 }
-
 function getTags($uuid) {
     GLOBAL $DB;
     $result = [];
@@ -131,12 +156,12 @@ function getTags($uuid) {
         while ($row = $Statement->fetch(PDO::FETCH_ASSOC)) {
             array_push($result, $row["tag"]);
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
     }
     return $result;
 }
-
 function hasTags($uuid) {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM tags WHERE uuid=:uuid");
@@ -148,12 +173,12 @@ function hasTags($uuid) {
         } else {
             return false;
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function isBanned($uuid) {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM banned_users WHERE uuid=:uuid;");
@@ -165,12 +190,12 @@ function isBanned($uuid) {
         } else {
             return false;
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function getBanMessage($uuid) {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM banned_users WHERE uuid=:uuid;");
@@ -179,12 +204,12 @@ function getBanMessage($uuid) {
         $Statement->execute();
         $row = $Statement->fetch(PDO::FETCH_ASSOC);
         return $row["ban_message"];
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return "";
     }
 }
-
 function banUser($uuid, $banMessage) {
     GLOBAL $DB;
     $Statement = $DB->prepare("INSERT INTO banned_users (uuid, ban_message) VALUES (:uuid, :ban_message)");
@@ -193,12 +218,12 @@ function banUser($uuid, $banMessage) {
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function liftBan($uuid) {
     GLOBAL $DB;
     $Statement = $DB->prepare("DELETE FROM banned_users WHERE uuid=:uuid;");
@@ -206,12 +231,12 @@ function liftBan($uuid) {
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function getNumberOfUsers() {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT count('uuid') as number FROM users;");
@@ -219,24 +244,24 @@ function getNumberOfUsers() {
         $Statement->execute();
         $row = $Statement->fetch(PDO::FETCH_ASSOC);
         return $row["number"];
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return NULL;
     }
 }
-
 function getAllUsers() {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM users;");
     try {
         $Statement->execute();
         return $Statement;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return NULL;
     }
 }
-
 function getUserData($uuid) {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM users WHERE uuid=:uuid;");
@@ -244,12 +269,12 @@ function getUserData($uuid) {
     try {
         $Statement->execute();
         return $Statement->fetch(PDO::FETCH_ASSOC);
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return NULL;
     }
 }
-
 function addTag($uuid, $newTag) {
     GLOBAL $DB;
     $Statement = $DB->prepare("INSERT INTO tags (uuid, tag) VALUES (:uuid, :tag);");
@@ -258,12 +283,12 @@ function addTag($uuid, $newTag) {
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return NULL;
     }
 }
-
 function removeTag($uuid, $remTag) {
     GLOBAL $DB;
     $Statement = $DB->prepare("DELETE FROM tags WHERE uuid=:uuid AND tag=:tag;");
@@ -272,12 +297,12 @@ function removeTag($uuid, $remTag) {
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return NULL;
     }
 }
-
 function websiteUserExists() {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM website");
@@ -288,12 +313,12 @@ function websiteUserExists() {
         } else {
             return false;
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function createWebsiteUser($username, $hashedPassword) {
     GLOBAL $DB;
     $Statement = $DB->prepare("INSERT INTO website (username, hashed_password) VALUES (:username, :hashed_password);");
@@ -302,12 +327,12 @@ function createWebsiteUser($username, $hashedPassword) {
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function websiteUserValid($username, $hashedPassword) {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM website WHERE username = :username AND hashed_password = :hashed_password;");
@@ -320,12 +345,12 @@ function websiteUserValid($username, $hashedPassword) {
         } else {
             return false;
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function getMapFileUrl($map) {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM maps WHERE map_url = :map_url;");
@@ -334,16 +359,16 @@ function getMapFileUrl($map) {
         $Statement->execute();
         if ($Statement->rowCount() > 0) {
             $row = $Statement->fetch(PDO::FETCH_ASSOC);
-            return "https://".$row["map_file_url"];
+            return "https://" . $row["map_file_url"];
         } else {
             return NULL;
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return NULL;
     }
 }
-
 function getMapPolicy($map) {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM maps WHERE map_url = :map_url;");
@@ -352,16 +377,16 @@ function getMapPolicy($map) {
         $Statement->execute();
         if ($Statement->rowCount() > 0) {
             $row = $Statement->fetch(PDO::FETCH_ASSOC);
-            return (int) $row["policy"];
+            return (int)$row["policy"];
         } else {
             return NULL;
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return NULL;
     }
 }
-
 function storeMapFileUrl($mapUrl, $mapFileUrl, $policyNumber) {
     GLOBAL $DB;
     $Statement = $DB->prepare("INSERT INTO maps (map_url, map_file_url, policy) VALUES (:map_url, :map_file_url, :policy);");
@@ -371,24 +396,24 @@ function storeMapFileUrl($mapUrl, $mapFileUrl, $policyNumber) {
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function getAllMaps() {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM maps;");
     try {
         $Statement->execute();
         return $Statement;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return NULL;
     }
 }
-
 function removeMap($mapUrl) {
     GLOBAL $DB;
     $Statement = $DB->prepare("DELETE FROM maps WHERE map_url = :map_url;");
@@ -396,12 +421,12 @@ function removeMap($mapUrl) {
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function addMapTag($mapUrl, $mapTag) {
     GLOBAL $DB;
     $Statement = $DB->prepare("INSERT INTO maps_tags (map_url, tag) VALUES (:map_url, :tag);");
@@ -410,12 +435,12 @@ function addMapTag($mapUrl, $mapTag) {
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function getMapTags($mapUrl) {
     GLOBAL $DB;
     $result = array();
@@ -426,12 +451,12 @@ function getMapTags($mapUrl) {
         while ($row = $Statement->fetch(PDO::FETCH_ASSOC)) {
             array_push($result, $row["tag"]);
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
     }
     return $result;
 }
-
 function removeMapTags($mapUrl) {
     GLOBAL $DB;
     $Statement = $DB->prepare("DELETE FROM maps_tags WHERE map_url = :map_url;");
@@ -439,12 +464,12 @@ function removeMapTags($mapUrl) {
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function allowedToCreateNewUser() {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT preference_key FROM preferences;");
@@ -455,19 +480,20 @@ function allowedToCreateNewUser() {
         } else {
             return false;
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function setAllowedToCreateNewUser($allow) {
     GLOBAL $DB;
     if (allowedToCreateNewUser()) {
         $Statement = $DB->prepare("DELETE FROM preferences WHERE preference_key = 'allowedToCreateNewUser';");
         try {
             $Statement->execute();
-        } catch (PDOException $exception) {
+        }
+        catch(PDOException $exception) {
             error_log($exception);
         }
     }
@@ -475,12 +501,12 @@ function setAllowedToCreateNewUser($allow) {
         $Statement = $DB->prepare("INSERT INTO preferences (preference_key, preference_value) VALUES ('allowedToCreateNewUser', 'true');");
         try {
             $Statement->execute();
-        } catch (PDOException $exception) {
+        }
+        catch(PDOException $exception) {
             error_log($exception);
         }
     }
 }
-
 function globalMessagesExist() {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM global_messages;");
@@ -491,12 +517,12 @@ function globalMessagesExist() {
         } else {
             return false;
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function createNewGlobalMessage($message) {
     GLOBAL $DB;
     $Statement = $DB->prepare("INSERT INTO global_messages (message) VALUES (:message);");
@@ -504,24 +530,24 @@ function createNewGlobalMessage($message) {
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function getGlobalMessages() {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM global_messages;");
     try {
         $Statement->execute();
         return $Statement;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return NULL;
     }
 }
-
 function deleteGlobalMessage($id) {
     GLOBAL $DB;
     $Statement1 = $DB->prepare("DELETE FROM hidden_global_messages WHERE message_id = :id;");
@@ -532,12 +558,12 @@ function deleteGlobalMessage($id) {
         $Statement1->execute();
         $Statement2->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function getHiddenMessagesIds($uuid) {
     GLOBAL $DB;
     $result = array();
@@ -545,15 +571,15 @@ function getHiddenMessagesIds($uuid) {
     $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
     try {
         $Statement->execute();
-        while($row = $Statement->fetch(PDO::FETCH_ASSOC)) {
+        while ($row = $Statement->fetch(PDO::FETCH_ASSOC)) {
             array_push($result, $row["message_id"]);
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
     }
     return $result;
 }
-
 function hideGlobalMessage($uuid, $messageId) {
     GLOBAL $DB;
     $Statement = $DB->prepare("INSERT INTO hidden_global_messages (uuid, message_id) VALUES (:uuid, :message_id);");
@@ -561,11 +587,11 @@ function hideGlobalMessage($uuid, $messageId) {
     $Statement->bindParam(":message_id", $messageId, PDO::PARAM_INT);
     try {
         $Statement->execute();
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
     }
 }
-
 function userMessagesExist($uuid) {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM user_messages WHERE user_uuid = :user_uuid;");
@@ -577,12 +603,12 @@ function userMessagesExist($uuid) {
         } else {
             return false;
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function getUserMessages($uuid) {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM user_messages WHERE user_uuid = :user_uuid;");
@@ -590,12 +616,12 @@ function getUserMessages($uuid) {
     try {
         $Statement->execute();
         return $Statement;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return NULL;
     }
 }
-
 function removeUserMessage($messageId) {
     GLOBAL $DB;
     $Statement = $DB->prepare("DELETE FROM user_messages WHERE message_id = :id;");
@@ -603,12 +629,12 @@ function removeUserMessage($messageId) {
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function storeUserMessage($userUuid, $message) {
     GLOBAL $DB;
     $Statement = $DB->prepare("INSERT INTO user_messages (user_uuid, message) VALUES (:user_uuid, :message);");
@@ -617,12 +643,12 @@ function storeUserMessage($userUuid, $message) {
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function customTexturesStored() {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM textures;");
@@ -633,24 +659,24 @@ function customTexturesStored() {
         } else {
             return false;
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function getCustomTextures() {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM textures;");
     try {
         $Statement->execute();
         return $Statement;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return NULL;
     }
 }
-
 function removeTexture($textureTableId) {
     GLOBAL $DB;
     $Statement1 = $DB->prepare("DELETE FROM textures_restrictions  WHERE texture_table_id = :id;");
@@ -661,12 +687,12 @@ function removeTexture($textureTableId) {
         $Statement1->execute();
         $Statement2->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function storeTexture($id, $level, $url, $rights, $notice) {
     GLOBAL $DB;
     $Statement = $DB->prepare("INSERT INTO textures (texture_id, texture_level, url, rights, notice) VALUES (:texture_id, :texture_level, :url, :rights, :notice);");
@@ -678,12 +704,12 @@ function storeTexture($id, $level, $url, $rights, $notice) {
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function storeTextureTag($textureId, $textureTag) {
     GLOBAL $DB;
     $Statement = $DB->prepare("INSERT INTO textures_restrictions (texture_table_id, tag) VALUES (:texture_table_id, :tag);");
@@ -692,12 +718,12 @@ function storeTextureTag($textureId, $textureTag) {
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function getTextureTags($textureId) {
     GLOBAL $DB;
     $result = array();
@@ -705,16 +731,16 @@ function getTextureTags($textureId) {
     $Statement->bindParam(":texture_table_id", $textureId, PDO::PARAM_INT);
     try {
         $Statement->execute();
-        while($row = $Statement->fetch(PDO::FETCH_ASSOC)) {
+        while ($row = $Statement->fetch(PDO::FETCH_ASSOC)) {
             array_push($result, $row["tag"]);
         }
         return $result;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return $result;
     }
 }
-
 function getLastTextureId() {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT texture_table_id FROM textures ORDER BY texture_table_id DESC LIMIT 1;");
@@ -726,12 +752,12 @@ function getLastTextureId() {
         } else {
             return -1;
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return -1;
     }
 }
-
 function reportUser($reportedUserUuid, $reportedUserComment, $reporterUserUuid, $reportWorldSlug) {
     GLOBAL $DB;
     $Statement = $DB->prepare("INSERT INTO reports (reportedUserUuid, reportedUserComment, reporterUserUuid, reportWorldSlug) VALUES (:reportedUserUuid, :reportedUserComment, :reporterUserUuid, :reportWorldSlug)");
@@ -741,11 +767,11 @@ function reportUser($reportedUserUuid, $reportedUserComment, $reporterUserUuid, 
     $Statement->bindParam(":reportWorldSlug", $reportWorldSlug, PDO::PARAM_STR);
     try {
         $Statement->execute();
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
     }
 }
-
 function reportsStored() {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM reports;");
@@ -756,24 +782,24 @@ function reportsStored() {
         } else {
             return false;
         }
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-
 function getReports() {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT * FROM reports;");
     try {
         $Statement->execute();
         return $Statement;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return NULL;
     }
 }
-
 function removeReport($reportId) {
     GLOBAL $DB;
     $Statement = $DB->prepare("DELETE FROM reports WHERE report_id = :id;");
@@ -781,9 +807,9 @@ function removeReport($reportId) {
     try {
         $Statement->execute();
         return true;
-    } catch (PDOException $exception) {
+    }
+    catch(PDOException $exception) {
         error_log($exception);
         return false;
     }
 }
-?>

@@ -6,47 +6,36 @@ session_start();
 
 <body>
   <?php
-  // Connect to database
-  try {
-    $DB = new PDO(
-      "mysql:dbname=" . getenv('DB_MYSQL_DATABASE') . ";host=admin-db;port=3306",
-      getenv('DB_MYSQL_USER'),
-      getenv('DB_MYSQL_PASSWORD')
-    );
-  } catch (PDOException $exception) { ?>
-    <aside class="alert alert-danger" role="alert">
-      Could not connect to database: <?php echo $exception->getMessage(); ?>
-    </aside>
-    <?php return;
-  }
-  require_once('../api/database_operations.php');
-  require_once('../login_functions.php');
-
-  if (!isLoggedIn()) {
-    http_response_code(403);
+require_once ('../util/database_operations.php');
+require_once ('../util/web_login_functions.php');
+// Connect to database
+$DB = getDatabaseHandleOrPrintError();
+if (!isLoggedIn()) {
+    $DB = NULL;
     die();
-  }
-
-  if (isset($_POST["reportId"])) {
+}
+if (isset($_POST["reportId"])) {
     $reportId = htmlspecialchars($_POST["reportId"]);
     if (removeReport($reportId)) { ?>
       <aside class="alert alert-success" role="alert">
         Removed report.
       </aside>
-    <?php } else { ?>
+    <?php
+    } else { ?>
       <aside class="alert alert-danger" role="alert">
         Could not remove report.
       </aside>
-    <?php }
-  }
-
-  if (reportsStored()) {
+    <?php
+    }
+}
+if (reportsStored()) {
     $reports = getReports();
     if ($reports == NULL) { ?>
       <aside class="alert alert-danger" role="alert">
         Could not load reports.
       </aside>
-    <?php } else { ?>
+    <?php
+    } else { ?>
       <main>
         <table class="table">
           <tr>
@@ -56,7 +45,7 @@ session_start();
             <th scope="col">Actions</th>
           </tr>
           <?php
-          while ($row = $reports->fetch(PDO::FETCH_ASSOC)) {
+        while ($row = $reports->fetch(PDO::FETCH_ASSOC)) {
             $reportedUserUuid = $row["reportedUserUuid"];
             $reportedUserData = getUserData($reportedUserUuid);
             $reporterUuid = $row["reporterUserUuid"];
@@ -81,27 +70,22 @@ session_start();
                 <button class="tag btn btn-danger" onclick="removeReport('<?php echo $row['report_id']; ?>');">
                   Remove report
                 </button>
-                <form target="_blank" action="edit_user.php" method="post" class="sameline-form">
-                  <input class="tag btn btn-danger" type="submit" value="Go to reported user">
-                  <input type="hidden" name="uuid" value="<?php echo $row['reportedUserUuid']; ?>">
-                </form>
-                <form target="_blank" action="edit_user.php" method="post" class="sameline-form">
-                  <input class="tag btn btn-danger" type="submit" value="Go to reporter">
-                  <input type="hidden" name="uuid" value="<?php echo $row['reporterUserUuid']; ?>">
-                </form>
+                <a class="tag btn btn-danger" role="button" target="_blank" href="/edit/<?php echo $row['reportedUserUuid']; ?>">Go to reported user</a>
+                <a class="tag btn btn-danger" role="button" target="_blank" href="/edit/<?php echo $row['reporterUserUuid']; ?>">Go to reporter</a>
               </td>
             </tr>
-        <?php }
-        } ?>
+        <?php
+        }
+    } ?>
         </table>
       </main> <?php
-            } else { ?>
+} else { ?>
       <main class="alert alert-primary" role="alert">
         No reports stored.
       </main>
-    <?php }
-
-            $DB = NULL; ?>
+    <?php
+}
+$DB = NULL; ?>
 </body>
 
 </html>

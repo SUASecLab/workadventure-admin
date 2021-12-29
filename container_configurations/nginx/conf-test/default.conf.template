@@ -14,6 +14,20 @@ server {
     fastcgi_hide_header X-Powered-By;
     add_header X-Content-Type-Options "nosniff" always;
     add_header Cache-Control no-cache;
+    
+    location = / {
+        rewrite ^/(.*)$ /template.php?target=index$1 last;
+    }
+    
+    rewrite ^/edit/(.*)$ /template.php?target=edit_user&uuid=$1 last;
+    rewrite ^/login(.*)$ /template.php?target=login$1 last;
+    rewrite ^/logout(.*)$ /template.php?target=logout$1 last;
+    rewrite ^/messages(.*)$ /template.php?target=messages$1 last;
+    rewrite ^/reports(.*)$ /template.php?target=reports$1 last;
+    rewrite ^/rooms(.*)$ /template.php?target=rooms$1 last;
+    rewrite ^/settings(.*)$ /template.php?target=settings$1 last;
+    rewrite ^/textures(.*)$ /template.php?target=textures$1 last;
+    rewrite ^/user(.*)$ /template.php?target=user$1 last;
 
     location ~ \.php$ {
         try_files $uri = 404;

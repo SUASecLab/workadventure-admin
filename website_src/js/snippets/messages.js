@@ -46,21 +46,26 @@ const quillToolbarSettings = [
 ];
 
 window.onload = function () {
-    $("#messages").load("snippets/messages.php");
+    $("#messages").load("/snippets/messages.php", addListener);
+}
+
+function addListener() {
+    const addMessageButton = document.getElementById("addMessageButton");
+    addMessageButton.addEventListener("click", addMessage);
 }
 
 function removeMessage(id) {
-    $("#messages").load("snippets/messages.php",
-    {
-        "message_id": id
-    });
+    $("#messages").load("/snippets/messages.php", {
+        "action": "removeMessage",
+        "id": id
+    }, addListener);
 }
 
 function addMessage() {
-    const message = document.getElementById("message").value;
+    const message = JSON.stringify(quill.getContents(0, quill.getLength()));
 
-    $("#messages").load("snippets/messages.php",
-    {
+    $("#messages").load("/snippets/messages.php", {
+        "action": "addMessage",
         "message": message
-    });
+    }, addListener);
 }

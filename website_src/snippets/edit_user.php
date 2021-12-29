@@ -6,197 +6,192 @@ session_start();
 
 <body>
   <?php
-  // Connect to database
-  $DB = NULL;
-  try {
-    $DB = new PDO(
-      "mysql:dbname=" . getenv('DB_MYSQL_DATABASE') . ";host=admin-db;port=3306",
-      getenv('DB_MYSQL_USER'),
-      getenv('DB_MYSQL_PASSWORD')
-    );
-  } catch (PDOException $exception) { ?>
-    <aside class="alert alert-danger" role="alert">
-      "Could not connect to database: <?php echo $exception->getMessage(); ?>
-    </aside>
-  <?php return;
-  }
-
-  require_once('../api/database_operations.php');
-  require_once('../login_functions.php');
-
-  if (!isLoggedIn()) {
-    http_response_code(403);
+require_once ('../util/database_operations.php');
+require_once ('../util/web_login_functions.php');
+// Connect to database
+$DB = getDatabaseHandleOrPrintError();
+if (!isLoggedIn()) {
+    $DB = NULL;
     die();
-  }
-
-  // Get user's uuid
-  if (!isset($_POST["uuid"])) {
-  ?>
+}
+// Get user's uuid
+if (!isset($_POST["uuid"])) {
+?>
     <aside class="alert alert-danger" role="alert">
       <p>User not specified</p>
     </aside>
     <?php
     die();
-  }
-
-  $uuid = htmlspecialchars($_POST["uuid"]);
-  createAccountIfNotExistent($uuid);
-
-  // Get new tag
-  if (isset($_POST["newtag"])) {
-    $newTag = htmlspecialchars($_POST["newtag"]);
-    if (!empty($newTag)) {
-      $addTagResult = addTag($uuid, $newTag);
-      if ($addTagResult == true) {
-    ?>
+}
+$uuid = htmlspecialchars($_POST["uuid"]);
+createAccountIfNotExistent($uuid);
+// Get new tag
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addTag") && (isset($_POST["tag"]))) {
+    $tag = htmlspecialchars($_POST["tag"]);
+    if (strlen(trim($tag)) > 0) {
+        $addTagResult = addTag($uuid, $tag);
+        if ($addTagResult == true) {
+?>
         <aside class="alert alert-success" role="alert">
-          The tag <?php echo "\"" . $newTag . "\""; ?> has been added.
+          The tag <?php echo "\"" . $tag . "\""; ?> has been added.
         </aside>
       <?php
-      } else {
-      ?>
+        } else {
+?>
         <aside class="alert alert-danger" role="alert">
-          Could not add the tag <?php echo "\"" . $newTag . "\""; ?>
+          Could not add the tag <?php echo "\"" . $tag . "\""; ?>
         </aside>
       <?php
-      }
+        }
+    } else { ?>
+      <aside class="alert alert-danger" role="alert">
+        Can not store empty tags
+      </aside>
+      <?php
     }
-  }
-
-  // Get tag to remove
-  if (isset($_POST["remtag"])) {
-    $remTag = htmlspecialchars($_POST["remtag"]);
-    if (!(strlen($remTag) == 0)) {
-      $remTagResult = removeTag($uuid, $remTag);
-      if ($remTagResult == true) {
-      ?>
+}
+// Get tag to remove
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeTag") && (isset($_POST["tag"]))) {
+    $tag = htmlspecialchars($_POST["tag"]);
+    if (strlen(trim($tag)) > 0) {
+        $remTagResult = removeTag($uuid, $tag);
+        if ($remTagResult == true) {
+?>
         <aside class="alert alert-success" role="alert">
-          The tag <?php echo "\"" . $remTag . "\""; ?> has been removed.
+          The tag <?php echo "\"" . $tag . "\""; ?> has been removed.
         </aside>
       <?php
-      } else {
-      ?>
+        } else {
+?>
         <aside class="alert alert-danger" role="alert">
-          Could not remove the tag <?php echo "\"" . $remTag . "\""; ?>.
+          Could not remove the tag <?php echo "\"" . $tag . "\""; ?>.
         </aside>
       <?php
-      }
+        }
+    } else { ?>
+      <aside class="alert alert-danger" role="alert">
+        Can not remove empty tags
+      </aside>
+    <?php
     }
-  }
-
-  // Ban user if requested
-  if (isset($_POST["ban"])) {
-    if ((isset($_POST["message"])) && (!empty($_POST["message"])) && (htmlspecialchars($_POST["ban"]) == "true")) {
-      if (banUser($uuid, htmlspecialchars($_POST["message"]))) {
-      ?>
+}
+// Ban user if requested
+if (isset($_POST["action"]) && (htmlspecialchars($_POST["action"]) == "ban") && (isset($_POST["reason"]))) {
+    $reason = htmlspecialchars($_POST["reason"]);
+    if (strlen(trim($reason)) > 0) {
+      if (banUser($uuid, htmlspecialchars($_POST["reason"]))) {
+?>
         <aside class="alert alert-success" role="alert">
           This user has been banned.
         </aside>
       <?php
       } else {
-      ?>
+?>
         <aside class="alert alert-danger" role="alert">
           Could not ban this user.
         </aside>
       <?php
       }
-    } else if (htmlspecialchars($_POST["ban"]) == "false") {
-      if (liftBan($uuid)) {
-      ?>
-        <aside class="alert alert-success" role="alert">
-          This user's ban has been lifted.
-        </aside>
-      <?php
-      } else {
-      ?>
-        <aside class="alert alert-danger" role="alert">
-          Could not lift this user's ban.
-        </aside>
-      <?php
-      }
     } else {
-      ?>
+?>
       <aside class="alert alert-danger" role="alert">
-        Ban message required.
+        Did not ban user: no reason specified
       </aside>
     <?php
     }
-  }
-
-  // Update userdata if requested
-  if ((isset($_POST["name"])) && (isset($_POST["email"]))) {
+}
+//unban user if requested
+if (isset($_POST["action"]) && (htmlspecialchars($_POST["action"]) == "unban")) {
+    if (liftBan($uuid)) {
+?>
+      <aside class="alert alert-success" role="alert">
+        This user's ban has been lifted.
+      </aside>
+    <?php
+    } else {
+?>
+      <aside class="alert alert-danger" role="alert">
+        Could not lift this user's ban.
+      </aside>
+    <?php
+    }
+}
+// Update userdata if requested
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "updateUserData") && (isset($_POST["name"])) && (isset($_POST["email"]))) {
     $name = htmlspecialchars($_POST["name"]);
     $email = htmlspecialchars($_POST["email"]);
-    if ((empty($name)) || (empty($email))) {
-    ?>
+    if ((strlen(trim($name)) == 0) || (strlen(trim($email)) == 0)) {
+?>
       <aside class="alert alert-danger" role="alert">
-        New user data must not be empty.
+        The entered data is invalid
       </aside>
       <?php
     } else {
-      $visitCardUrl = NULL;
-      if (isset($_POST["visitCardUrl"])) {
-        $visitCardUrl = htmlspecialchars($_POST["visitCardUrl"]);
-      }
-      if (updateUserData($uuid, $name, $email, $visitCardUrl)) { ?>
+        $visitCardUrl = NULL;
+        if (isset($_POST["visitCardUrl"])) {
+            $visitCardUrl = htmlspecialchars($_POST["visitCardUrl"]);
+        }
+        if (updateUserData($uuid, $name, $email, $visitCardUrl)) { ?>
         <aside class="alert alert-success" role="alert">
           User data has been updated.
         </aside>
       <?php
-      } else { ?>
+        } else { ?>
         <aside class="alert alert-danger" role="alert">
           User data could not be updated.
         </aside>
       <?php
-      }
+        }
     }
-  }
-
-  // remove message if requested
-  if ((isset($_POST["removemessage"])) && (isset($_POST["message_id"]))) {
-    $id = htmlspecialchars($_POST["message_id"]);
+}
+// remove message if requested
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeMessage") && (isset($_POST["messageId"]))) {
+    $id = htmlspecialchars($_POST["messageId"]);
     if (removeUserMessage($id)) { ?>
       <aside class="alert alert-success" role="alert">
         <p>Removed message</p>
       </aside>
-    <?php } else { ?>
+    <?php
+    } else { ?>
       <aside class="alert alert-danger" role="alert">
         <p>Could not remove message</p>
       </aside>
-      <?php }
-  }
-
-  // send message if requested
-  if ((isset($_POST["sendmessage"])) && (isset($_POST["message"]))) {
+      <?php
+    }
+}
+// send message if requested
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "sendMessage") && (isset($_POST["message"]))) {
     $message = htmlspecialchars($_POST["message"]);
     if (strlen(trim($message)) > 0) {
-      if (storeUserMessage($uuid, $message)) { ?>
+        if (storeUserMessage($uuid, $message)) { ?>
         <aside class="alert alert-success" role="alert">
           <p>Stored user message</p>
         </aside>
-      <?php } else { ?>
+      <?php
+        } else { ?>
         <aside class="alert alert-danger" role="alert">
           <p>Could not store message</p>
         </aside>
-      <?php }
+      <?php
+        }
     } else { ?>
       <aside class="alert alert-danger" role="alert">
-        <p>User message not valid</p>
+        <p>User message must not be empty</p>
       </aside>
-    <?php }
-  }
-
-  // get current user data
-  $userData = getUserData($uuid);
-  if ($userData == NULL) {
-    ?>
+    <?php
+    }
+}
+// get current user data
+$userData = getUserData($uuid);
+if ($userData == NULL) {
+?>
     <aside class="alert alert-danger" role="alert">
       <p>Could not fetch user details</p>
     </aside>
   <?php
     die();
-  }
-  ?>
+}
+?>
   <main>
     <section>
       <form action="javascript:void(0);" style="margin-bottom: 1rem;">
@@ -222,12 +217,12 @@ session_start();
         </section>
         <section class="mb-3">
           <?php
-          if (hasTags($uuid)) {
-          ?>
+if (hasTags($uuid)) {
+?>
             <p>Tags (click to remove):</p>
             <?php
-            $tags = getTags($uuid);
-            foreach ($tags as $currentTag) { ?>
+    $tags = getTags($uuid);
+    foreach ($tags as $currentTag) { ?>
               <button class="tag btn btn-primary" onclick="removeTag('<?php echo $uuid; ?>', '<?php echo $currentTag; ?>');">
                 <?php echo $currentTag; ?>
               </button>
@@ -240,7 +235,7 @@ session_start();
         <section>
           <p>Add tag:</p>
           <form action="javascript:void(0)">
-            <input class="form-control" type="text" id="newtag"><br>
+            <input class="form-control" type="text" id="newTag"><br>
             <button class="btn btn-primary" onclick="addTag('<?php echo $uuid; ?>');">Add tag</button>
           </form>
         </section>
@@ -252,10 +247,12 @@ session_start();
               <div class="alert alert-danger" role="alert">
                 <p>Could not fetch messages</p>
               </div>
-            <?php } else { ?>
+            <?php
+            } else { ?>
               <br>
               <div class="alert alert-warning" role="alert">
-                <p>Only the top message will be shown to the user. If the user also receives a global message, the global message will be shown instead of the private one!</p>
+                <p>Only the top message will be shown to the user. If the user also receives a global message, the global
+                  message will be shown instead of the private one!</p>
               </div>
               <p class="fs-3">User messages:</p>
               <table class="table">
@@ -277,10 +274,11 @@ session_start();
                       </button>
                     </td>
                   </tr>
-                <?php } ?>
+                <?php
+                } ?>
               </table> <?php
-                      }
-                    } ?>
+            }
+        } ?>
         </section>
         <br>
         <section>
@@ -304,7 +302,8 @@ session_start();
               <input type="text" class="form-control" id="banReason" value="<?php echo getBanMessage($uuid); ?>" readonly>
             </div>
             <button class="btn btn-danger" onclick="unban('<?php echo $uuid; ?>');">Lift ban</button>
-          <?php } else { ?>
+          <?php
+        } else { ?>
             <br>
             <p>Ban this user:</p>
             <form action="javascript:void(0);">
@@ -314,10 +313,11 @@ session_start();
               </div>
               <button class="btn btn-danger" onclick="ban('<?php echo $uuid; ?>');">Ban</button>
             </form>
-          <?php } ?>
+          <?php
+        } ?>
         </section>
         <br>
-        <a class="btn btn-primary" href="user.php" role="button">Go back</a>
+        <a class="btn btn-primary" href="/user" role="button">Go back</a>
   </main>
 </body>
 
