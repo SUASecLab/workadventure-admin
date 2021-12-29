@@ -11,11 +11,13 @@ header("Content-Type:application/json");
 require_once ('../util/api_authentication.php');
 require_once ('../util/database_operations.php');
 require_once ('../util/api_helper_functions.php');
+require_once ('../util/uuid_adapter.php');
 $DB = getDatabaseHandleOrDie();
 authorizeOrDie();
 if ((isset($_GET["userIdentifier"])) && (isset($_GET["roomId"])) && (isset($_GET["ipAddress"]))) {
     $userIdentifier = htmlspecialchars($_GET["userIdentifier"]);
     $uuid = getUuid($userIdentifier);
+    isValidUuidOrDie($uuid);
     if (allowedToCreateNewUser()) {
         createAccountIfNotExistent($uuid);
     }

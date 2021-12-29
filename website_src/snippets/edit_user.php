@@ -8,6 +8,7 @@ session_start();
   <?php
 require_once ('../util/database_operations.php');
 require_once ('../util/web_login_functions.php');
+require_once ('../util/uuid_adapter.php');
 // Connect to database
 $DB = getDatabaseHandleOrPrintError();
 if (!isLoggedIn()) {
@@ -24,6 +25,16 @@ if (!isset($_POST["uuid"])) {
     die();
 }
 $uuid = htmlspecialchars($_POST["uuid"]);
+
+if(!isValidUuid($uuid)) {
+?>
+  <aside class="alert alert-danger" role="alert">
+    The given user ID is invalid
+  </aside>
+<?php
+  die();
+}
+
 createAccountIfNotExistent($uuid);
 // Get new tag
 if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addTag") && (isset($_POST["tag"]))) {
