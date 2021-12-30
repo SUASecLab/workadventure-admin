@@ -3,6 +3,16 @@ window.onload = function () {
 
     $("#edit_user").load("/snippets/edit_user.php", {
         "uuid": uuid
+    }, function() {
+        const navbarMain = document.getElementById("navbarMain");
+
+        const divider = document.createElement('a')
+        navbarMain.appendChild(divider);
+        divider.outerHTML = '<a class="navbar-brand" href="#">/</a>';
+
+        const users = document.createElement('a');
+        navbarMain.appendChild(users);
+        users.outerHTML = '<a class="navbar-brand" href="/user">Users</a>';
     });
 }
 

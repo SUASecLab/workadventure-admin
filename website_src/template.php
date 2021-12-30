@@ -50,7 +50,9 @@ $DB = getDatabaseHandleOrPrintError();
 
     <nav class="container navbar navbar-expant-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">WorkAdventure Administration</a>
+            <div id="navbarMain">
+                <a class="navbar-brand" href="/">WorkAdventure Administration</a>
+            </div>
             <?php
 if (isLoggedIn()) {
 ?>
