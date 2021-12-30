@@ -32,7 +32,19 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeM
 // create new message if requested
 if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addMessage") && (isset($_POST["message"]))) {
     $message = htmlspecialchars($_POST["message"]);
-    if (createNewGlobalMessage($message)) { ?>
+    // check message length first, decode quill delta for this
+    $messageLength = 0;
+    try {
+        $messageLength = strlen(trim(json_decode($_POST["message"], true)['ops'][0]['insert']));
+    } catch (Exception $e) {
+        error_log("Can not get message length: ".$e->getMessage());
+    }
+    if ($messageLength == 0) { ?>
+            <aside class="alert alert-danger" role="alert">
+                <p>Could not create new message: empty message</p>
+            </aside>
+        <?php
+    } else if (createNewGlobalMessage($message)) { ?>
             <aside class="alert alert-success" role="alert">
                 <p>Created new message</p>
             </aside>
