@@ -38,6 +38,12 @@ CREATE TABLE maps (
   PRIMARY KEY (map_url)
 );
 
+CREATE TABLE map_redirects (
+  map_url varchar(100) NOT NULL,
+  redirect_url varchar(120) NOT NULL,
+  PRIMARY KEY (map_url)
+);
+
 CREATE TABLE maps_tags (
   map_url varchar(120) NOT NULL,
   tag varchar(15) NOT NULL,

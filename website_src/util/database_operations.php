@@ -470,6 +470,62 @@ function removeMapTags($mapUrl) {
         return false;
     }
 }
+function getMapRedirect($mapUrl) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT redirect_url FROM map_redirects WHERE map_url = :map_url;");
+    $Statement->bindParam(":map_url", $mapUrl, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        if ($Statement->rowCount() > 0) {
+            $row = $Statement->fetch(PDO::FETCH_ASSOC);
+            return $row["redirect_url"];
+        } else {
+            return NULL;
+        }
+    }
+    catch(PDOException $exception) {
+        error_log($exception);
+        return NULL;
+    }
+}
+function addMapRedirect($shortMapOld, $redirectUrl) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("INSERT INTO map_redirects(map_url, redirect_url) VALUES(:map_url, :redirect_url);");
+    $Statement->bindParam(":map_url", $shortMapOld, PDO::PARAM_STR);
+    $Statement->bindParam(":redirect_url", $redirectUrl, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        return true;
+    } catch (PDOException $exception) {
+        error_log($exception);
+        return false;
+    }
+}
+function getAllMapRedirects() {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT * FROM map_redirects;");
+    try {
+        $Statement->execute();
+        return $Statement;
+    }
+    catch(PDOException $exception) {
+        error_log($exception);
+        return NULL;
+    }
+}
+function removeMapRedirect($redirect) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("DELETE FROM map_redirects WHERE map_url = :map_url;");
+    $Statement->bindParam(":map_url", $redirect, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        return true;
+    }
+    catch(PDOException $exception) {
+        error_log($exception);
+        return false;
+    }
+}
 function allowedToCreateNewUser() {
     GLOBAL $DB;
     $Statement = $DB->prepare("SELECT preference_key FROM preferences;");

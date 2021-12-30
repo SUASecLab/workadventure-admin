@@ -24,7 +24,7 @@ $target = htmlspecialchars($_GET["target"]);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/css/bootstrap/bootstrap.min.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
-    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="/js/ajax/jquery-3.6.0.min.js"></script>
     <script src="/js/snippets/<?php echo $target; ?>.js"></script>
 
@@ -33,6 +33,12 @@ if ($target == "messages") {
 ?>
         <link href="/css/quill/quill.snow.css" rel="stylesheet">
         <script src="/js/quill/quill.min.js"></script>
+    <?php
+}
+if ($target == "rooms") {
+?>
+    <script src="/js/snippets/maps.js"></script>
+    <script src="/js/snippets/redirects.js"></script>
     <?php
 }
 ?>

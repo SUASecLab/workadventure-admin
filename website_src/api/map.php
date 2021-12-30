@@ -13,14 +13,20 @@ if (isset($_GET["playUri"])) {
     $playUri = htmlspecialchars($_GET["playUri"]);
     $shortUri = substr($playUri, strlen("https://" . getenv('DOMAIN')));
     $resultMap = getMapFileUrl($shortUri);
+    $result = array();
     if ($resultMap == NULL) {
-        http_response_code(404);
-        die();
+        $mapRedirect = getMapRedirect($shortUri);
+        if ($mapRedirect != NULL) {
+            $result['redirectUrl'] = $mapRedirect;
+        } else {
+            die();
+        }
+    } else {
+        $result['policy_type'] = getMapPolicy($shortUri);
+        $result['mapUrl'] = $resultMap;
+        $result['tags'] = getMapTags($shortUri);
+        $result['textures'] = getTextures();
     }
-    $result['policy_type'] = getMapPolicy($shortUri);
-    $result['mapUrl'] = $resultMap;
-    $result['tags'] = getMapTags($shortUri);
-    $result['textures'] = getTextures();
     echo json_encode($result);
 } else {
     die();
