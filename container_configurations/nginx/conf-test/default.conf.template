@@ -7,7 +7,6 @@ server {
     listen  [::]:80;
     server_name  ${DOMAIN};
 
-    index  index.php;
     root /var/www/html;
 
     # Remove X-Powered-By, which is an information leak
@@ -15,10 +14,11 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header Cache-Control no-cache;
     
+    # Website routing
     location = / {
         rewrite ^/(.*)$ /template.php?target=index$1 last;
     }
-    
+
     rewrite ^/edit/(.*)$ /template.php?target=edit_user&uuid=$1 last;
     rewrite ^/login(.*)$ /template.php?target=login$1 last;
     rewrite ^/logout(.*)$ /template.php?target=logout$1 last;
@@ -29,6 +29,21 @@ server {
     rewrite ^/textures(.*)$ /template.php?target=textures$1 last;
     rewrite ^/user(.*)$ /template.php?target=user$1 last;
 
+    # API routing
+    rewrite ^/api/room/access(.*)$ /api/access.php$1 last;
+    rewrite ^/api/check-user/(.*)$ /api/check_user.php?token=$1 last;
+    rewrite ^/api/map(.*)$ /api/map.php$1 last;
+    rewrite ^/api/login-url/(.*)$  /api/login.php?token=$1 last;
+    rewrite ^/api/ban(.*)$ /api/ban.php$1 last;
+    rewrite ^/api/report(.*)$ /api/report.php$1 last;
+    rewrite ^/api/room/sameWorld(.*)$ /api/sameWorld.php$1 last;
+
+    # Don't serve these files
+    location ~ /(.vscode*|.gitignore|composer.*) {
+        return 404;
+    }
+
+    # Pass PHP
     location ~ \.php$ {
         try_files $uri = 404;
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
@@ -38,33 +53,5 @@ server {
         fastcgi_param REQUEST_URI $request_uri;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         fastcgi_param PATH_INFO $fastcgi_path_info;
-    }
-
-    location /api/room/access {
-        rewrite ^/api/room/access(.*)$ /api/access.php$1 last;
-    }
-
-    location /api/check-user {
-        rewrite ^/api/check-user/(.*)$ /api/check_user.php?token=$1 last;
-    }
-
-    location /api/map {
-        rewrite ^/api/map(.*)$ /api/map.php$1 last;
-    }
-
-    location /api/login-url {
-        rewrite ^/api/login-url/(.*)$  /api/login.php?token=$1 last;
-    }
-    
-    location /api/ban {
-        rewrite ^/api/ban(.*)$ /api/ban.php$1 last;
-    }
-    
-    location /api/report {
-        rewrite ^/api/report(.*)$ /api/report.php$1 last;
-    }
-
-    location /api/room/sameWorld {
-        rewrite ^/api/room/sameWorld(.*)$ /api/sameWorld.php$1 last;
     }
 }
