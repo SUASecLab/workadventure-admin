@@ -38,7 +38,27 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addText
     $textureNotice = htmlspecialchars($_POST["textureNotice"]);
     $error = false;
 
-    if (strlen(trim(htmlspecialchars($_POST["textureUrl"]))) == 0) { ?>
+    if (!is_numeric($textureId)) { ?>
+      <aside class="alert alert-danger" role="alert">
+        The texture ID must be a number
+      </aside>
+      <?php
+    } else if ($textureId < 0) { ?>
+      <aside class="alert alert-danger" role="alert">
+        The texture ID must be non-negative
+      </aside>
+      <?php
+    } else if (!is_numeric($textureLevel)) { ?>
+      <aside class="alert alert-danger" role="alert">
+        The texture level must be a number
+      </aside>
+      <?php
+    } else if (($textureLevel < 0) || ($textureLevel > 5)) { ?>
+      <aside class="alert alert-danger" role="alert">
+        The texture level must be a number between 0 and 5 (inclusive)
+      </aside>
+      <?php
+    } else if (strlen(trim(htmlspecialchars($_POST["textureUrl"]))) == 0) { ?>
       <aside class="alert alert-danger" role="alert">
         Invalid URL
       </aside>
