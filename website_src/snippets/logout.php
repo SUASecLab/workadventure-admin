@@ -23,6 +23,10 @@ if (!isLoggedIn()) {
     <main class="alert alert-success" role="alert">
       You have been logged out.
     </main>
+    <script>
+      // change nav bar to logout
+      adjustNavbar();
+    </script>
   <?php
 }
 ?>

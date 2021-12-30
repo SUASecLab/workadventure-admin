@@ -16,5 +16,15 @@ function login() {
     $("#login").load("/snippets/login.php", {
         "username": username,
         "password": password
-    }, addListener);
+    }, function() {
+        addListener();
+
+        const adminButton = document.getElementById("goToAdminButton");
+        if (adminButton !== undefined) {
+            // login successful -> change navigation bar's login button to logout
+            const loginLogoutForm = document.getElementById("navLoginLogout");
+            loginLogoutForm.innerText = "Log out";
+            loginLogoutForm.href = "/logout";
+        }
+    });
 }

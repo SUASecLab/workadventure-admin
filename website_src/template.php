@@ -54,10 +54,10 @@ $DB = getDatabaseHandleOrPrintError();
             <?php
 if (isLoggedIn()) {
 ?>
-                <a class="navbar-brand" href="/logout">Log out</a>
+                <a class="navbar-brand" href="/logout" id="navLoginLogout">Log out</a>
             <?php
 } else { ?>
-                <a class="navbar-brand" href="/login">Log in</a>
+                <a class="navbar-brand" href="/login" id="navLoginLogout">Log in</a>
             <?php
 } ?>
         </div>

@@ -8,10 +8,15 @@ session_start();
   <?php
 require_once ('../util/database_operations.php');
 require_once ('../util/web_login_functions.php');
+function showGoToAdmin() {
+  echo "<br>";
+  echo "<a class=\"btn btn-primary\" href=\"/\" role=\"button\" id=\"goToAdminButton\">Go to the administration panel</a>";
+}
 // Connect to database
 $DB = getDatabaseHandleOrPrintError();
 $triedToLogin = false;
 $validLogin = false;
+$alreadyLoggedIn = isLoggedIn();
 if ((isset($_POST["username"])) && (isset($_POST["password"]))) {
     $username = htmlspecialchars($_POST["username"]);
     $password = htmlspecialchars($_POST["password"]);
@@ -20,16 +25,19 @@ if ((isset($_POST["username"])) && (isset($_POST["password"]))) {
 } else {
     $validLogin = false;
 }
-if ($validLogin) {
+if ($alreadyLoggedIn) { ?>
+<section class="alert alert-warning" role="alert">
+  You are already logged in
+</section>
+<?php
+showGoToAdmin();
+} else if ($validLogin) {
 ?>
-    <main>
-      <section class="alert alert-success" role="alert">
-        Welcome back, <?php echo htmlspecialchars($_POST["username"]); ?>
-      </section>
-      <br>
-      <a class="btn btn-primary" href="/" role="button">Go to the administration panel</a>
-    </main>
-    <?php
+  <section class="alert alert-success" role="alert">
+    Welcome back, <?php echo htmlspecialchars($_POST["username"]); ?>
+  </section>
+  <?php
+  showGoToAdmin();
 } else {
     if ($triedToLogin) {
 ?>
