@@ -16,7 +16,18 @@ if (!isLoggedIn()) {
 }
 if (isset($_POST["anonymousAccountCreation"])) {
     $allowAnonymousAccountCreation = htmlspecialchars($_POST["anonymousAccountCreation"]) == "true";
-    setAllowedToCreateNewUser($allowAnonymousAccountCreation);
+    $success = setAllowedToCreateNewUser($allowAnonymousAccountCreation);
+    if ($success) { ?>
+        <aside class="alert alert-success" role="alert">
+          Account creation settings for anonymous users have been updated
+        </aside>
+      <?php
+    } else { ?>
+        <aside class="alert alert-danger" role="alert">
+          Account creation settings for anonymous users could not be updated
+        </aside>
+      <?php
+    }
 }
 ?>
   <main>

@@ -6,19 +6,23 @@ function getMessages($uuid) {
     $globalMessagesIds = array();
     // get private messages
     $userMessages = getUserMessages($uuid);
-    while ($row = $userMessages->fetch(PDO::FETCH_ASSOC)) {
-        $messageArray = array("type" => "ban", "message" => $row["message"]);
-        array_push($result, $messageArray);
-        array_push($privateMessagesIds, $row["message_id"]);
+    if ($userMessages != NULL) {
+        while ($row = $userMessages->fetch(PDO::FETCH_ASSOC)) {
+            $messageArray = array("type" => "ban", "message" => $row["message"]);
+            array_push($result, $messageArray);
+            array_push($privateMessagesIds, $row["message_id"]);
+        }
     }
     // get global messages
     $messages = getGlobalMessages();
-    $hiddenMessagesIds = getHiddenMessagesIds($uuid);
-    while ($row = $messages->fetch(PDO::FETCH_ASSOC)) {
-        if (!(in_array($row["message_id"], $hiddenMessagesIds))) {
-            $messageArray = array("type" => "message", "message" => htmlspecialchars_decode($row["message"]));
-            array_push($result, $messageArray);
-            array_push($globalMessagesIds, $row["message_id"]);
+    if ($messages != NULL) {
+        $hiddenMessagesIds = getHiddenMessagesIds($uuid);
+        while ($row = $messages->fetch(PDO::FETCH_ASSOC)) {
+            if (!(in_array($row["message_id"], $hiddenMessagesIds))) {
+                $messageArray = array("type" => "message", "message" => htmlspecialchars_decode($row["message"]));
+                array_push($result, $messageArray);
+                array_push($globalMessagesIds, $row["message_id"]);
+            }
         }
     }
     if (sizeof($globalMessagesIds) > 0) {
@@ -41,15 +45,17 @@ function getTextures($uuid = NULL) {
     $result = array();
     $userTags = array();
     $textures = getCustomTextures();
-    if (($uuid != NULL) && (userExists($uuid))) {
-        $userTags = getTags($uuid);
-    }
-    while ($row = $textures->fetch(PDO::FETCH_ASSOC)) {
-        $textureId = $row["texture_table_id"];
-        $textureTags = getTextureTags($textureId);
-        if ((empty($textureTags)) || (!empty(array_intersect($textureTags, $userTags)))) {
-            $thisTexture = array("id" => (int)$row["texture_id"], "level" => (int)$row["texture_level"], "url" => "https://" . $row["url"], "rights" => $row["rights"]);
-            array_push($result, $thisTexture);
+    if ($textures != NULL) {
+        if (($uuid != NULL) && (userExists($uuid))) {
+            $userTags = getTags($uuid);
+        }
+        while ($row = $textures->fetch(PDO::FETCH_ASSOC)) {
+            $textureId = $row["texture_table_id"];
+            $textureTags = getTextureTags($textureId);
+            if ((count($textureTags) == 0) || (count(array_intersect($textureTags, $userTags)) > 0)) {
+                $thisTexture = array("id" => (int)$row["texture_id"], "level" => (int)$row["texture_level"], "url" => "https://" . $row["url"], "rights" => $row["rights"]);
+                array_push($result, $thisTexture);
+            }
         }
     }
     return $result;

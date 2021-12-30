@@ -148,7 +148,7 @@ if (customTexturesStored()) {
                       <?php echo $row["notice"]; ?>
                     </p>
                   </td>
-                  <?php if (empty($tags)) { ?>
+                  <?php if (count($tags) == 0) { ?>
                     <td>
                       <p class="fw-normal">Public</p>
                     </td>

@@ -16,7 +16,6 @@ if (isset($_GET["token"])) {
     $uuid = htmlspecialchars($_GET["token"]);
     $uuid = getUuid($uuid);
     isValidUuidOrDie($uuid);
-    $userData = getUserData($uuid);
     if (allowedToCreateNewUser()) {
         createAccountIfNotExistent($uuid);
     }

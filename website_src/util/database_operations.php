@@ -286,7 +286,7 @@ function addTag($uuid, $newTag) {
     }
     catch(PDOException $exception) {
         error_log($exception);
-        return NULL;
+        return false;
     }
 }
 function removeTag($uuid, $remTag) {
@@ -300,7 +300,7 @@ function removeTag($uuid, $remTag) {
     }
     catch(PDOException $exception) {
         error_log($exception);
-        return NULL;
+        return false;
     }
 }
 function websiteUserExists() {
@@ -316,7 +316,7 @@ function websiteUserExists() {
     }
     catch(PDOException $exception) {
         error_log($exception);
-        return false;
+        return true; // do not create new users in case of errors
     }
 }
 function createWebsiteUser($username, $hashedPassword) {
@@ -544,6 +544,7 @@ function allowedToCreateNewUser() {
 }
 function setAllowedToCreateNewUser($allow) {
     GLOBAL $DB;
+    $result = true;
     if (allowedToCreateNewUser()) {
         $Statement = $DB->prepare("DELETE FROM preferences WHERE preference_key = 'allowedToCreateNewUser';");
         try {
@@ -551,6 +552,7 @@ function setAllowedToCreateNewUser($allow) {
         }
         catch(PDOException $exception) {
             error_log($exception);
+            $result = false;
         }
     }
     if ($allow) {
@@ -560,8 +562,10 @@ function setAllowedToCreateNewUser($allow) {
         }
         catch(PDOException $exception) {
             error_log($exception);
+            $result = false;
         }
     }
+    return $result;
 }
 function globalMessagesExist() {
     GLOBAL $DB;
@@ -790,12 +794,11 @@ function getTextureTags($textureId) {
         while ($row = $Statement->fetch(PDO::FETCH_ASSOC)) {
             array_push($result, $row["tag"]);
         }
-        return $result;
     }
     catch(PDOException $exception) {
         error_log($exception);
-        return $result;
     }
+    return $result;
 }
 function getLastTextureId() {
     GLOBAL $DB;

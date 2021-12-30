@@ -125,6 +125,14 @@ if ($redirects == NULL) {
     </table>
 <?php
 $baseUrl = "https://" . getenv('DOMAIN') . "/@/org/" . getenv('DOMAIN') . "/";
+$maps = getAllMaps();
+if ($maps == NULL) { ?>
+    <aside class="alert alert-danger" role="alert">
+         Could not load maps
+    </aside>
+<?php
+    die();
+}
 ?>
         <form action="javascript:void(0);">
             <p class="fs-4">Add room redirection</p>
@@ -140,7 +148,6 @@ $baseUrl = "https://" . getenv('DOMAIN') . "/@/org/" . getenv('DOMAIN') . "/";
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="sourceMapsDropdown">
                     <?php
-                    $maps = getAllMaps();
                     while ($row = $maps->fetch(PDO::FETCH_ASSOC)) {
                         $mapUrl = $row["map_url"];
 ?>

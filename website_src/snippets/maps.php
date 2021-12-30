@@ -68,13 +68,12 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addMap"
     if ($validInput) {
         $mapUrlPrefix = "/@/org/" . getenv('DOMAIN') . "/";
         $mapUrl = $mapUrlPrefix . $mapUrl;
-        $storedMap = storeMapFileUrl($mapUrl, $mapFileUrl, $accessRestriction);
-        $tagsSucess = true;
+        $success = storeMapFileUrl($mapUrl, $mapFileUrl, $accessRestriction);
         foreach ($tagsArray as $tag) {
-            $tagsSucess&= addMapTag($mapUrl, $tag);
+            $success &= addMapTag($mapUrl, $tag);
         }
         // check whether adding the map worked
-        if ($storedMap && $tagsSucess) { ?>
+        if ($success) { ?>
                 <aside class="alert alert-success" role="alert">
                     Sucessfully stored <?php echo $mapUrl; ?>
                 </aside>
@@ -93,7 +92,7 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addMap"
     }
 }
 // show alert if start room map has not been set so far
-if (!getMapFileUrl(getenv('START_ROOM_URL'))) { ?>
+if (getMapFileUrl(getenv('START_ROOM_URL')) == NULL) { ?>
         <aside class="alert alert-danger" role="alert">
             The map file for the start room has not been set so far!
         </aside>
@@ -109,6 +108,13 @@ if (!getMapFileUrl(getenv('START_ROOM_URL'))) { ?>
         <?php
 $firstIteration = true;
 $maps = getAllMaps();
+if ($maps == NULL) { ?>
+    <aside class="alert alert-danger" role="alert">
+        Could not load maps
+    </aside>
+<?php
+    die();
+}
 while ($row = $maps->fetch(PDO::FETCH_ASSOC)) {
     if ($firstIteration) {
         $firstIteration = false;
@@ -188,7 +194,7 @@ while ($row = $maps->fetch(PDO::FETCH_ASSOC)) {
                 <?php
 $startRoom = getenv('START_ROOM_URL');
 $startRoom = explode("/", $startRoom) [4];
-if (getMapFileUrl(getenv('START_ROOM_URL'))) { ?>
+if (getMapFileUrl(getenv('START_ROOM_URL')) != NULL) { ?>
                     <input type="text" class="form-control" id="mapURL" aria-describedby="map_url_prefix" name="map_url">
                 <?php
 } else { ?>
