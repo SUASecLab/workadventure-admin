@@ -17,7 +17,7 @@ function setupMaps() {
 }
 
 function removeMap(mapUrl) {
-    $("#mapContainer").load("/snippets/maps.php", {
+    $("#mapContainer").load("snippets/maps.php", {
         "action": "removeMap",
         "mapUrl": mapUrl
     }, setupMaps);
@@ -46,7 +46,7 @@ function addMap() {
         data.tags = JSON.stringify(newMapsTags);
     }
 
-    $("#mapContainer").load("/snippets/maps.php", data, setupMaps);
+    $("#mapContainer").load("snippets/maps.php", data, setupMaps);
 }
 
 function addTagsElements() {

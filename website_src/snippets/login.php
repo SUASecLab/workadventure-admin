@@ -10,7 +10,7 @@ require_once ('../util/database_operations.php');
 require_once ('../util/web_login_functions.php');
 function showGoToAdmin() {
   echo "<br>";
-  echo "<a class=\"btn btn-primary\" href=\"/\" role=\"button\" id=\"goToAdminButton\">Go to the administration panel</a>";
+  echo "<a class=\"btn btn-primary\" href=\"./\" role=\"button\" id=\"goToAdminButton\">Go to the administration panel</a>";
 }
 // Connect to database
 $DB = getDatabaseHandleOrPrintError();

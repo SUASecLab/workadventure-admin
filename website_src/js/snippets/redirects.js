@@ -15,7 +15,7 @@ function addRedirection() {
     const dropdown = document.getElementById("sourceMapsDropdown");
     destination = dropdown.innerHTML;
 
-    $("#redirectsContainer").load("/snippets/redirects.php", {
+    $("#redirectsContainer").load("snippets/redirects.php", {
         "action": "addRedirection",
         "source": mapRedirectionUrl,
         "destination": destination
@@ -23,7 +23,7 @@ function addRedirection() {
 }
 
 function removeRedirection(source) {
-    $("#redirectsContainer").load("/snippets/redirects.php", {
+    $("#redirectsContainer").load("snippets/redirects.php", {
         "action": "removeRedirection",
         "source": source
     }, setupRedirects);

@@ -1,5 +1,5 @@
 window.onload = function () {
-    $("#settings").load("/snippets/settings.php", addListener);
+    $("#settings").load("snippets/settings.php", addListener);
 }
 
 function addListener() {
@@ -11,7 +11,7 @@ function addListener() {
 function updateSettings() {
     const createAccountsOnLogin = document.getElementById("createAccountCheckBox").checked;
 
-    $("#settings").load("/snippets/settings.php", {
+    $("#settings").load("snippets/settings.php", {
         "anonymousAccountCreation": createAccountsOnLogin
     }, addListener);
 }

@@ -17,7 +17,7 @@ function showLogin() {
     echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
     echo "You are not logged in. Please log in to continue.";
     echo "</aside>";
-    echo "<a href=\"/login\" class=\"element btn btn-primary\">Log in</a>";
+    echo "<a href=\"login\" class=\"element btn btn-primary\">Log in</a>";
     echo "</body></html>";
 }
 function getHash($data) {

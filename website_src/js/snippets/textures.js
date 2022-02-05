@@ -1,7 +1,7 @@
 var tags = [];
 
 window.onload = function () {
-    $("#textures").load("/snippets/textures.php", setup);
+    $("#textures").load("snippets/textures.php", setup);
 }
 
 function setup() {
@@ -15,7 +15,7 @@ function setup() {
 }
 
 function removeTexture(id) {
-    $("#textures").load("/snippets/textures.php", {
+    $("#textures").load("snippets/textures.php", {
         "action": "removeTexture",
         "id": id,
     }, setup);
@@ -28,7 +28,7 @@ function addTexture() {
     const rights = document.getElementById("rights").value;
     const notice = document.getElementById("notice").value;
 
-    $("#textures").load("/snippets/textures.php", {
+    $("#textures").load("snippets/textures.php", {
         "action": "addTexture",
         "textureId": textureId,
         "textureLevel": textureLevel,

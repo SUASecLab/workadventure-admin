@@ -72,14 +72,14 @@ while ($row = $users->fetch(PDO::FETCH_ASSOC)) { ?>
 ?>
             </td>
             <td>
-              <a class="btn btn-dark" role="button" href="/edit/<?php echo $row["uuid"]; ?>">Edit</a>
+              <a class="btn btn-dark" role="button" href="./edit/<?php echo $row["uuid"]; ?>">Edit</a>
             </td>
 
           <?php
 }
 ?>
       </table>
-      <a class="btn btn-primary" role="button" href="/edit/<?php echo generateUuid(); ?>">Create new user</a>
+      <a class="btn btn-primary" role="button" href="./edit/<?php echo generateUuid(); ?>">Create new user</a>
     </article>
   </main>
 </body>

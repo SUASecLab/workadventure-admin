@@ -328,7 +328,7 @@ if (hasTags($uuid)) {
         } ?>
         </section>
         <br>
-        <a class="btn btn-primary" href="/user" role="button">Go to users</a>
+        <a class="btn btn-primary" href="../user" role="button">Go to users</a>
   </main>
 </body>
 

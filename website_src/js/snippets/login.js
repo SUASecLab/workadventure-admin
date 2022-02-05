@@ -1,5 +1,5 @@
 window.onload = function () {
-    $("#login").load("/snippets/login.php", addListener);
+    $("#login").load("snippets/login.php", addListener);
 }
 
 function addListener() {
@@ -13,18 +13,18 @@ function login() {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
-    $("#login").load("/snippets/login.php", {
+    $("#login").load("snippets/login.php", {
         "username": username,
         "password": password
     }, function() {
         addListener();
 
         const adminButton = document.getElementById("goToAdminButton");
-        if (adminButton !== undefined) {
+        if (adminButton !== null) {
             // login successful -> change navigation bar's login button to logout
             const loginLogoutForm = document.getElementById("navLoginLogout");
             loginLogoutForm.innerText = "Log out";
-            loginLogoutForm.href = "/logout";
+            loginLogoutForm.href = "logout";
         }
     });
 }

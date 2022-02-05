@@ -46,7 +46,7 @@ const quillToolbarSettings = [
 ];
 
 window.onload = function () {
-    $("#messages").load("/snippets/messages.php", addListener);
+    $("#messages").load("snippets/messages.php", addListener);
 }
 
 function addListener() {
@@ -55,7 +55,7 @@ function addListener() {
 }
 
 function removeMessage(id) {
-    $("#messages").load("/snippets/messages.php", {
+    $("#messages").load("snippets/messages.php", {
         "action": "removeMessage",
         "id": id
     }, addListener);
@@ -64,7 +64,7 @@ function removeMessage(id) {
 function addMessage() {
     const message = JSON.stringify(quill.getContents(0, quill.getLength()));
 
-    $("#messages").load("/snippets/messages.php", {
+    $("#messages").load("snippets/messages.php", {
         "action": "addMessage",
         "message": message
     }, addListener);
