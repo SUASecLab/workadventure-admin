@@ -141,6 +141,29 @@ function getUserVisitCardUrl($uuid, $withPrefix = false) {
         return NULL;
     }
 }
+function getUserStartMap($uuid) {
+    GLOBAL $DB;
+    $Statement = $DB->prepare("SELECT startMap FROM users WHERE uuid = :uuid");
+    $Statement->bindParam(":uuid", $uuid, PDO::PARAM_STR);
+    try {
+        $Statement->execute();
+        if ($Statement->rowCount() > 0) {
+            $row = $Statement->fetch(PDO::FETCH_ASSOC);
+            $map = $row["startMap"];
+            if (($map == NULL) || (strlen($map) == 0)) {
+                return NULL;
+            } else {
+                return $map;
+            }
+        } else {
+            return NULL;
+        }
+    }
+    catch(PDOException $exception) {
+        error_log($exception);
+        return NULL;
+    }
+}
 function createAccountIfNotExistent($uuid) {
     if (!userExists($uuid)) {
         return writeUuidToDatabase($uuid);

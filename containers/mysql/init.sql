@@ -3,6 +3,7 @@ CREATE TABLE users (
   name varchar(30) NOT NULL,
   email varchar(80) NOT NULL UNIQUE,
   visitCardUrl varchar(150),
+  startMap varchar(50),
   PRIMARY KEY (uuid)
 );
 

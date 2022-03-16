@@ -19,7 +19,10 @@ if (isset($_GET["token"])) {
     if (allowedToCreateNewUser()) {
         createAccountIfNotExistent($uuid);
     }
-    $map = getenv('START_ROOM_URL');
+    $map = getUserStartMap($uuid);
+    if ($map == NULL) {
+        $map = getenv('START_ROOM_URL');
+    }
     $result['roomUrl'] = $map;
     $result['email'] = getUserEmail($uuid);
     $result['mapUrlStart'] = getMapFileUrl($map);
