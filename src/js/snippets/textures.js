@@ -23,18 +23,14 @@ function removeTexture(id) {
 
 function addTexture() {
     const textureId = document.getElementById("textureId").value;
-    const textureLevel = document.getElementById("textureLevel").value;
+    const textureLayer = document.getElementById("textureLayer").value;
     const textureUrl = document.getElementById("textureUrl").value;
-    const rights = document.getElementById("rights").value;
-    const notice = document.getElementById("notice").value;
 
     $("#textures").load("snippets/textures.php", {
         "action": "addTexture",
         "textureId": textureId,
-        "textureLevel": textureLevel,
+        "textureLayer": textureLayer,
         "textureUrl": textureUrl,
-        "textureRights": rights,
-        "textureNotice": notice,
         "textureTags": JSON.stringify(tags)
     }, setup);
 }

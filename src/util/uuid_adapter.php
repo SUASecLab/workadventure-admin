@@ -5,6 +5,9 @@ function generateUuid() {
     return trim(Uuid::uuid4()->toString());
 }
 function isValidUuid($uuid) {
+    if (is_null($uuid)) {
+        return FALSE;
+    }
     return Uuid::isValid($uuid);
 }
 function isValidUuidOrDie($uuid) {

@@ -30,41 +30,19 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeT
     }
 }
 // check whether url has been added
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addTexture") && (isset($_POST["textureId"])) && (isset($_POST["textureLevel"])) && (isset($_POST["textureUrl"])) && (isset($_POST["textureRights"]))) {
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addTexture") && (isset($_POST["textureId"])) && (isset($_POST["textureLayer"])) && (isset($_POST["textureUrl"]))) {
     $textureId = htmlspecialchars($_POST["textureId"]);
-    $textureLevel = htmlspecialchars($_POST["textureLevel"]);
+    $textureLayer = htmlspecialchars($_POST["textureLayer"]);
     $textureUrl = htmlspecialchars($_POST["textureUrl"]);
-    $textureRights = htmlspecialchars($_POST["textureRights"]);
-    $textureNotice = htmlspecialchars($_POST["textureNotice"]);
     $error = false;
 
-    if (!is_numeric($textureId)) { ?>
-      <aside class="alert alert-danger" role="alert">
-        The texture ID must be a number
-      </aside>
-      <?php
-    } else if ($textureId < 0) { ?>
-      <aside class="alert alert-danger" role="alert">
-        The texture ID must be non-negative
-      </aside>
-      <?php
-    } else if (!is_numeric($textureLevel)) { ?>
-      <aside class="alert alert-danger" role="alert">
-        The texture level must be a number
-      </aside>
-      <?php
-    } else if (($textureLevel < 0) || ($textureLevel > 5)) { ?>
-      <aside class="alert alert-danger" role="alert">
-        The texture level must be a number between 0 and 5 (inclusive)
-      </aside>
-      <?php
-    } else if (strlen(trim(htmlspecialchars($_POST["textureUrl"]))) == 0) { ?>
+    if (strlen(trim(htmlspecialchars($_POST["textureUrl"]))) == 0) { ?>
       <aside class="alert alert-danger" role="alert">
         Invalid URL
       </aside>
     <?php
     } else {
-      if (storeTexture($textureId, $textureLevel, $textureUrl, $textureRights, $textureNotice)) {
+      if (storeTexture($textureId, $textureLayer, $textureUrl)) {
         if ((isset($_POST["textureTags"])) && (strlen(trim(htmlspecialchars($_POST["textureTags"])) > 0))) {
           $tagsList = json_decode($_POST["textureTags"]);
           $lastTexture = getLastTextureId();
@@ -112,12 +90,9 @@ if (customTexturesStored()) {
             <table class="table">
               <tr>
                 <th scope="col">ID</th>
-                <th scope="col">Level</th>
+                <th scope="col">Layer</th>
                 <th scope="col">Url</th>
-                <th scope="col">Rights</th>
-                <th scope="col">Notice</th>
                 <th scope="col">Restriction</th>
-                <th scope="col">Action</th>
               </tr>
               <?php
         while ($row = $textures->fetch(PDO::FETCH_ASSOC)) {
@@ -130,22 +105,12 @@ if (customTexturesStored()) {
                   </td>
                   <td>
                     <p class="fw-normal">
-                      <?php echo $row["texture_level"]; ?>
+                      <?php echo $row["texture_layer"]; ?>
                     </p>
                   </td>
                   <td>
                     <p class="fw-normal">
-                      https://<?php echo $row["url"]; ?>
-                    </p>
-                  </td>
-                  <td>
-                    <p class="fw-normal">
-                      <?php echo $row["rights"]; ?>
-                    </p>
-                  </td>
-                  <td>
-                    <p class="fw-normal">
-                      <?php echo $row["notice"]; ?>
+                      <?php echo $row["texture_url"]; ?>
                     </p>
                   </td>
                   <?php if (count($tags) == 0) { ?>
@@ -176,25 +141,24 @@ if (customTexturesStored()) {
             <p class="fs-3">Add custom texture</p>
             <form action="javascript:void(0);" style="margin-bottom: 1rem;">
               <div class="mb-3">
-                <label for="textureId" class="form-label">Position ID</label>
-                <input type="number" min="0" step="1" class="form-control" id="textureId" value="0">
+                <label for="textureId" class="form-label">Texture ID</label>
+                <input type="text" class="form-control" id="textureId">
               </div>
               <div class="mb-3">
-                <label for="textureLevel" class="form-label">Texture Level</label>
-                <input type="number" min="0" max="5" step="1" class="form-control" id="textureLevel" value="0">
+                <label for="textureLayer" class="form-label">Texture Layer</label>
+                <select class="form-control" id="textureLayer">
+                  <option value="woka">Woka</option>
+                  <option value="body">Body</option>
+                  <option value="eyes">Eyes</option>
+                  <option value="hair">Hair</option>
+                  <option value="clothes">Clothes</option>
+                  <option value="hat">Hat</option>
+                  <option value="accessory">Accessory</option>
+                </select>
               </div>
               <label for="textureUrl" class="form-label">Texture URL</label>
               <div class="input-group mb-3">
-                <span class="input-group-text" id="textureUrlPrefix">https://</span>
-                <input type="text" class="form-control" id="textureUrl" aria-describedby="textureUrlPrefix">
-              </div>
-              <div class="mb-3">
-                <label for="rights" class="form-label">Rights</label>
-                <input type="text" class="form-control" id="rights">
-              </div>
-              <div class="mb-3">
-                <label for="notice" class="form-label">Notice</label>
-                <input type="text" class="form-control" id="notice">
+                <input type="text" class="form-control" id="textureUrl">
               </div>
               <div class="mb-3">
                 <label for="tagsInput" class="form-label">Tags (optional):</label>

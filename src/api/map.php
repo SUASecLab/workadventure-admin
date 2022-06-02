@@ -22,10 +22,22 @@ if (isset($_GET["playUri"])) {
             die();
         }
     } else {
-        $result['policy_type'] = getMapPolicy($shortUri);
         $result['mapUrl'] = $resultMap;
+        $result['policy_type'] = getMapPolicy($shortUri);
         $result['tags'] = getMapTags($shortUri);
-        $result['textures'] = getTextures();
+        $result['authenticationMandatory'] = getAuthenticationMandatory($shortUri);
+        $result['roomSlug'] = ''; // deprecated
+        $result['contactPage'] = '';
+        $result['group'] = '';
+        
+        // optional parameters
+
+        $result['iframeAuthentication'] = "https://127.0.0.1";
+        // unused currently
+        // $result['expireOn'] = ;
+        // $result['canReport'] = ;
+        // $result['loadingLogo'] = ;
+        // $result['loginSceneLogo'] = ;
     }
     echo json_encode($result);
 } else {

@@ -84,12 +84,8 @@ function getUserEmail($uuid) {
     try {
         $Statement->execute();
         $row = $Statement->fetch(PDO::FETCH_ASSOC);
-        $email = $row["email"];
-        if (str_ends_with($email, getenv('DOMAIN'))) {
-            return NULL;
-        } else {
-            return $email;
-        }
+        $email = $row["email"] ?? $uuid . "@" . getenv('DOMAIN');
+        return $email;
     }
     catch(PDOException $exception) {
         error_log($exception);
@@ -178,6 +174,9 @@ function getTags($uuid) {
         $Statement->execute();
         while ($row = $Statement->fetch(PDO::FETCH_ASSOC)) {
             array_push($result, $row["tag"]);
+        }
+        if (sizeof($result) == 0) {
+            array_push($result, " ");
         }
     }
     catch(PDOException $exception) {
@@ -776,14 +775,13 @@ function removeTexture($textureTableId) {
         return false;
     }
 }
-function storeTexture($id, $level, $url, $rights, $notice) {
+function storeTexture($id, $layer, $url) {
     GLOBAL $DB;
-    $Statement = $DB->prepare("INSERT INTO textures (texture_id, texture_level, url, rights, notice) VALUES (:texture_id, :texture_level, :url, :rights, :notice);");
-    $Statement->bindParam(":texture_id", $id, PDO::PARAM_INT);
-    $Statement->bindParam(":texture_level", $level, PDO::PARAM_INT);
-    $Statement->bindParam(":url", $url, PDO::PARAM_STR);
-    $Statement->bindParam(":rights", $rights, PDO::PARAM_STR);
-    $Statement->bindParam(":notice", $notice, PDO::PARAM_STR);
+    $Statement = $DB->prepare("INSERT INTO textures (texture_id, texture_name, texture_layer, texture_url) VALUES (:texture_id, :texture_id, :texture_layer, :texture_url);");
+    $Statement->bindParam(":texture_id", $id, PDO::PARAM_STR);
+    $Statement->bindParam(":texture_name", $id, PDO::PARAM_STR);
+    $Statement->bindParam(":texture_layer", $layer, PDO::PARAM_STR);
+    $Statement->bindParam(":texture_url", $url, PDO::PARAM_STR);
     try {
         $Statement->execute();
         return true;

@@ -16,21 +16,21 @@ if (isset($_GET["token"])) {
     $uuid = htmlspecialchars($_GET["token"]);
     $uuid = getUuid($uuid);
     isValidUuidOrDie($uuid);
-    if (allowedToCreateNewUser()) {
-        createAccountIfNotExistent($uuid);
+    if (!userExists($uuid)) {
+        if (allowedToCreateNewUser()) {
+            createAccountIfNotExistent($uuid);
+        }
     }
     $map = getUserStartMap($uuid);
     if ($map == NULL) {
         $map = getenv('START_ROOM_URL');
     }
-    $result['roomUrl'] = $map;
-    $result['email'] = getUserEmail($uuid);
-    $result['mapUrlStart'] = getMapFileUrl($map);
-    $result['tags'] = getTags($uuid);
-    $result['policy_type'] = getMapPolicy($map);
     $result['userUuid'] = $uuid;
+    $result['email'] = getUserEmail($uuid);
+    $result['roomUrl'] = $map;
+    $result['mapUrlStart'] = getMapFileUrl($map);
+    // optional parameters
     $result['messages'] = array(); // messages are being sent when calling the access function
-    $result['textures'] = getTextures($uuid);
     echo json_encode($result);
 } else {
     die();

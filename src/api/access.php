@@ -21,12 +21,19 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["roomId"])) && (isset($_GET
     if (allowedToCreateNewUser()) {
         createAccountIfNotExistent($uuid);
     }
+    if((isset($_GET["characterLayers"]))) {
+        $result['textures'] = getTexturesIfValid($uuid, $_GET["characterLayers"]);
+    } else {
+        $result['textures'] = [];
+    }
     $result['userUuid'] = $uuid;
+    $result['email']= getUserEmail($uuid);
     $result['tags'] = getTags($uuid);
     $result['visitCardUrl'] = getUserVisitCardUrl($uuid, true);
-    $result['textures'] = getTextures($uuid);
     $result['messages'] = getMessages($uuid);
+    // optional parameters
     $result['anonymous'] = !userExists($uuid);
+    $result['userRoomToken'] = '';
     echo json_encode($result);
 } else {
     http_response_code(400);

@@ -53,10 +53,61 @@ function getTextures($uuid = NULL) {
             $textureId = $row["texture_table_id"];
             $textureTags = getTextureTags($textureId);
             if ((count($textureTags) == 0) || (count(array_intersect($textureTags, $userTags)) > 0)) {
-                $thisTexture = array("id" => (int)$row["texture_id"], "level" => (int)$row["texture_level"], "url" => "https://" . $row["url"], "rights" => $row["rights"]);
+                $thisTexture = array("id" => $row["texture_id"], "name" => $row["texture_name"], "layer" => $row["texture_layer"], "url" => $row["texture_url"]);
                 array_push($result, $thisTexture);
             }
         }
     }
     return $result;
+}
+// checks if the textureIDs in characterLayer are valid and returns their corresponding textures
+function getTexturesIfValid($uuid, $characterLayer) {
+    if (!is_array($characterLayer)){
+        return [];
+    }
+    $result = array();
+    $userTextures = getTextures($uuid);
+    if (!is_array($userTextures)){
+        return [];
+    }
+    foreach  ($characterLayer as &$textureId) {
+        $found = FALSE;
+        foreach ($userTextures as &$userTexture) {
+            if ($userTexture["id"] == $textureId) {
+                $found = TRUE;
+                array_push($result, $userTexture);
+                break;
+            }
+        }
+            if (!$found) {
+                return [];
+            }
+    }
+
+    return $result;
+}
+
+function getTexturesWithoutLayers($uuid = NULL) {
+    $result = array();
+    $userTags = array();
+    $textures = getCustomTextures();
+    if ($textures != NULL) {
+        if (($uuid != NULL) && (userExists($uuid))) {
+            $userTags = getTags($uuid);
+        }
+        while ($row = $textures->fetch(PDO::FETCH_ASSOC)) {
+            $textureId = $row["texture_table_id"];
+            $textureTags = getTextureTags($textureId);
+            if ((count($textureTags) == 0) || (count(array_intersect($textureTags, $userTags)) > 0)) {
+                $thisTexture = array("id" => $row["texture_id"], "name" => $row["texture_name"], "url" => $row["texture_url"]);
+                array_push($result, $thisTexture);
+            }
+        }
+    }
+    return $result;
+}
+
+function getAuthenticationMandatory($map) {
+    $mapPolicy = getMapPolicy($map);
+    return $mapPolicy != 1;
 }
