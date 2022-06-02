@@ -1,0 +1,57 @@
+version: "3"
+services:
+  admin-db:
+    image: mysql:8
+    restart: ${RESTART_POLICY}
+    environment:
+      MYSQL_ROOT_PASSWORD: "$ADMIN_DB_MYSQL_ROOT_PASSWORD"
+      MYSQL_DATABASE: "$ADMIN_MYSQL_DATABASE"
+      MYSQL_USER: "$ADMIN_MYSQL_USER"
+      MYSQL_PASSWORD: "$ADMIN_MYSQL_PASSWORD"
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+      - ./containers/mysql:/docker-entrypoint-initdb.d
+
+  admin_php:
+    build: ./containers/php
+    restart: ${RESTART_POLICY}
+    environment:
+      ADMIN_API_TOKEN : "$ADMIN_API_TOKEN"
+      ADMIN_API_SALT : "$ADMIN_API_SALT"
+      DB_MYSQL_ROOT_PASSWORD: "$ADMIN_DB_MYSQL_ROOT_PASSWORD"
+      DB_MYSQL_DATABASE: "$ADMIN_MYSQL_DATABASE"
+      DB_MYSQL_USER: "$ADMIN_MYSQL_USER"
+      DB_MYSQL_PASSWORD: "$ADMIN_MYSQL_PASSWORD"
+      DOMAIN: "$DOMAIN"
+      START_ROOM_URL: "$START_ROOM_URL"
+    volumes:
+      - ./src:/var/www/html:ro
+
+  composer:
+    image: composer:2.1.5
+    command: ["composer", "install"]
+    volumes:
+      - ./src:/app
+
+  admin:
+    image: nginx:latest
+    restart: ${RESTART_POLICY}
+    environment:
+      DOMAIN: "$DOMAIN"
+    depends_on:
+      - admin_php
+    volumes:
+      - ./src:/var/www/html:ro
+      - ./containers/nginx:/etc/nginx/templates
+    labels:
+      - "traefik.http.middlewares.strip-admin-prefix.stripprefix.prefixes=/admin"
+      - "traefik.http.routers.admin.rule=(Host(`${DOMAIN}`) && PathPrefix(`/admin`))"
+      - "traefik.http.routers.admin.middlewares=strip-admin-prefix@docker"
+      - "traefik.http.routers.admin.entryPoints=web"
+      - "traefik.http.services.admin.loadbalancer.server.port=80"
+      - "traefik.http.routers.admin-ssl.rule=(Host(`${DOMAIN}`) && PathPrefix(`/admin`))"
+      - "traefik.http.routers.admin-ssl.middlewares=strip-admin-prefix@docker"
+      - "traefik.http.routers.admin-ssl.entryPoints=websecure"
+      - "traefik.http.routers.admin-ssl.tls=true"
+      - "traefik.http.routers.admin-ssl.service=admin"
+
