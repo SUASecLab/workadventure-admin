@@ -111,3 +111,20 @@ function getAuthenticationMandatory($map) {
     $mapPolicy = getMapPolicy($map);
     return $mapPolicy != 1;
 }
+
+// checks if user is not allowed to access map
+function userCanAccessMap($userUuid, $shortMapUri):bool{
+    $policy = getMapPolicy($shortMapUri);
+    if ($policy != 1) {
+        if (!userExists($userUuid)) {
+            return false;
+        }
+        if ($policy == 3) {
+            $sharedTagsCount = count(array_intersect(getMapTags($shortMapUri), getTags($userUuid)));
+            if ($sharedTagsCount < 1) {
+                return false;
+            }
+        }
+    }
+    return true;
+}

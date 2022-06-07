@@ -19,9 +19,16 @@ if (isset($_GET["playUri"])) {
         if ($mapRedirect != NULL) {
             $result['redirectUrl'] = $mapRedirect;
         } else {
+            http_response_code(404);
             die();
         }
     } else {
+        $uuid = isset($_GET["userId"]) ? getUuid($_GET["userId"]) : NULL;
+        if (!userCanAccessMap($uuid, $shortUri)) {
+            http_response_code(403);
+            die();
+        }
+
         $result['mapUrl'] = $resultMap;
         $result['policy_type'] = getMapPolicy($shortUri);
         $result['tags'] = getMapTags($shortUri);
@@ -32,7 +39,7 @@ if (isset($_GET["playUri"])) {
         
         // optional parameters
 
-        $result['iframeAuthentication'] = "https://127.0.0.1";
+        // $result['iframeAuthentication'] = "https://127.0.0.1";
         // unused currently
         // $result['expireOn'] = ;
         // $result['canReport'] = ;
