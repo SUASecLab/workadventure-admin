@@ -32,13 +32,12 @@ if (isset($_GET["playUri"])) {
         $result['mapUrl'] = $resultMap;
         $result['policy_type'] = getMapPolicy($shortUri);
         $result['tags'] = getMapTags($shortUri);
-        $result['authenticationMandatory'] = getAuthenticationMandatory($shortUri);
         $result['roomSlug'] = ''; // deprecated
         $result['contactPage'] = '';
         $result['group'] = '';
         
         // optional parameters
-
+        // $result['authenticationMandatory'] = getAuthenticationMandatory($shortUri);
         // $result['iframeAuthentication'] = "https://127.0.0.1";
         // unused currently
         // $result['expireOn'] = ;
