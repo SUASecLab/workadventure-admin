@@ -113,9 +113,14 @@ function getAuthenticationMandatory($map) {
 }
 
 // checks if user is not allowed to access map
-function userCanAccessMap($userUuid, $shortMapUri):bool{
+function userCanAccessMap($userUuid, $shortMapUri) {
     $policy = getMapPolicy($shortMapUri);
     if ($policy != 1) {
+        // null is acceptable here, because this is not meant for security, but for UX
+        // WA uses call to /map Endpoint also without userId -> need to support that
+        if ($userUuid === null) {
+            return true;
+        }
         if (!userExists($userUuid)) {
             return false;
         }
