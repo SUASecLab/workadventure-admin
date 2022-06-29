@@ -16,17 +16,19 @@ if (isset($_GET["token"])) {
     $uuid = htmlspecialchars($_GET["token"]);
     $uuid = getUuid($uuid);
     isValidUuidOrDie($uuid);
-    if (!userExists($uuid)) {
+    if (!localUserExists($uuid)) {
         if (allowedToCreateNewUser()) {
             createAccountIfNotExistent($uuid);
         }
     }
-    $map = getUserStartMap($uuid);
+    $userData = getUserData($uuid);
+    $map = $userData["startMap"] ?? null;
+
     if ($map == NULL) {
         $map = getenv('START_ROOM_URL');
     }
     $result['userUuid'] = $uuid;
-    $result['email'] = getUserEmail($uuid);
+    $result['email'] = $userData["email"];
     $result['roomUrl'] = $map;
     $result['mapUrlStart'] = getMapFileUrl($map);
     // optional parameters
@@ -36,4 +38,3 @@ if (isset($_GET["token"])) {
     die();
 }
 $DB = NULL;
-?>

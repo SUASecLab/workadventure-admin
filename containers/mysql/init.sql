@@ -100,3 +100,53 @@ CREATE TABLE textures_restrictions (
     PRIMARY KEY(texture_table_id, tag),
     FOREIGN KEY(texture_table_id) REFERENCES textures(texture_table_id)
 );
+
+CREATE TABLE lti_registration (
+    registration_id integer NOT NULL AUTO_INCREMENT,
+    name varchar(255) NOT NULL,
+    auto_registration bit(1) NOT NULL,
+    platform_id varchar(255),
+    client_id varchar(255),
+    authentication_request_url varchar(255),
+    access_token_url varchar(255),
+    jwks_url varchar(255),
+    Unique (platform_id, client_id),
+    PRIMARY KEY(registration_id)
+);
+
+CREATE TABLE lti_deployment
+(
+    deployment_id varchar(255) NOT NULL,
+    registration_id integer NOT NULL,
+    name varchar(255) NOT NULL,
+    PRIMARY KEY (deployment_id, registration_id),
+    FOREIGN KEY (registration_id) references lti_registration(registration_id)
+);
+
+CREATE TABLE lti_users (
+    uuid varchar(36) NOT NULL,
+    sub varchar(255) NOT NULL,
+    deployment_id varchar(255) NOT NULL,
+    registration_id integer NOT NULL,
+    name varchar(60),
+    given_name varchar(30),
+    family_name varchar(30),
+    email varchar(80) NOT NULL UNIQUE,
+    PRIMARY KEY (uuid),
+    UNIQUE (sub, registration_id),
+    FOREIGN KEY (deployment_id, registration_id) references lti_deployment(deployment_id, registration_id)
+);
+
+CREATE TABLE lti_roles (
+    uuid varchar(36) NOT NULL, -- uuid of lti-user
+    role varchar(255) NOT NULL, -- role / uri of lti-role
+    PRIMARY KEY (uuid, role),
+    FOREIGN KEY (uuid) references lti_users(uuid)
+);
+
+-- translation layer between lti-roles and WA`s Tag-System
+CREATE TABLE lti_role_tag_mappings (
+    role varchar(255) NOT NULL,
+    tag varchar(15) NOT NULL,
+    PRIMARY KEY (role, tag)
+);

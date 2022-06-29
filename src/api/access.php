@@ -26,10 +26,15 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["roomId"])) && (isset($_GET
     } else {
         $result['textures'] = [];
     }
+    $userData = getUserData($uuid);
+    $visitCardUrl = $userData["visitCardUrl"] ?? null;
+    if ($visitCardUrl) {
+        $visitCardUrl = 'https://' . $visitCardUrl;
+    }
     $result['userUuid'] = $uuid;
-    $result['email']= getUserEmail($uuid);
+    $result['email']= $userData["email"];
     $result['tags'] = getTags($uuid);
-    $result['visitCardUrl'] = getUserVisitCardUrl($uuid, true);
+    $result['visitCardUrl'] = $visitCardUrl;
     $result['messages'] = getMessages($uuid);
     // optional parameters
     $result['anonymous'] = !userExists($uuid);
@@ -40,4 +45,3 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["roomId"])) && (isset($_GET
     die();
 }
 $DB = NULL;
-?>

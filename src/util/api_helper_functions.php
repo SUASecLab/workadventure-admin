@@ -1,6 +1,7 @@
 <?php
-require_once ('database_operations.php');
-function getMessages($uuid) {
+require_once('database_operations.php');
+function getMessages($uuid)
+{
     $result = array();
     $privateMessagesIds = array();
     $globalMessagesIds = array();
@@ -32,7 +33,8 @@ function getMessages($uuid) {
     }
     return $result;
 }
-function getUuid($userIdentifier) {
+function getUuid($userIdentifier)
+{
     if (str_contains($userIdentifier, "@")) {
         // email as unique identifier -> get uuid
         return getUuidFromEmail($userIdentifier);
@@ -41,7 +43,8 @@ function getUuid($userIdentifier) {
         return $userIdentifier;
     }
 }
-function getTextures($uuid = NULL) {
+function getTextures($uuid = NULL)
+{
     $result = array();
     $userTags = array();
     $textures = getCustomTextures();
@@ -61,16 +64,17 @@ function getTextures($uuid = NULL) {
     return $result;
 }
 // checks if the textureIDs in characterLayer are valid and returns their corresponding textures
-function getTexturesIfValid($uuid, $characterLayer) {
-    if (!is_array($characterLayer)){
+function getTexturesIfValid($uuid, $characterLayer)
+{
+    if (!is_array($characterLayer)) {
         return [];
     }
     $result = array();
     $userTextures = getTextures($uuid);
-    if (!is_array($userTextures)){
+    if (!is_array($userTextures)) {
         return [];
     }
-    foreach  ($characterLayer as &$textureId) {
+    foreach ($characterLayer as &$textureId) {
         $found = FALSE;
         foreach ($userTextures as &$userTexture) {
             if ($userTexture["id"] == $textureId) {
@@ -79,15 +83,16 @@ function getTexturesIfValid($uuid, $characterLayer) {
                 break;
             }
         }
-            if (!$found) {
-                return [];
-            }
+        if (!$found) {
+            return [];
+        }
     }
 
     return $result;
 }
 
-function getTexturesWithoutLayers($uuid = NULL) {
+function getTexturesWithoutLayers($uuid = NULL)
+{
     $result = array();
     $userTags = array();
     $textures = getCustomTextures();
@@ -107,13 +112,15 @@ function getTexturesWithoutLayers($uuid = NULL) {
     return $result;
 }
 
-function getAuthenticationMandatory($map) {
+function getAuthenticationMandatory($map)
+{
     $mapPolicy = getMapPolicy($map);
     return $mapPolicy != 1;
 }
 
 // checks if user is not allowed to access map
-function userCanAccessMap($userUuid, $shortMapUri) {
+function userCanAccessMap($userUuid, $shortMapUri)
+{
     $policy = getMapPolicy($shortMapUri);
     if ($policy != 1) {
         // null is acceptable here, because this is not meant for security, but for UX
@@ -132,4 +139,32 @@ function userCanAccessMap($userUuid, $shortMapUri) {
         }
     }
     return true;
+}
+
+function getUserData($uuid)
+{
+    if (localUserExists($uuid)) {
+        return getLocalUserData($uuid);
+    } else {
+        $ltiUserData = getLtiUserData($uuid);
+        return $ltiUserData ?? null;
+    }
+}
+
+function getUuidFromEmail($email)
+{
+    $localUuid = getLocalUuidFromEmail($email);
+    if ($localUuid) {
+        return $localUuid;
+    }
+    $ltiUuid = getLtiUuidFromEmail($email);
+    if ($ltiUuid) {
+        return $ltiUuid;
+    }
+    return  null;
+}
+
+function userExists($uuid)
+{
+    return localUserExists($uuid) || ltiUserExists($uuid);
 }

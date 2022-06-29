@@ -6,157 +6,157 @@ session_start();
 
 <body>
   <?php
-require_once ('../util/database_operations.php');
-require_once ('../util/web_login_functions.php');
-require_once ('../util/uuid_adapter.php');
-// Connect to database
-$DB = getDatabaseHandleOrPrintError();
-if (!isLoggedIn()) {
+  require_once('../util/database_operations.php');
+  require_once('../util/web_login_functions.php');
+  require_once('../util/uuid_adapter.php');
+  // Connect to database
+  $DB = getDatabaseHandleOrPrintError();
+  if (!isLoggedIn()) {
     $DB = NULL;
     die();
-}
-// Get user's uuid
-if (!isset($_POST["uuid"])) {
-?>
+  }
+  // Get user's uuid
+  if (!isset($_POST["uuid"])) {
+  ?>
     <aside class="alert alert-danger" role="alert">
       <p>User not specified</p>
     </aside>
+  <?php
+    die();
+  }
+  $uuid = htmlspecialchars($_POST["uuid"]);
+
+  if (!isValidUuid($uuid)) {
+  ?>
+    <aside class="alert alert-danger" role="alert">
+      The given user ID is invalid
+    </aside>
     <?php
     die();
-}
-$uuid = htmlspecialchars($_POST["uuid"]);
+  }
 
-if(!isValidUuid($uuid)) {
-?>
-  <aside class="alert alert-danger" role="alert">
-    The given user ID is invalid
-  </aside>
-<?php
-  die();
-}
-
-createAccountIfNotExistent($uuid);
-// Get new tag
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addTag") && (isset($_POST["tag"]))) {
+  createAccountIfNotExistent($uuid);
+  // Get new tag
+  if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addTag") && (isset($_POST["tag"]))) {
     $tag = htmlspecialchars($_POST["tag"]);
     if (strlen(trim($tag)) > 0) {
-        $addTagResult = addTag($uuid, $tag);
-        if ($addTagResult == true) {
-?>
+      $addTagResult = addTag($uuid, $tag);
+      if ($addTagResult == true) {
+    ?>
         <aside class="alert alert-success" role="alert">
           The tag <?php echo "\"" . $tag . "\""; ?> has been added.
         </aside>
       <?php
-        } else {
-?>
+      } else {
+      ?>
         <aside class="alert alert-danger" role="alert">
           Could not add the tag <?php echo "\"" . $tag . "\""; ?>
         </aside>
       <?php
-        }
+      }
     } else { ?>
       <aside class="alert alert-danger" role="alert">
         Can not store empty tags
       </aside>
       <?php
     }
-}
-// Get tag to remove
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeTag") && (isset($_POST["tag"]))) {
+  }
+  // Get tag to remove
+  if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeTag") && (isset($_POST["tag"]))) {
     $tag = htmlspecialchars($_POST["tag"]);
     if (strlen(trim($tag)) > 0) {
-        $remTagResult = removeTag($uuid, $tag);
-        if ($remTagResult == true) {
-?>
+      $remTagResult = removeTag($uuid, $tag);
+      if ($remTagResult == true) {
+      ?>
         <aside class="alert alert-success" role="alert">
           The tag <?php echo "\"" . $tag . "\""; ?> has been removed.
         </aside>
       <?php
-        } else {
-?>
+      } else {
+      ?>
         <aside class="alert alert-danger" role="alert">
           Could not remove the tag <?php echo "\"" . $tag . "\""; ?>.
         </aside>
       <?php
-        }
+      }
     } else { ?>
       <aside class="alert alert-danger" role="alert">
         Can not remove empty tags
       </aside>
-    <?php
+      <?php
     }
-}
-// Ban user if requested
-if (isset($_POST["action"]) && (htmlspecialchars($_POST["action"]) == "ban") && (isset($_POST["reason"]))) {
+  }
+  // Ban user if requested
+  if (isset($_POST["action"]) && (htmlspecialchars($_POST["action"]) == "ban") && (isset($_POST["reason"]))) {
     $reason = htmlspecialchars($_POST["reason"]);
     if (strlen(trim($reason)) > 0) {
       if (banUser($uuid, htmlspecialchars($_POST["reason"]))) {
-?>
+      ?>
         <aside class="alert alert-success" role="alert">
           This user has been banned.
         </aside>
       <?php
       } else {
-?>
+      ?>
         <aside class="alert alert-danger" role="alert">
           Could not ban this user.
         </aside>
       <?php
       }
     } else {
-?>
+      ?>
       <aside class="alert alert-danger" role="alert">
         Did not ban user: no reason specified
       </aside>
     <?php
     }
-}
-//unban user if requested
-if (isset($_POST["action"]) && (htmlspecialchars($_POST["action"]) == "unban")) {
+  }
+  //unban user if requested
+  if (isset($_POST["action"]) && (htmlspecialchars($_POST["action"]) == "unban")) {
     if (liftBan($uuid)) {
-?>
+    ?>
       <aside class="alert alert-success" role="alert">
         This user's ban has been lifted.
       </aside>
     <?php
     } else {
-?>
+    ?>
       <aside class="alert alert-danger" role="alert">
         Could not lift this user's ban.
       </aside>
     <?php
     }
-}
-// Update userdata if requested
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "updateUserData") && (isset($_POST["name"])) && (isset($_POST["email"]))) {
+  }
+  // Update userdata if requested
+  if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "updateUserData") && (isset($_POST["name"])) && (isset($_POST["email"]))) {
     $name = htmlspecialchars($_POST["name"]);
     $email = htmlspecialchars($_POST["email"]);
     if ((strlen(trim($name)) == 0) || (strlen(trim($email)) == 0)) {
-?>
+    ?>
       <aside class="alert alert-danger" role="alert">
         The entered data is invalid
       </aside>
       <?php
     } else {
-        $visitCardUrl = NULL;
-        if (isset($_POST["visitCardUrl"])) {
-            $visitCardUrl = htmlspecialchars($_POST["visitCardUrl"]);
-        }
-        if (updateUserData($uuid, $name, $email, $visitCardUrl)) { ?>
+      $visitCardUrl = NULL;
+      if (isset($_POST["visitCardUrl"])) {
+        $visitCardUrl = htmlspecialchars($_POST["visitCardUrl"]);
+      }
+      if (updateUserData($uuid, $name, $email, $visitCardUrl)) { ?>
         <aside class="alert alert-success" role="alert">
           User data has been updated.
         </aside>
       <?php
-        } else { ?>
+      } else { ?>
         <aside class="alert alert-danger" role="alert">
           User data could not be updated.
         </aside>
       <?php
-        }
+      }
     }
-}
-// remove message if requested
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeMessage") && (isset($_POST["messageId"]))) {
+  }
+  // remove message if requested
+  if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeMessage") && (isset($_POST["messageId"]))) {
     $id = htmlspecialchars($_POST["messageId"]);
     if (removeUserMessage($id)) { ?>
       <aside class="alert alert-success" role="alert">
@@ -169,40 +169,40 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeM
       </aside>
       <?php
     }
-}
-// send message if requested
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "sendMessage") && (isset($_POST["message"]))) {
+  }
+  // send message if requested
+  if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "sendMessage") && (isset($_POST["message"]))) {
     $message = htmlspecialchars($_POST["message"]);
     if (strlen(trim($message)) > 0) {
-        if (storeUserMessage($uuid, $message)) { ?>
+      if (storeUserMessage($uuid, $message)) { ?>
         <aside class="alert alert-success" role="alert">
           <p>Stored user message</p>
         </aside>
       <?php
-        } else { ?>
+      } else { ?>
         <aside class="alert alert-danger" role="alert">
           <p>Could not store message</p>
         </aside>
       <?php
-        }
+      }
     } else { ?>
       <aside class="alert alert-danger" role="alert">
         <p>User message must not be empty</p>
       </aside>
     <?php
     }
-}
-// get current user data
-$userData = getUserData($uuid);
-if ($userData == NULL) {
-?>
+  }
+  // get current user data
+  $userData = getLocalUserData($uuid);
+  if ($userData == NULL) {
+    ?>
     <aside class="alert alert-danger" role="alert">
       <p>Could not fetch user details</p>
     </aside>
   <?php
     die();
-}
-?>
+  }
+  ?>
   <main>
     <section>
       <form action="javascript:void(0);" style="margin-bottom: 1rem;">
@@ -217,7 +217,7 @@ if ($userData == NULL) {
         <label for="visitCardUrlLabel" class="form-label">Visit card URL</label>
         <div class="input-group mb-3">
           <span class="input-group-text" id="visitCardUrlPrefix">https://</span>
-          <input type="text" class="form-control" id="visitCardUrlLabel" aria-describedby="visitCardUrlPrefix" name="visitCardUrl" value="<?php echo getUserVisitCardUrl($uuid) == NULL ? "" : getUserVisitCardUrl($uuid); ?>">
+          <input type="text" class="form-control" id="visitCardUrlLabel" aria-describedby="visitCardUrlPrefix" name="visitCardUrl" value="<?php echo $userData["visitCardUrl"] == NULL ? "" : $userData["visitCardUrl"]; ?>">
         </div>
         <button class="btn btn-primary" onclick="updateUserData('<?php echo $uuid; ?>');">Update</button>
       </form>
@@ -228,12 +228,12 @@ if ($userData == NULL) {
         </section>
         <section class="mb-3">
           <?php
-if (hasTags($uuid)) {
-?>
+          if (hasTags($uuid)) {
+          ?>
             <p>Tags (click to remove):</p>
             <?php
-    $tags = getTags($uuid);
-    foreach ($tags as $currentTag) { ?>
+            $tags = getTags($uuid);
+            foreach ($tags as $currentTag) { ?>
               <button class="tag btn btn-primary" onclick="removeTag('<?php echo $uuid; ?>', '<?php echo $currentTag; ?>');">
                 <?php echo $currentTag; ?>
               </button>
@@ -288,8 +288,8 @@ if (hasTags($uuid)) {
                 <?php
                 } ?>
               </table> <?php
-            }
-        } ?>
+                      }
+                    } ?>
         </section>
         <br>
         <section>
@@ -314,7 +314,7 @@ if (hasTags($uuid)) {
             </div>
             <button class="btn btn-danger" onclick="unban('<?php echo $uuid; ?>');">Lift ban</button>
           <?php
-        } else { ?>
+          } else { ?>
             <br>
             <p>Ban this user:</p>
             <form action="javascript:void(0);">
@@ -325,7 +325,7 @@ if (hasTags($uuid)) {
               <button class="btn btn-danger" onclick="ban('<?php echo $uuid; ?>');">Ban</button>
             </form>
           <?php
-        } ?>
+          } ?>
         </section>
         <br>
         <a class="btn btn-primary" href="../user" role="button">Go to users</a>

@@ -22,6 +22,10 @@ server {
     rewrite ^/edit/(.*)$ /template.php?target=edit_user&uuid=$1 last;
     rewrite ^/login(.*)$ /template.php?target=login$1 last;
     rewrite ^/logout(.*)$ /template.php?target=logout$1 last;
+    rewrite ^/lti-platform-details(.*)$ /template.php?target=lti_platform_details&platform_id=$1 last;
+    rewrite ^/lti(.*)$ /template.php?target=lti$1 last;
+    rewrite ^/lti-role-mapping(.*)$ /template.php?target=lti_role_mapping$1 last;
+    rewrite ^/edit-lti-role-mapping(.*)$ /template.php?target=lti_role_mapping_details$1 last;
     rewrite ^/messages(.*)$ /template.php?target=messages$1 last;
     rewrite ^/reports(.*)$ /template.php?target=reports$1 last;
     rewrite ^/rooms(.*)$ /template.php?target=rooms$1 last;
@@ -41,6 +45,11 @@ server {
     location ~ /(.vscode*|.gitignore|composer.*) {
         return 404;
     }
+
+    # LTI routing
+    rewrite ^/api/lti-login(.*)$ /lti/login.php$1 last;
+    rewrite ^/api/lti-jwks(.*)$ /lti/jwks.php$1 last;
+    rewrite ^/api/lti-launch(.*)$ /lti/launch.php$1 last;
 
     # Pass PHP
     location ~ \.php$ {
