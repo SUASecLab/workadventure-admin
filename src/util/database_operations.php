@@ -838,13 +838,13 @@ function getLastTextureId() {
         return -1;
     }
 }
-function reportUser($reportedUserUuid, $reportedUserComment, $reporterUserUuid, $reportWorldSlug) {
+function reportUser($reportedUserUuid, $reportedUserComment, $reporterUserUuid, $reportRoomUrl) {
     GLOBAL $DB;
-    $Statement = $DB->prepare("INSERT INTO reports (reportedUserUuid, reportedUserComment, reporterUserUuid, reportWorldSlug) VALUES (:reportedUserUuid, :reportedUserComment, :reporterUserUuid, :reportWorldSlug)");
+    $Statement = $DB->prepare("INSERT INTO reports (reportedUserUuid, reportedUserComment, reporterUserUuid, reportRoomUrl) VALUES (:reportedUserUuid, :reportedUserComment, :reporterUserUuid, :reportRoomUrl)");
     $Statement->bindParam(":reportedUserUuid", $reportedUserUuid, PDO::PARAM_STR);
     $Statement->bindParam(":reportedUserComment", $reportedUserComment, PDO::PARAM_STR);
     $Statement->bindParam(":reporterUserUuid", $reporterUserUuid, PDO::PARAM_STR);
-    $Statement->bindParam(":reportWorldSlug", $reportWorldSlug, PDO::PARAM_STR);
+    $Statement->bindParam(":reportRoomUrl", $reportRoomUrl, PDO::PARAM_STR);
     try {
         $Statement->execute();
     }

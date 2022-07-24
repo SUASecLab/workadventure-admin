@@ -12,6 +12,8 @@ require_once ('../util/api_helper_functions.php');
 require_once ('../util/uuid_adapter.php');
 $DB = getDatabaseHandleOrDie();
 authorizeOrDie();
+
+//token = organizationMemberToken
 if (isset($_GET["token"])) {
     $uuid = htmlspecialchars($_GET["token"]);
     $uuid = getUuid($uuid);
@@ -33,7 +35,15 @@ if (isset($_GET["token"])) {
     $result['messages'] = array(); // messages are being sent when calling the access function
     echo json_encode($result);
 } else {
-    die();
+    http_response_code(404);
+
+    $error["code"] = "INSUFFICIENT_USER_INFORMATION";
+    $error["title"] = "Insufficient user information";
+    $error["subtitle"] = "You did not specify enough information about the user.";
+    $error["details"] = "";
+    $error["image"] = "";
+
+    echo json_encode($error);
 }
 $DB = NULL;
 ?>

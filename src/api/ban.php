@@ -15,18 +15,19 @@ if ((isset($_GET["ipAddress"])) && (isset($_GET["token"])) && (isset($_GET["room
     $uuid = htmlspecialchars($_GET["token"]);
     $uuid = getUuid($uuid);
     isValidUuidOrDie($uuid);
-    // find out whether user is banned
-    $isBanned = isBanned($uuid);
-    $result['is_banned'] = $isBanned;
-    // get ban message if user is banned
-    if ($isBanned) {
-        $result['message'] = getBanMessage($uuid);
-    } else {
-        $result['message'] = "";
-    }
+
+    $result['is_banned'] = isBanned($uuid);
     echo json_encode($result);
 } else {
-    die();
+    http_response_code(404);
+
+    $error["code"] = "INSUFFICIENT_USER_INFORMATION";
+    $error["title"] = "Insufficient user information";
+    $error["subtitle"] = "You did not specify enough information about the user.";
+    $error["details"] = "";
+    $error["image"] = "";
+
+    echo json_encode($error);
 }
 $DB = NULL;
 ?>

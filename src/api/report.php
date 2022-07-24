@@ -10,9 +10,9 @@ $decodedPayload = (array)json_decode($payload);
 $reportedUserUuid = htmlspecialchars($decodedPayload["reportedUserUuid"]);
 $reportedUserComment = htmlspecialchars($decodedPayload["reportedUserComment"]);
 $reporterUserUuid = htmlspecialchars($decodedPayload["reporterUserUuid"]);
-$reportWorldSlug = htmlspecialchars($decodedPayload["reportWorldSlug"]);
+$reportRoomUrl = htmlspecialchars($decodedPayload["roomUrl"]);
 isValidUuidOrDie($reportedUserUuid);
 isValidUuidOrDie($reporterUserUuid);
-reportUser($reportedUserUuid, $reportedUserComment, $reporterUserUuid, $reportWorldSlug);
+reportUser($reportedUserUuid, $reportedUserComment, $reporterUserUuid, $reportRoomUrl);
 $DB = NULL;
 ?>

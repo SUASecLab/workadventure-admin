@@ -14,7 +14,15 @@ if (isset($_GET["roomUrl"])) {
     }
     echo json_encode($result);
 } else {
-    die();
+    http_response_code(404);
+
+    $error["code"] = "INSUFFICIENT_DATA";
+    $error["title"] = "Insufficient data provided";
+    $error["subtitle"] = "Not enough data was provided to perform this operation.";
+    $error["details"] = "";
+    $error["image"] = "";
+
+    echo json_encode($error);
 }
 $DB = NULL;
 ?>
