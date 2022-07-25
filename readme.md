@@ -6,4 +6,4 @@ The features include (but are not limited to) map and access control, sending gl
 
 This software is distributed under same license as WorkAdventure.
 
-The targeted version of WorkAdventure is 1.5.
+The targeted version of WorkAdventure is 1.11.

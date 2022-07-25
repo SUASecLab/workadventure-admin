@@ -63,11 +63,13 @@ while ($row = $users->fetch(PDO::FETCH_ASSOC)) { ?>
               </p>
             </td>
             <td>
-              <?php $tags = getTags($row["uuid"]);
-    foreach ($tags as $currentTag) { ?>
-                <div class="badge rounded-pill bg-primary tag">
-                  <?php echo $currentTag; ?>
-                </div> <?php
+<?php $tags = getTags($row["uuid"]);
+    foreach ($tags as $currentTag) {
+        if (strlen(trim($currentTag)) > 0) {?>
+            <div class="badge rounded-pill bg-primary tag">
+    <?php echo $currentTag; ?>
+            </div> <?php
+        }
     }
 ?>
             </td>

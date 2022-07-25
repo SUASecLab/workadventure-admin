@@ -11,7 +11,6 @@ if ((isset($_GET["roomUrl"]) && (isset($_GET["uuid"])))) {
     $uuid = htmlspecialchars($_GET["uuid"]);
     $uuid = getUuid($uuid);
     if (isValidUuid($uuid)) {
-        //TODO: check if name is correct
         $result = array("woka" => array("collections" => array(array("name" => "userTextures", "textures" => getTexturesWithoutLayers($uuid)))));
         echo json_encode($result);
     } else {

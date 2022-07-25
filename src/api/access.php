@@ -11,6 +11,7 @@ header("Content-Type:application/json");
 require_once ('../util/api_authentication.php');
 require_once ('../util/database_operations.php');
 require_once ('../util/api_helper_functions.php');
+require_once ('../util/jwt_adapter.php');
 require_once ('../util/uuid_adapter.php');
 $DB = getDatabaseHandleOrDie();
 authorizeOrDie();
@@ -27,14 +28,29 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
         } else {
             $result['textures'] = [];
         }
+        $tags = getTags($uuid);
+
         $result['userUuid'] = $uuid;
         $result['email']= getUserEmail($uuid);
-        $result['tags'] = getTags($uuid);
+        $result['tags'] = $tags;
         $result['visitCardUrl'] = getUserVisitCardUrl($uuid, true);
         $result['messages'] = getMessages($uuid);
         // optional parameters
         $result['anonymous'] = !getAuthenticationMandatory($uuid);
-        //$result['userRoomToken'] = '';
+
+        // Generate user room token
+        $token["uuid"] = $uuid;
+        $token["tags"] = $tags;
+        $token["moderator"] = in_array("admin", $tags);
+
+        $date = new DateTime();
+        $time = $date->getTimestamp();
+
+        $token["exp"] = $time + 60 * 60 * 24;
+        $token["nbf"] = $time - 5;
+        $token["iat"] = $time;
+
+        $result['userRoomToken'] = encryptJWT($token, getenv("EXTERNAL_TOKEN")); // WA.player.userRoomToken
         echo json_encode($result);
     } else {
         http_response_code(403);

@@ -58,7 +58,7 @@ if (isset($_GET["playUri"])) {
         $result['group'] = '';
 
         // optional parameters
-        // $result['authenticationMandatory'] = getAuthenticationMandatory($shortUri);
+        $result['authenticationMandatory'] = getAuthenticationMandatory($shortUri);
         // $result['iframeAuthentication'] = "https://127.0.0.1";
         // unused currently
         // $result['expireOn'] = ;
