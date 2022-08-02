@@ -1,5 +1,9 @@
 <?php
+require_once ('database_operations.php');
+
 function isLoggedIn() {
+    GLOBAL $DB;
+
     if (!isset($_SESSION["user"])) {
         return false;
     }
@@ -7,11 +11,11 @@ function isLoggedIn() {
     if (!isset($_SESSION["password"])) {
         return false;
     }
+    
+    // the password is already stored as hash
     $password = htmlspecialchars($_SESSION["password"]);
-    if (!websiteUserValid($user, $password)) {
-        return false;
-    }
-    return true;
+
+    return websiteUserExists($user, $password);
 }
 function showLogin() {
     echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
@@ -30,10 +34,12 @@ function login($user, $password) {
     $passwordHash = getHash($password);
     $_SESSION["user"] = $user;
     $_SESSION["password"] = $passwordHash;
-    if (websiteUserExists()) {
-        return websiteUserValid($user, $passwordHash);
+    if (websiteUserExists($user, $passwordHash)) {
+        return true;
     } else {
-        return createWebsiteUser($user, $passwordHash);
+        if (getNumberOfWebsiteUsers() == 0) {
+            return createWebsiteUser($user, $passwordHash);
+        }
     }
     return false;
 }

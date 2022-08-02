@@ -44,33 +44,6 @@ if (!isLoggedIn()) {
           </div>
         </div>
       </div>
-      <div class="col-sm-6">
-        <div class="card card-style">
-          <div class="card-body">
-            <h5 class="card-title">Global messages</h5>
-            <p class="card-text">Global messages can be sent here</p>
-            <a href="messages" class="btn btn-primary">Go to global messages</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-6">
-        <div class="card card-style">
-          <div class="card-body">
-            <h5 class="card-title">Reports</h5>
-            <p class="card-text">Reports can be reviewed and managed here</p>
-            <a href="reports" class="btn btn-primary">Go to reports</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-6">
-        <div class="card card-style">
-          <div class="card-body">
-            <h5 class="card-title">Settings</h5>
-            <p class="card-text">Admin API settings can be adjusted here</p>
-            <a href="settings" class="btn btn-primary">Go to Settings</a>
-          </div>
-        </div>
-      </div>
     </div>
   </main>
 </body>

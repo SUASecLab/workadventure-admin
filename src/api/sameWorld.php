@@ -8,8 +8,8 @@ if (isset($_GET["roomUrl"])) {
     $maps = getAllMaps();
     $result = array();
     if ($maps != NULL) {
-        while ($row = $maps->fetch(PDO::FETCH_ASSOC)) {
-            array_push($result, "https://" . getenv('DOMAIN') . $row["map_url"]);
+        foreach ($maps as $map) {
+            array_push($result, "https://" . getenv('DOMAIN') . $map["mapUrl"]);
         }
     }
     echo json_encode($result);

@@ -1,9 +1,4 @@
 <?php
-/*
-verify ban -> returns AdminBannedData
-only works on private maps -> '@' url part
-is_banned is used, message not but most likely equal to ban message
-*/
 header("Content-Type:application/json");
 require_once ('../util/api_authentication.php');
 require_once ('../util/database_operations.php');
@@ -15,8 +10,14 @@ if ((isset($_GET["ipAddress"])) && (isset($_GET["token"])) && (isset($_GET["room
     $uuid = htmlspecialchars($_GET["token"]);
     $uuid = getUuid($uuid);
     isValidUuidOrDie($uuid);
+    $userData = iterator_to_array(getUserData($uuid));
 
-    $result['is_banned'] = isBanned($uuid);
+    $isBanned = false;
+    if ((array_key_exists("banned", $userData)) && ($userData["banned"] == true)) {
+        $isBanned = true;
+    }
+
+    $result['is_banned'] = $isBanned;
     echo json_encode($result);
 } else {
     http_response_code(404);

@@ -16,7 +16,7 @@ if (!isLoggedIn()) {
 // map should be removed
 if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeMap") && (isset($_POST["mapUrl"]))) {
     $mapToRemove = htmlspecialchars($_POST["mapUrl"]);
-    if ((removeMapTags($mapToRemove)) && (removeMap($mapToRemove))) { ?>
+    if (removeMap($mapToRemove)) { ?>
             <aside class="alert alert-success" role="alert">
                 Sucessfully removed <?php echo $mapToRemove; ?>
             </aside>
@@ -68,10 +68,7 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addMap"
     if ($validInput) {
         $mapUrlPrefix = "/@/org/" . getenv('DOMAIN') . "/";
         $mapUrl = $mapUrlPrefix . $mapUrl;
-        $success = storeMapFileUrl($mapUrl, $mapFileUrl, $accessRestriction);
-        foreach ($tagsArray as $tag) {
-            $success &= addMapTag($mapUrl, $tag);
-        }
+        $success = storeMap($mapUrl, $mapFileUrl, $accessRestriction, $tagsArray);
         // check whether adding the map worked
         if ($success) { ?>
                 <aside class="alert alert-success" role="alert">
@@ -115,7 +112,7 @@ if ($maps == NULL) { ?>
 <?php
     die();
 }
-while ($row = $maps->fetch(PDO::FETCH_ASSOC)) {
+foreach ($maps as $map) {
     if ($firstIteration) {
         $firstIteration = false;
 ?>
@@ -134,17 +131,17 @@ while ($row = $maps->fetch(PDO::FETCH_ASSOC)) {
                 <tr>
                     <td>
                         <p class="fw-normal">
-                            <?php echo $row["map_url"]; ?>
+                            <?php echo $map["mapUrl"]; ?>
                         </p>
                     </td>
                     <td>
                         <p class="fw-normal">
-                            <?php echo $row["map_file_url"]; ?>
+                            <?php echo $map["mapFileUrl"]; ?>
                         </p>
                     </td>
                     <td>
                         <?php
-    $policy = $row["policy"];
+    $policy = $map["policyNumber"];
     if ($policy == "1") { ?>
                             <p class="fw-normal">
                                 Public
@@ -159,7 +156,7 @@ while ($row = $maps->fetch(PDO::FETCH_ASSOC)) {
                             <p class="fw-normal">
                                 Members with tags
                                 <?php
-        $mapTags = getMapTags($row["map_url"]);
+        $mapTags = $map["tags"];
         foreach ($mapTags as $tag) { ?>
                             <div class="badge rounded-pill bg-primary tag">
                                 <?php echo $tag; ?>
@@ -173,7 +170,7 @@ while ($row = $maps->fetch(PDO::FETCH_ASSOC)) {
 ?>
                     </td>
                     <td>
-                        <button class="tag btn btn-danger" onclick="removeMap('<?php echo $row['map_url']; ?>');">
+                        <button class="tag btn btn-danger" onclick="removeMap('<?php echo $map['mapUrl']; ?>');">
                             Remove
                         </button>
                     </td>

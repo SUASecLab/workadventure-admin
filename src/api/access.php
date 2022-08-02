@@ -1,12 +1,4 @@
 <?php
-/*
-fetch member data by uuid -> returns FetchMemberDataByUuidResponse
-currently, the messages, the tags, the textures, the tags, the anonymous variable and http status codes are used
-Status codes:
-404 -> anonymous login
-403 -> world full
-tags: 'admin' for sending world messages, furthermore a jitsi moderator tag can be set (set in map, is a custom tag)
-*/
 header("Content-Type:application/json");
 require_once ('../util/api_authentication.php');
 require_once ('../util/database_operations.php');
@@ -16,27 +8,77 @@ require_once ('../util/uuid_adapter.php');
 $DB = getDatabaseHandleOrDie();
 authorizeOrDie();
 if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GET["ipAddress"]))) {
-    //  contents of playUri, ipAdress are ignored here
+    //  contents of ipAdress are ignored here
     $userIdentifier = htmlspecialchars($_GET["userIdentifier"]);
     $uuid = getUuid($userIdentifier);
     if (userExists($uuid)) {
-        if (allowedToCreateNewUser()) {
-            createAccountIfNotExistent($uuid);
-        }
-        if((isset($_GET["characterLayers"]))) {
-            $result['textures'] = getTexturesIfValid($uuid, $_GET["characterLayers"]);
+        $selectedTextures = array();
+        if (isset($_GET["characterLayers"])) {
+            $selectedTextures = $_GET["characterLayers"];
         } else {
-            $result['textures'] = [];
+            $selectedTextures = [];
         }
-        $tags = getTags($uuid);
+        $userData = iterator_to_array(getUserData($uuid));
+
+        $tags = array();
+        if (array_key_exists("tags", $userData)) {
+            $tags = iterator_to_array($userData["tags"]);
+        }
 
         $result['userUuid'] = $uuid;
-        $result['email']= getUserEmail($uuid);
+        $result['email']= $userData["email"];
         $result['tags'] = $tags;
-        $result['visitCardUrl'] = getUserVisitCardUrl($uuid, true);
-        $result['messages'] = getMessages($uuid);
-        // optional parameters
-        $result['anonymous'] = !getAuthenticationMandatory($uuid);
+
+        $textures =  iterator_to_array(getTextures());
+        $textureArray = array();
+
+        foreach ($textures as $texture) {
+            if (in_array($texture["waId"], $selectedTextures)) {
+                // check if tags are matching (if any)
+                if (array_key_exists("tags", iterator_to_array($texture))) {
+                    $textureTags = iterator_to_array($texture["tags"]);
+                    if ((count($textureTags) != 0) &&
+                        (count(array_intersect($tags, $textureTags)) == 0)) {
+                        continue;
+                    }
+                }
+                array_push($textureArray, array(
+                    "id" => $texture["waId"],
+                    "url" => $texture["url"],
+                    "layer" => $texture["layer"]
+                ));
+            }
+        }
+
+        $result["textures"] = $textureArray;
+
+        $visitCardUrl = NULL;
+        if (array_key_exists("visitCardURL", $userData)) {
+            $visitCardUrl = "https://".$userData["visitCardURL"];
+        }
+
+        $result['visitCardUrl'] = $visitCardUrl;
+
+        // fetch messages
+        $messages = array();
+
+        if (array_key_exists("messages", $userData)) {
+            $userMessages = $userData["messages"];
+            foreach($userMessages as $message) {
+                $currentMessage = array(
+                    "type" => "ban",
+                    "message" => $message
+                );
+                array_push($messages, $currentMessage);
+            }
+        }
+        $result['messages'] = $messages;
+        removeMessages($uuid);
+
+        // decide whether anonymous login is allowed
+        $playUri = htmlspecialchars($_GET["playUri"]);
+        $map = iterator_to_array(getMap(substr($playUri, strlen("https://".getenv("DOMAIN")))));
+        $result['anonymous'] = $map["policyNumber"] == 1; 
 
         // Generate user room token
         $token["uuid"] = $uuid;
@@ -50,7 +92,7 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
         $token["nbf"] = $time - 5;
         $token["iat"] = $time;
 
-        $result['userRoomToken'] = encryptJWT($token, getenv("EXTERNAL_TOKEN")); // WA.player.userRoomToken
+        $result['userRoomToken'] = encodeJWT($token, getenv("EXTERNAL_TOKEN")); // WA.player.userRoomToken
         echo json_encode($result);
     } else {
         http_response_code(403);

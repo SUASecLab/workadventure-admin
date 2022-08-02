@@ -17,7 +17,7 @@ if (!isLoggedIn()) {
 include_once ('../util/uuid_adapter.php');
 // Get number of users
 $nrOfUsers = getNumberOfUsers();
-if ($nrOfUsers == NULL) {
+if ($nrOfUsers === NULL) {
 ?>
     <aside class="container alert alert-danger" role="alert">
       <p>Could not fetch user count</p>
@@ -33,8 +33,8 @@ if ($nrOfUsers == NULL) {
     </p>
     <?php
 // Get all users
-$users = getAllUsers();
-if ($users == NULL) {
+$users = iterator_to_array(getAllUsers());
+if ($users === NULL) {
 ?>
       <aside class="alert alert-danger" role="alert">
         <p>Could not fetch users</p>
@@ -55,15 +55,17 @@ if ($users == NULL) {
         </tr>
 
         <?php
-while ($row = $users->fetch(PDO::FETCH_ASSOC)) { ?>
+foreach ($users as $user) { ?>
           <tr>
             <td>
               <p class="fw-normal">
-                <?php echo $row["name"]; ?>
+                <?php echo $user["name"]; ?>
               </p>
             </td>
             <td>
-<?php $tags = getTags($row["uuid"]);
+<?php 
+  if (array_key_exists("tags", iterator_to_array($user))) {
+  $tags = $user["tags"];
     foreach ($tags as $currentTag) {
         if (strlen(trim($currentTag)) > 0) {?>
             <div class="badge rounded-pill bg-primary tag">
@@ -71,10 +73,11 @@ while ($row = $users->fetch(PDO::FETCH_ASSOC)) { ?>
             </div> <?php
         }
     }
+  }
 ?>
             </td>
             <td>
-              <a class="btn btn-dark" role="button" href="./edit/<?php echo $row["uuid"]; ?>">Edit</a>
+              <a class="btn btn-dark" role="button" href="./edit/<?php echo $user["uuid"]; ?>">Edit</a>
             </td>
 
           <?php

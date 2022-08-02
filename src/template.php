@@ -7,10 +7,7 @@ if (!isset($_GET["target"])) {
 targets:
 - edit_user=edit a user; reuires 'uuid' as post parameter
 - login=log in; don't die if no user is logged in
-- messages=send global messages, requires quill
-- reports = view user reports
 - rooms = view and manage maps
-- settings = adjust settings
 - textures = manage custom textures
 - index = show the index
 */
@@ -22,7 +19,7 @@ $target = htmlspecialchars($_GET["target"]);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <? if ($target != "edit_user") { ?>
+    <?php if ($target != "edit_user") { ?>
         <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet">
         <link href="css/style.css" rel="stylesheet">
         <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
@@ -37,12 +34,6 @@ $target = htmlspecialchars($_GET["target"]);
     <?php } ?>
 
     <?php
-if ($target == "messages") {
-?>
-        <link href="css/quill/quill.snow.css" rel="stylesheet">
-        <script src="js/quill/quill.min.js"></script>
-    <?php
-}
 if ($target == "rooms") {
 ?>
     <script src="js/snippets/maps.js"></script>

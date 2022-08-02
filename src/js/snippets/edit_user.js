@@ -48,11 +48,11 @@ function addTag(uuid) {
     });
 }
 
-function removeMessage(uuid, messageId) {
+function removeMessage(uuid, message) {
     $("#edit_user").load("../snippets/edit_user.php", {
         "action": "removeMessage",
         "uuid": uuid,
-        "messageId": messageId
+        "message": message
     });
 }
 

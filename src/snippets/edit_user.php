@@ -140,9 +140,9 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "updateU
     } else {
         $visitCardUrl = NULL;
         if (isset($_POST["visitCardUrl"])) {
-            $visitCardUrl = htmlspecialchars($_POST["visitCardUrl"]);
+            $visitCardURL = htmlspecialchars($_POST["visitCardUrl"]);
         }
-        if (updateUserData($uuid, $name, $email, $visitCardUrl)) { ?>
+        if (updateUserData($uuid, $name, $email, $visitCardURL)) { ?>
         <aside class="alert alert-success" role="alert">
           User data has been updated.
         </aside>
@@ -156,9 +156,9 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "updateU
     }
 }
 // remove message if requested
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeMessage") && (isset($_POST["messageId"]))) {
-    $id = htmlspecialchars($_POST["messageId"]);
-    if (removeUserMessage($id)) { ?>
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeMessage") && (isset($_POST["message"]))) {
+    $message = htmlspecialchars($_POST["message"]);
+    if (removeUserMessage($uuid, $message)) { ?>
       <aside class="alert alert-success" role="alert">
         <p>Removed message</p>
       </aside>
@@ -193,8 +193,8 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "sendMes
     }
 }
 // get current user data
-$userData = getUserData($uuid);
-if ($userData == NULL) {
+$userData = iterator_to_array(getUserData($uuid));
+if ($userData === NULL) {
 ?>
     <aside class="alert alert-danger" role="alert">
       <p>Could not fetch user details</p>
@@ -217,7 +217,8 @@ if ($userData == NULL) {
         <label for="visitCardUrlLabel" class="form-label">Visit card URL</label>
         <div class="input-group mb-3">
           <span class="input-group-text" id="visitCardUrlPrefix">https://</span>
-          <input type="text" class="form-control" id="visitCardUrlLabel" aria-describedby="visitCardUrlPrefix" name="visitCardUrl" value="<?php echo getUserVisitCardUrl($uuid) == NULL ? "" : getUserVisitCardUrl($uuid); ?>">
+          <input type="text" class="form-control" id="visitCardUrlLabel" aria-describedby="visitCardUrlPrefix" name="visitCardUrl"
+            value="<?php echo (array_key_exists("visitCardURL", $userData)) ? $userData["visitCardURL"] : ""; ?>">
         </div>
         <button class="btn btn-primary" onclick="updateUserData('<?php echo $uuid; ?>');">Update</button>
       </form>
@@ -228,19 +229,19 @@ if ($userData == NULL) {
         </section>
         <section class="mb-3">
           <?php
-if (hasTags($uuid)) {
+if ((array_key_exists("tags", $userData)) && (count(iterator_to_array($userData["tags"])) > 0)){
 ?>
             <p>Tags (click to remove):</p>
             <?php
-    $tags = getTags($uuid);
+    $tags = $userData["tags"];
     foreach ($tags as $currentTag) { ?>
               <button class="tag btn btn-primary" onclick="removeTag('<?php echo $uuid; ?>', '<?php echo $currentTag; ?>');">
                 <?php echo $currentTag; ?>
               </button>
-          <?
+          <?php
             }
             echo "<br><br>";
-          }
+}
           ?>
         </section>
         <section>
@@ -251,20 +252,16 @@ if (hasTags($uuid)) {
           </form>
         </section>
         <section>
-          <?php if (userMessagesExist($uuid)) {
-            $messages = getUserMessages($uuid);
-            if ($messages == NULL) { ?>
+<?php if ((array_key_exists("messages", $userData)) && (count(iterator_to_array($userData["messages"])) > 0)){
+            $messages = $userData["messages"];
+  if ($messages === NULL) { ?>
               <br>
               <div class="alert alert-danger" role="alert">
                 <p>Could not fetch messages</p>
               </div>
             <?php
-            } else { ?>
+  } else { ?>
               <br>
-              <div class="alert alert-warning" role="alert">
-                <p>Only the top message will be shown to the user. If the user also receives a global message, the global
-                  message will be shown instead of the private one!</p>
-              </div>
               <p class="fs-3">User messages:</p>
               <table class="table">
                 <tr>
@@ -272,24 +269,24 @@ if (hasTags($uuid)) {
                   <th scope="col">Actions</th>
                 </tr>
                 <?php
-                while ($row = $messages->fetch(PDO::FETCH_ASSOC)) { ?>
+    foreach ($messages as $message) { ?>
                   <tr>
                     <td>
                       <p class="fw-normal">
-                        <?php echo $row["message"]; ?>
+                        <?php echo $message; ?>
                       </p>
                     </td>
                     <td>
-                      <button class="tag btn btn-danger" onclick="removeMessage('<?php echo $uuid; ?>', '<?php echo $row['message_id']; ?>');">
+                      <button class="tag btn btn-danger" onclick="removeMessage('<?php echo $uuid; ?>', '<?php echo $message; ?>');">
                         Remove
                       </button>
                     </td>
                   </tr>
                 <?php
-                } ?>
+    } ?>
               </table> <?php
-            }
-        } ?>
+  }
+} ?>
         </section>
         <br>
         <section>
@@ -305,16 +302,16 @@ if (hasTags($uuid)) {
           </form>
         </section>
         <section>
-          <?php if (isBanned($uuid)) { ?>
+<?php if ((array_key_exists("banned", $userData)) && ($userData["banned"] == true)) { ?>
             <br>
             <p>This user has been banned!</p>
             <div class="mb-3">
               <label for="banReason" class="form-label">Reason:</label>
-              <input type="text" class="form-control" id="banReason" value="<?php echo getBanMessage($uuid); ?>" readonly>
+              <input type="text" class="form-control" id="banReason" value="<?php echo $userData["banReason"]; ?>" readonly>
             </div>
             <button class="btn btn-danger" onclick="unban('<?php echo $uuid; ?>');">Lift ban</button>
           <?php
-        } else { ?>
+} else { ?>
             <br>
             <p>Ban this user:</p>
             <form action="javascript:void(0);">
@@ -325,7 +322,7 @@ if (hasTags($uuid)) {
               <button class="btn btn-danger" onclick="ban('<?php echo $uuid; ?>');">Ban</button>
             </form>
           <?php
-        } ?>
+} ?>
         </section>
         <br>
         <a class="btn btn-primary" href="../user" role="button">Go to users</a>

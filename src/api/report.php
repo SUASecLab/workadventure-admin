@@ -1,18 +1,3 @@
 <?php
-header("Content-Type:application/json");
-require_once ('../util/api_authentication.php');
-require_once ('../util/database_operations.php');
-require_once ('../util/uuid_adapter.php');
-$DB = getDatabaseHandleOrDie();
-authorizeOrDie();
-$payload = file_get_contents("php://input");
-$decodedPayload = (array)json_decode($payload);
-$reportedUserUuid = htmlspecialchars($decodedPayload["reportedUserUuid"]);
-$reportedUserComment = htmlspecialchars($decodedPayload["reportedUserComment"]);
-$reporterUserUuid = htmlspecialchars($decodedPayload["reporterUserUuid"]);
-$reportRoomUrl = htmlspecialchars($decodedPayload["roomUrl"]);
-isValidUuidOrDie($reportedUserUuid);
-isValidUuidOrDie($reporterUserUuid);
-reportUser($reportedUserUuid, $reportedUserComment, $reporterUserUuid, $reportRoomUrl);
-$DB = NULL;
+// empty file to signalize success (we don't implement a report feature anymore as its implementation is optional and we do not need it)
 ?>

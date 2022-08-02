@@ -78,13 +78,14 @@ if ($redirects == NULL) {
 </aside>
 <?php
 } else {
-    if ($redirects->rowCount() > 0) {
+    if (count($redirects->toArray()) > 0) {
 ?>
         <p class="fs-4">Enumeration of room redirections</p>
         <table class="table" style="margin-bottom: 1rem;">
         <?php
         $firstIteration = true;
-        while ($row = $redirects->fetch(PDO::FETCH_ASSOC)) {
+        $redirects = getAllMapRedirects();
+        foreach ($redirects as $redirect) {
             if ($firstIteration) {
                 $firstIteration = false;
 ?>
@@ -102,16 +103,16 @@ if ($redirects == NULL) {
             <tr>
                 <td>
                     <p class="fw-normal">
-                        <?php echo $row["map_url"]; ?>
+                        <?php echo $redirect["mapUrl"]; ?>
                     </p>
                 </td>
                 <td>
                     <p class="fw-normal">
-                        <?php echo $row["redirect_url"]; ?>
+                        <?php echo $redirect["redirectUrl"]; ?>
                     </p>
                 </td>
                 <td>
-                    <button class="tag btn btn-danger" onclick="removeRedirection(encodeURI('<?php echo $row['map_url']; ?>'));">
+                    <button class="tag btn btn-danger" onclick="removeRedirection(encodeURI('<?php echo $redirect['mapUrl']; ?>'));">
                         Remove
                     </button>
                 </td>
@@ -148,8 +149,8 @@ if ($maps == NULL) { ?>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="sourceMapsDropdown">
                     <?php
-                    while ($row = $maps->fetch(PDO::FETCH_ASSOC)) {
-                        $mapUrl = $row["map_url"];
+                    foreach ($maps as $map) {
+                        $mapUrl = $map["mapUrl"];
 ?>
                         <li>
                             <button class="dropdown-item" onclick="destinationMapSelect('<?php echo $mapUrl; ?>');"><?php echo $mapUrl; ?></button>

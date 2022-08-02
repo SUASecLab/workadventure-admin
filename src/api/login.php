@@ -1,10 +1,4 @@
 <?php
-/*
-fetch member data by token -> returns AdminApiData
-maybe useful for generating the admin join links
-currently, the uuid, the organization slug, the world slug, the room slug,
-the mapUrlStart and the textures are being considered
-*/
 header("Content-Type:application/json");
 require_once ('../util/api_authentication.php');
 require_once ('../util/database_operations.php');
@@ -19,20 +13,32 @@ if (isset($_GET["token"])) {
     $uuid = getUuid($uuid);
     isValidUuidOrDie($uuid);
     if (!userExists($uuid)) {
-        if (allowedToCreateNewUser()) {
-            createAccountIfNotExistent($uuid);
-        }
+        http_response_code(401);
+
+        $error["code"] = "UNAUTHORIZED";
+        $error["title"] = "Unauthorized";
+        $error["subtitle"] = "You are not allowed to use this service.";
+        $error["details"] = "";
+        $error["image"] = "";
+    
+        echo json_encode($error);
+        die();
     }
-    $map = getUserStartMap($uuid);
-    if ($map == NULL) {
+
+    $userData = iterator_to_array(getUserData($uuid));
+    if (array_key_exists("startMap", $userData)) {
+        $map = $userData["startMap"];
+    } else {
         $map = getenv('START_ROOM_URL');
     }
+
     $result['userUuid'] = $uuid;
-    $result['email'] = getUserEmail($uuid);
+    $result['email'] = $userData["email"];
     $result['roomUrl'] = $map;
     $result['mapUrlStart'] = getMapFileUrl($map);
     // optional parameters
     $result['messages'] = array(); // messages are being sent when calling the access function
+
     echo json_encode($result);
 } else {
     http_response_code(404);

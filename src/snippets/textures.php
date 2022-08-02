@@ -29,116 +29,45 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeT
     <?php
     }
 }
-// check whether url has been added
+// check whether texture should be added
 if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addTexture") && (isset($_POST["textureId"])) && (isset($_POST["textureLayer"])) && (isset($_POST["textureUrl"]))) {
     $textureId = htmlspecialchars($_POST["textureId"]);
     $textureLayer = htmlspecialchars($_POST["textureLayer"]);
     $textureUrl = htmlspecialchars($_POST["textureUrl"]);
-    $error = false;
+    
+    if (isset($_POST["textureTags"])) {
+      $textureTags = (array) json_decode($_POST["textureTags"]);
+    } else {
+      $textureTags = array();
+    }
 
     if (strlen(trim(htmlspecialchars($_POST["textureUrl"]))) == 0) { ?>
       <aside class="alert alert-danger" role="alert">
         Invalid URL
       </aside>
     <?php
+    } else if (strlen(trim($textureId)) == 0) { ?>
+      <aside class="alert alert-danger" role="alert">
+        Invalid ID
+      </aside>
+      <?php
     } else {
-      if (storeTexture($textureId, $textureLayer, $textureUrl)) {
-        if ((isset($_POST["textureTags"])) && (strlen(trim(htmlspecialchars($_POST["textureTags"])) > 0))) {
-          $tagsList = json_decode($_POST["textureTags"]);
-          $lastTexture = getLastTextureId();
-          if ($lastTexture != - 1) {
-            if (sizeof($tagsList) > 0) {
-              foreach ($tagsList as $tag) {
-                if (!storeTextureTag($lastTexture, trim(htmlspecialchars($tag)))) {
-                  $error = true;
-                }
-              }
-            }
-          } else {
-            $error = true;
-          }
-        }
-      } else {
-          $error = true;
-      }
-      if ($error) { ?>
+      if (storeTexture($textureId, $textureLayer, $textureUrl, $textureTags)) { ?>
+        <aside class="alert alert-success" role="alert">
+          <p>Stored texture</p>
+        </aside>
+    <?php
+      } else{ ?>
         <aside class="alert alert-danger" role="alert">
           <p>Could not store texture</p>
         </aside>
       <?php
-      } else {
-?>
-        <aside class="alert alert-success" role="alert">
-          <p>Stored texture</p>
-        </aside>
-      <?php
       }
     }
-}
-if (customTexturesStored()) {
-    $textures = getCustomTextures();
-    if ($textures == NULL) { ?>
-      <aside class="alert alert-danger" role="alert">
-        <p>Could not fetch custom textures</p>
-      </aside>
-      <main>
-      <?php
-    } else { ?>
-        <main>
+  }
+  ?>
           <article>
-            <p class="fs-3">Custom textures:</p>
-            <table class="table">
-              <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Layer</th>
-                <th scope="col">Url</th>
-                <th scope="col">Restriction</th>
-              </tr>
-              <?php
-        while ($row = $textures->fetch(PDO::FETCH_ASSOC)) {
-            $tags = getTextureTags($row["texture_table_id"]); ?>
-                <tr>
-                  <td>
-                    <p class="fw-normal">
-                      <?php echo $row["texture_id"]; ?>
-                    </p>
-                  </td>
-                  <td>
-                    <p class="fw-normal">
-                      <?php echo $row["texture_layer"]; ?>
-                    </p>
-                  </td>
-                  <td>
-                    <p class="fw-normal">
-                      <?php echo $row["texture_url"]; ?>
-                    </p>
-                  </td>
-                  <?php if (count($tags) == 0) { ?>
-                    <td>
-                      <p class="fw-normal">Public</p>
-                    </td>
-                  <?php
-            } else {
-                $tagsAsString = "";
-                foreach ($tags as $tag) {
-                    $tagsAsString = $tagsAsString . "<div class=\"badge rounded-pill bg-primary tag\">" . $tag . "</div>";
-                }
-                echo "<td>" . $tagsAsString . "</td>";
-            } ?>
-                  <td>
-                    <button class="tag btn btn-danger" onclick="removeTexture('<?php echo $row['texture_table_id']; ?>');">
-                      Remove
-                    </button>
-                  </td>
-                </tr>
-          <?php
-        }
-        echo "</table></article>";
-    }
-}
-?>
-          <article>
-            <p class="fs-3">Add custom texture</p>
+            <p class="fs-3">Add texture:</p>
             <form action="javascript:void(0);" style="margin-bottom: 1rem;">
               <div class="mb-3">
                 <label for="textureId" class="form-label">Texture ID</label>
@@ -176,6 +105,86 @@ if (customTexturesStored()) {
               </button>
             </form>
           </article>
+<?php
+
+if (texturesStored()) {
+    $textures = getTextures();
+    if ($textures == NULL) { ?>
+      <aside class="alert alert-danger" role="alert">
+        <p>Could not fetch textures</p>
+      </aside>
+      <main>
+      <?php
+    } else { ?>
+        <main>
+          <article>
+            <p class="fs-3">Textures:</p>
+            <table class="table">
+              <thead>
+                <th scope="col">ID</th>
+                <th scope="col">Layer</th>
+                <th scope="col">URL</th>
+                <th scope="col">Image</th>
+                <th scope="col">Restriction</th>
+                <th scope="col">Action</th>
+              </thead>
+              <?php
+        foreach ($textures as $texture) {
+            $tags = NULL;
+            $texture = iterator_to_array($texture);
+            if (array_key_exists("tags", $texture)) {
+              $tags = iterator_to_array($texture["tags"]);
+            }
+            ?>
+                <tr>
+                  <td>
+                    <p class="fw-normal">
+                      <?php echo $texture["waId"]; ?>
+                    </p>
+                  </td>
+                  <td>
+                    <p class="fw-normal">
+                      <?php echo $texture["layer"]; ?>
+                    </p>
+                  </td>
+                  <td>
+                    <p class="fw-normal">
+                      <?php echo $texture["url"]; ?>
+                    </p>
+                  </td>
+                  <td>
+                    <?php
+                      $textureUrl = (string) $texture["url"];
+                      if (str_starts_with($texture["url"], "resources")) {
+                        $textureUrl = "https://".getenv("DOMAIN")."/".$textureUrl;
+                      }
+                      echo '<img src="'.$textureUrl.'">';
+                    ?>
+                  </td>
+                  <?php if ($tags == NULL) { ?>
+                    <td>
+                      <p class="fw-normal">Public</p>
+                    </td>
+                  <?php
+            } else {
+                $tagsAsString = "";
+                foreach ($tags as $tag) {
+                    $tagsAsString = $tagsAsString . "<div class=\"badge rounded-pill bg-primary tag\">" . $tag . "</div>";
+                }
+                echo "<td>" . $tagsAsString . "</td>";
+            } ?>
+                  <td>
+                    <button class="tag btn btn-danger" onclick="removeTexture('<?php echo $texture['_id']; ?>');">
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+          <?php
+        }
+        echo "</table></article>";
+    }
+}
+?>
 </body>
 
 </html>

@@ -1,8 +1,4 @@
 <?php
-/*
-fetch map details -> returns MapDetailsData
-currently, the tags and the policy type are used
-*/
 header("Content-Type:application/json");
 require_once ('../util/api_authentication.php');
 require_once ('../util/database_operations.php');
@@ -12,12 +8,13 @@ authorizeOrDie();
 if (isset($_GET["playUri"])) {
     $playUri = htmlspecialchars($_GET["playUri"]);
     $shortUri = substr($playUri, strlen("https://" . getenv('DOMAIN')));
-    $resultMap = getMapFileUrl($shortUri);
+    $resultMap = getMap($shortUri);
     $result = array();
     if ($resultMap == NULL) {
         $mapRedirect = getMapRedirect($shortUri);
         if ($mapRedirect != NULL) {
             $result['redirectUrl'] = $mapRedirect;
+            echo json_encode($result);
         } else {
             http_response_code(404);
             die();
@@ -50,19 +47,18 @@ if (isset($_GET["playUri"])) {
             }
         }
 
-        $result['mapUrl'] = $resultMap;
-        $result['policy_type'] = getMapPolicy($shortUri);
-        $result['tags'] = getMapTags($shortUri);
+        $result['mapUrl'] = "https://".$resultMap["mapFileUrl"];
+        $result['policy_type'] = $resultMap["policyNumber"];
+        $result['tags'] = $resultMap["tags"];
         $result['roomSlug'] = ''; // deprecated
         $result['contactPage'] = '';
         $result['group'] = '';
 
         // optional parameters
-        $result['authenticationMandatory'] = getAuthenticationMandatory($shortUri);
+        $result['authenticationMandatory'] = $resultMap["policyNumber"] != 1;
         // $result['iframeAuthentication'] = "https://127.0.0.1";
-        // unused currently
         // $result['expireOn'] = ;
-        // $result['canReport'] = ;
+        $result['canReport'] = false;
         // $result['loadingCowebsiteLogo'] = ;
         // $result['miniLogo'] = ;
         // $result['loadingLogo'] = ;
