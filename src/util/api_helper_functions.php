@@ -25,7 +25,8 @@ function userCanAccessMap($userUuid, $shortMapUri) {
         }
         if ($policy == 3) {
             $user = iterator_to_array(getUserData($userUuid));
-            $sharedTagsCount = count(array_intersect($map["tags"], $user["tags"]));
+            $sharedTagsCount = count(array_intersect(iterator_to_array($map["tags"]),
+                                                    iterator_to_array($user["tags"])));
             if ($sharedTagsCount < 1) {
                 return false;
             }
