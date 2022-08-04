@@ -23,13 +23,13 @@ $target = htmlspecialchars($_GET["target"]);
         <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet">
         <link href="css/style.css" rel="stylesheet">
         <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
-        <script src="js/ajax/jquery-3.6.0.min.js"></script>
+        <script src="js/ajax/jquery.min.js"></script>
         <script src="js/snippets/<?php echo $target; ?>.js"></script>
     <?php } else { ?>
         <link href="../css/bootstrap/bootstrap.min.css" rel="stylesheet">
         <link href="../css/style.css" rel="stylesheet">
         <script src="../js/bootstrap/bootstrap.bundle.min.js"></script>
-        <script src="../js/ajax/jquery-3.6.0.min.js"></script>
+        <script src="../js/ajax/jquery.min.js"></script>
         <script src="../js/snippets/<?php echo $target; ?>.js"></script>
     <?php } ?>
 

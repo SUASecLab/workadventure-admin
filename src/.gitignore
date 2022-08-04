@@ -2,5 +2,9 @@
 composer.phar
 vendor
 
+css/bootstrap
+js/ajax
+js/bootstrap
+
 # VSCode
 .vscode
