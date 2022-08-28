@@ -81,19 +81,22 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
         $result['anonymous'] = $map["policyNumber"] == 1; 
 
         // Generate user room token
-        $token["uuid"] = $uuid;
-        $token["tags"] = $tags;
-        $token["moderator"] = in_array("admin", $tags);
+        $sidecarURL = "http://".getenv("SIDECAR_URL")."/issuance?uuid=" . $uuid;
+        $sidecarResult = file_get_contents($sidecarURL);
+        if ($result == false) {
+            http_response_code(403);
 
-        $date = new DateTime();
-        $time = $date->getTimestamp();
+            $error["code"] = "NO_TOKEN";
+            $error["title"] = "No auth token";
+            $error["subtitle"] = "No auth token received.";
+            $error["details"] = "";
+            $error["image"] = "";
 
-        $token["exp"] = $time + 60 * 60 * 24;
-        $token["nbf"] = $time - 5;
-        $token["iat"] = $time;
-
-        $result['userRoomToken'] = encodeJWT($token, getenv("EXTERNAL_TOKEN")); // WA.player.userRoomToken
-        echo json_encode($result);
+            echo json_encode($error);
+        } else {
+            $result['userRoomToken'] = json_decode($sidecarResult, true)["token"]; // WA.player.userRoomToken
+            echo json_encode($result);
+        }
     } else {
         http_response_code(403);
 
