@@ -1,7 +1,6 @@
 {
     "require": {
         "ramsey/uuid": "^4.2",
-        "firebase/php-jwt": "^6.3",
         "mongodb/mongodb": "^1.13",
         "twbs/bootstrap": "5.2.0",
         "components/jquery": "3.6.0"
