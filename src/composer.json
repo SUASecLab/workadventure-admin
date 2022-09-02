@@ -25,5 +25,8 @@
             "mkdir js/ajax",
             "cp -R vendor/components/jquery/jquery.min.js js/ajax"
         ]
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.8"
     }
 }
