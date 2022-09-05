@@ -1,16 +1,15 @@
 version: "3"
 services:
   admin-db:
-    image: mysql:8
+    image: mongo:5.0
     restart: ${RESTART_POLICY}
     environment:
-      MYSQL_ROOT_PASSWORD: "$ADMIN_DB_MYSQL_ROOT_PASSWORD"
-      MYSQL_DATABASE: "$ADMIN_MYSQL_DATABASE"
-      MYSQL_USER: "$ADMIN_MYSQL_USER"
-      MYSQL_PASSWORD: "$ADMIN_MYSQL_PASSWORD"
+      MONGO_INITDB_ROOT_USERNAME: "$ADMIN_DB_ROOT"
+      MONGO_INITDB_ROOT_PASSWORD: "$ADMIN_DB_ROOT_PASSWORD"
+      MONGO_INITDB_DATABASE: "$MONGO_INITDB_DATABASE"
     volumes:
-      - ./data/mysql:/var/lib/mysql
-      - ./containers/mysql:/docker-entrypoint-initdb.d
+      - ./data:/data/db
+      - ./containers/mongo:/docker-entrypoint-initdb.d:ro
 
   admin_php:
     build: ./containers/php
@@ -18,23 +17,25 @@ services:
     environment:
       ADMIN_API_TOKEN : "$ADMIN_API_TOKEN"
       ADMIN_API_SALT : "$ADMIN_API_SALT"
-      DB_MYSQL_ROOT_PASSWORD: "$ADMIN_DB_MYSQL_ROOT_PASSWORD"
-      DB_MYSQL_DATABASE: "$ADMIN_MYSQL_DATABASE"
-      DB_MYSQL_USER: "$ADMIN_MYSQL_USER"
-      DB_MYSQL_PASSWORD: "$ADMIN_MYSQL_PASSWORD"
+      DB_USER: "$ADMIN_DB_USER"
+      DB_PASSWORD: "$ADMIN_DB_PASSWORD"
+      DB_NAME: "$DB_NAME"
       DOMAIN: "$DOMAIN"
       START_ROOM_URL: "$START_ROOM_URL"
+      SIDECAR_URL: "$SIDECAR_URL"
+      ENABLE_SUAS_EXTENSIONS: "$ENABLE_SUAS_EXTENSIONS"
     volumes:
       - ./src:/var/www/html:ro
+      - ./vendor:/var/www/vendor:ro
 
   composer:
-    image: composer:2.1.5
-    command: ["composer", "install"]
+    image: composer/composer
+    command: ["composer", "install", "--ignore-platform-req=ext-mongodb"]
     volumes:
-      - ./src:/app
+      - ./:/app
 
   admin:
-    image: nginx:latest
+    build: configuration/nginx
     restart: ${RESTART_POLICY}
     environment:
       DOMAIN: "$DOMAIN"
@@ -42,6 +43,7 @@ services:
       - admin_php
     volumes:
       - ./src:/var/www/html:ro
+      - ./vendor:/var/www/vendor:ro
       - ./containers/nginx:/etc/nginx/templates
     labels:
       - "traefik.http.middlewares.strip-admin-prefix.stripprefix.prefixes=/admin"
@@ -54,4 +56,4 @@ services:
       - "traefik.http.routers.admin-ssl.entryPoints=websecure"
       - "traefik.http.routers.admin-ssl.tls=true"
       - "traefik.http.routers.admin-ssl.service=admin"
-
+      - "traefik.enable=true"
