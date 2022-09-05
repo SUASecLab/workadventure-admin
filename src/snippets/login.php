@@ -6,7 +6,7 @@ session_start();
 
 <body>
   <?php
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 require_once ('../util/database_operations.php');
 require_once ('../util/web_login_functions.php');
 function showGoToAdmin() {

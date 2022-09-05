@@ -1,7 +1,4 @@
-# Composer
-composer.phar
-vendor
-
+# JS and CSS from composer
 css/bootstrap
 js/ajax
 js/bootstrap

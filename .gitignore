@@ -4,3 +4,6 @@ data/*
 # IDE Folders
 .vscode/*
 .idea/*
+
+# Composer
+vendor

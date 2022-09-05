@@ -1,0 +1,31 @@
+{
+    "require": {
+        "ramsey/uuid": "^4.2",
+        "mongodb/mongodb": "^1.13",
+        "twbs/bootstrap": "5.2.0",
+        "components/jquery": "3.6.0"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "rm -rf src/js/bootstrap",
+            "cp -R vendor/twbs/bootstrap/dist/js src/js/bootstrap",
+            "rm -rf src/css/bootstrap",
+            "cp -R vendor/twbs/bootstrap/dist/css src/css/bootstrap",
+            "rm -rf src/js/ajax",
+            "mkdir src/js/ajax",
+            "cp -R vendor/components/jquery/jquery.min.js src/js/ajax"
+        ],
+        "post-update-cmd": [
+            "rm -rf src/js/bootstrap",
+            "cp -R vendor/twbs/bootstrap/dist/js src/js/bootstrap",
+            "rm -rf src/css/bootstrap",
+            "cp -R vendor/twbs/bootstrap/dist/css src/css/bootstrap",
+            "rm -rf src/js/ajax",
+            "mkdir src/js/ajax",
+            "cp -R vendor/components/jquery/jquery.min.js src/js/ajax"
+        ]
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.8"
+    }
+}
