@@ -14,14 +14,14 @@ function getDatabaseHandle() {
 
 function getDatabaseHandleOrDie() {
     $handle = getDatabaseHandle();
-    if ($handle == NULL) {
+    if ($handle === NULL) {
         die();
     }
     return $handle;
 }
 function getDatabaseHandleOrPrintError() {
     $handle = getDatabaseHandle();
-    if ($handle == NULL) {
+    if ($handle === NULL) {
         echo "<aside class=\"alert alert-danger\" role=\"alert\">";
         echo "Could not connect to database";
         echo "</aside>";
@@ -34,7 +34,7 @@ function userExists($uuid) {
     $result = $DB->users->findOne([
         "uuid" => $uuid
     ]);
-    return $result != NULL;
+    return $result !== NULL;
 }
 function writeUuidToDatabase($uuid) {
     GLOBAL $DB;
@@ -114,7 +114,7 @@ function addTag($uuid, $newTag) {
     GLOBAL $DB;
     $user = getUserData($uuid);
 
-    if ($user == NULL) {
+    if ($user === NULL) {
         return false;
     }
 
@@ -140,7 +140,7 @@ function removeTag($uuid, $remTag) {
     GLOBAL $DB;
     $user = getUserData($uuid);
 
-    if ($user == NULL) {
+    if ($user === NULL) {
         return false;
     }
 
@@ -176,7 +176,7 @@ function websiteUserExists($user, $password) {
         ]
     );
 
-    if ($document == NULL) {
+    if ($document === NULL) {
         return false;
     }
     return true;
@@ -214,7 +214,7 @@ function getMapFileUrl($mapUrl) {
         ]
     );
 
-    if ($document == NULL) {
+    if ($document === NULL) {
         return NULL;
     }
     return "https://".$document["mapFileUrl"];
@@ -256,7 +256,7 @@ function getMapRedirect($mapUrl) {
     $result = $DB->mapRedirects->findOne([
         "mapUrl" => $mapUrl
     ]);
-    if ($result != NULL) {
+    if ($result !== NULL) {
         return $result["redirectUrl"];
     } else {
         return NULL;
@@ -285,7 +285,7 @@ function removeUserMessage($uuid, $message) {
     GLOBAL $DB;
     $user = getUserData($uuid);
 
-    if ($user == NULL) {
+    if ($user === NULL) {
         return false;
     }
 
@@ -306,7 +306,7 @@ function storeUserMessage($uuid, $message) {
     GLOBAL $DB;
     $user = getUserData($uuid);
 
-    if ($user == NULL) {
+    if ($user === NULL) {
         return false;
     }
 

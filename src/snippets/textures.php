@@ -15,7 +15,7 @@ if (!isLoggedIn()) {
     die();
 }
 // remove texture if requested
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeTexture") && (isset($_POST["id"]))) {
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "removeTexture") && (isset($_POST["id"]))) {
     $textureToRemoveId = htmlspecialchars($_POST["id"]);
     if (removeTexture($textureToRemoveId)) { ?>
       <aside class="alert alert-success" role="alert">
@@ -30,7 +30,7 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeT
     }
 }
 // check whether texture should be added
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addTexture") && (isset($_POST["textureId"])) && (isset($_POST["textureLayer"])) && (isset($_POST["textureUrl"]))) {
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "addTexture") && (isset($_POST["textureId"])) && (isset($_POST["textureLayer"])) && (isset($_POST["textureUrl"]))) {
     $textureId = htmlspecialchars($_POST["textureId"]);
     $textureLayer = htmlspecialchars($_POST["textureLayer"]);
     $textureUrl = htmlspecialchars($_POST["textureUrl"]);
@@ -41,12 +41,12 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addText
       $textureTags = array();
     }
 
-    if (strlen(trim(htmlspecialchars($_POST["textureUrl"]))) == 0) { ?>
+    if (strlen(trim(htmlspecialchars($_POST["textureUrl"]))) === 0) { ?>
       <aside class="alert alert-danger" role="alert">
         Invalid URL
       </aside>
     <?php
-    } else if (strlen(trim($textureId)) == 0) { ?>
+    } else if (strlen(trim($textureId)) === 0) { ?>
       <aside class="alert alert-danger" role="alert">
         Invalid ID
       </aside>
@@ -109,7 +109,7 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addText
 
 if (texturesStored()) {
     $textures = getTextures();
-    if ($textures == NULL) { ?>
+    if ($textures === NULL) { ?>
       <aside class="alert alert-danger" role="alert">
         <p>Could not fetch textures</p>
       </aside>
@@ -161,7 +161,7 @@ if (texturesStored()) {
                       echo '<img src="'.$textureUrl.'">';
                     ?>
                   </td>
-                  <?php if ($tags == NULL) { ?>
+                  <?php if ($tags === NULL) { ?>
                     <td>
                       <p class="fw-normal">Public</p>
                     </td>

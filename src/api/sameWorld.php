@@ -7,7 +7,7 @@ authorizeOrDie();
 if (isset($_GET["roomUrl"])) {
     $maps = getAllMaps();
     $result = array();
-    if ($maps != NULL) {
+    if ($maps !== NULL) {
         foreach ($maps as $map) {
             array_push($result, "https://" . getenv('DOMAIN') . $map["mapUrl"]);
         }

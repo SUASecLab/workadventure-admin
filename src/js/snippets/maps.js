@@ -42,7 +42,7 @@ function addMap() {
         "access": accessRestriction
     };
 
-    if (accessRestriction == 3) {
+    if (accessRestriction === 3) {
         data.tags = JSON.stringify(newMapsTags);
     }
 

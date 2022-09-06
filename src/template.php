@@ -19,7 +19,7 @@ $target = htmlspecialchars($_GET["target"]);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <?php if ($target != "edit_user") { ?>
+    <?php if ($target !== "edit_user") { ?>
         <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet">
         <link href="css/style.css" rel="stylesheet">
         <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
@@ -34,7 +34,7 @@ $target = htmlspecialchars($_GET["target"]);
     <?php } ?>
 
     <?php
-if ($target == "rooms") {
+if ($target === "rooms") {
 ?>
     <script src="js/snippets/maps.js"></script>
     <script src="js/snippets/redirects.js"></script>
@@ -56,7 +56,7 @@ $DB = getDatabaseHandleOrPrintError();
     <nav class="container navbar navbar-expant-lg navbar-light bg-light">
         <div class="container-fluid">
             <div id="navbarMain">
-                <?php if ($target == "edit_user") { ?>
+                <?php if ($target === "edit_user") { ?>
                     <a class="navbar-brand" href="../">WorkAdventure Administration</a>
                 <?php } else { ?>
                     <a class="navbar-brand" href="./">WorkAdventure Administration</a>
@@ -64,13 +64,13 @@ $DB = getDatabaseHandleOrPrintError();
             </div>
             <?php
 if (isLoggedIn()) {
-    if ($target == "edit_user") { ?>
+    if ($target === "edit_user") { ?>
         <a class="navbar-brand" href="../logout" id="navLoginLogout">Log out</a>
     <?php } else { ?>
         <a class="navbar-brand" href="logout" id="navLoginLogout">Log out</a>
     <?php }
 } else {
-    if ($target == "edit_user") { ?>
+    if ($target === "edit_user") { ?>
         <a class="navbar-brand" href="../login" id="navLoginLogout">Log in</a>
     <?php } else { ?>
         <a class="navbar-brand" href="login" id="navLoginLogout">Log in</a>
@@ -80,7 +80,7 @@ if (isLoggedIn()) {
     </nav>
 
     <?php
-if (($target != "login") && (!isLoggedIn())) {
+if (($target !== "login") && (!isLoggedIn())) {
     showLogin();
     die();
 }

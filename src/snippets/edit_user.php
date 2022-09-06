@@ -37,11 +37,11 @@ if(!isValidUuid($uuid)) {
 
 createAccountIfNotExistent($uuid);
 // Get new tag
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addTag") && (isset($_POST["tag"]))) {
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "addTag") && (isset($_POST["tag"]))) {
     $tag = htmlspecialchars($_POST["tag"]);
     if (strlen(trim($tag)) > 0) {
         $addTagResult = addTag($uuid, $tag);
-        if ($addTagResult == true) {
+        if ($addTagResult === true) {
 ?>
         <aside class="alert alert-success" role="alert">
           The tag <?php echo "\"" . $tag . "\""; ?> has been added.
@@ -62,11 +62,11 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addTag"
     }
 }
 // Get tag to remove
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeTag") && (isset($_POST["tag"]))) {
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "removeTag") && (isset($_POST["tag"]))) {
     $tag = htmlspecialchars($_POST["tag"]);
     if (strlen(trim($tag)) > 0) {
         $remTagResult = removeTag($uuid, $tag);
-        if ($remTagResult == true) {
+        if ($remTagResult === true) {
 ?>
         <aside class="alert alert-success" role="alert">
           The tag <?php echo "\"" . $tag . "\""; ?> has been removed.
@@ -87,7 +87,7 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeT
     }
 }
 // Ban user if requested
-if (isset($_POST["action"]) && (htmlspecialchars($_POST["action"]) == "ban") && (isset($_POST["reason"]))) {
+if (isset($_POST["action"]) && (htmlspecialchars($_POST["action"]) === "ban") && (isset($_POST["reason"]))) {
     $reason = htmlspecialchars($_POST["reason"]);
     if (strlen(trim($reason)) > 0) {
       if (banUser($uuid, htmlspecialchars($_POST["reason"]))) {
@@ -112,7 +112,7 @@ if (isset($_POST["action"]) && (htmlspecialchars($_POST["action"]) == "ban") && 
     }
 }
 //unban user if requested
-if (isset($_POST["action"]) && (htmlspecialchars($_POST["action"]) == "unban")) {
+if (isset($_POST["action"]) && (htmlspecialchars($_POST["action"]) === "unban")) {
     if (liftBan($uuid)) {
 ?>
       <aside class="alert alert-success" role="alert">
@@ -128,10 +128,10 @@ if (isset($_POST["action"]) && (htmlspecialchars($_POST["action"]) == "unban")) 
     }
 }
 // Update userdata if requested
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "updateUserData") && (isset($_POST["name"])) && (isset($_POST["email"]))) {
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "updateUserData") && (isset($_POST["name"])) && (isset($_POST["email"]))) {
     $name = htmlspecialchars($_POST["name"]);
     $email = htmlspecialchars($_POST["email"]);
-    if ((strlen(trim($name)) == 0) || (strlen(trim($email)) == 0)) {
+    if ((strlen(trim($name)) === 0) || (strlen(trim($email)) === 0)) {
 ?>
       <aside class="alert alert-danger" role="alert">
         The entered data is invalid
@@ -140,9 +140,9 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "updateU
     } else {
         $visitCardUrl = NULL;
         if (isset($_POST["visitCardUrl"])) {
-            $visitCardURL = htmlspecialchars($_POST["visitCardUrl"]);
+            $visitCardUrl = htmlspecialchars($_POST["visitCardUrl"]);
         }
-        if (updateUserData($uuid, $name, $email, $visitCardURL)) { ?>
+        if (updateUserData($uuid, $name, $email, $visitCardUrl)) { ?>
         <aside class="alert alert-success" role="alert">
           User data has been updated.
         </aside>
@@ -156,7 +156,7 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "updateU
     }
 }
 // remove message if requested
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeMessage") && (isset($_POST["message"]))) {
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "removeMessage") && (isset($_POST["message"]))) {
     $message = htmlspecialchars($_POST["message"]);
     if (removeUserMessage($uuid, $message)) { ?>
       <aside class="alert alert-success" role="alert">
@@ -171,7 +171,7 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeM
     }
 }
 // send message if requested
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "sendMessage") && (isset($_POST["message"]))) {
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "sendMessage") && (isset($_POST["message"]))) {
     $message = htmlspecialchars($_POST["message"]);
     if (strlen(trim($message)) > 0) {
         if (storeUserMessage($uuid, $message)) { ?>
@@ -193,7 +193,7 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "sendMes
     }
 }
 // get current user data
-$userData = iterator_to_array(getUserData($uuid));
+$userData = getUserData($uuid);
 if ($userData === NULL) {
 ?>
     <aside class="alert alert-danger" role="alert">
@@ -202,6 +202,7 @@ if ($userData === NULL) {
   <?php
     die();
 }
+$userData = iterator_to_array($userData);
 ?>
   <main>
     <section>
@@ -302,7 +303,7 @@ if ((array_key_exists("tags", $userData)) && (count(iterator_to_array($userData[
           </form>
         </section>
         <section>
-<?php if ((array_key_exists("banned", $userData)) && ($userData["banned"] == true)) { ?>
+<?php if ((array_key_exists("banned", $userData)) && ($userData["banned"] === true)) { ?>
             <br>
             <p>This user has been banned!</p>
             <div class="mb-3">

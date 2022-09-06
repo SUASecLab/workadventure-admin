@@ -15,19 +15,19 @@ if (!isLoggedIn()) {
 
 // add redirection
 if ((isset($_POST["action"])) &&
-    (htmlspecialchars($_POST["action"]) == "addRedirection") &&
+    (htmlspecialchars($_POST["action"]) === "addRedirection") &&
     (isset($_POST["source"])) &&
     (isset($_POST["destination"]))) {
         $sourceRaw = trim(htmlspecialchars($_POST["source"]));
         $destinationRaw = trim(htmlspecialchars($_POST["destination"]));
         $source = "/@/org/".getenv('DOMAIN')."/".$sourceRaw;
         $destination = "https://".getenv('DOMAIN').$destinationRaw;
-        if (strlen($sourceRaw) == 0) { ?>
+        if (strlen($sourceRaw) === 0) { ?>
             <aside class="alert alert-danger" role="alert">
                 The redirected URL must at least be one character long
             </aside>
             <?php
-        } else if (getMapFileUrl($destinationRaw) == NULL) { ?>
+        } else if (getMapFileUrl($destinationRaw) === NULL) { ?>
             <aside class="alert alert-danger" role="alert">
                 The specified destination map does not exist
             </aside>
@@ -50,7 +50,7 @@ if ((isset($_POST["action"])) &&
 
 // remove redirection
 if ((isset($_POST["action"])) &&
-    (htmlspecialchars($_POST["action"]) == "removeRedirection") &&
+    (htmlspecialchars($_POST["action"]) === "removeRedirection") &&
     (isset($_POST["source"]))) {
         $mapToRemove = htmlspecialchars($_POST["source"]);
         $removalSuccess = removeMapRedirect($mapToRemove);
@@ -71,7 +71,7 @@ if ((isset($_POST["action"])) &&
 // list all redirects
 
 $redirects = getAllMapRedirects();
-if ($redirects == NULL) {
+if ($redirects === NULL) {
 ?>
 <aside class="alert alert-danger" role="alert">
     Could not fetch redirect entries
@@ -127,7 +127,7 @@ if ($redirects == NULL) {
 <?php
 $baseUrl = "https://" . getenv('DOMAIN') . "/@/org/" . getenv('DOMAIN') . "/";
 $maps = getAllMaps();
-if ($maps == NULL) { ?>
+if ($maps === NULL) { ?>
     <aside class="alert alert-danger" role="alert">
          Could not load maps
     </aside>

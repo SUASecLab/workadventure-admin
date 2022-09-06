@@ -3,7 +3,6 @@ header("Content-Type:application/json");
 require_once ('../util/api_authentication.php');
 require_once ('../util/database_operations.php');
 require_once ('../util/api_helper_functions.php');
-require_once ('../util/jwt_adapter.php');
 require_once ('../util/uuid_adapter.php');
 $DB = getDatabaseHandleOrDie();
 authorizeOrDie();
@@ -37,8 +36,8 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
                 // check if tags are matching (if any)
                 if (array_key_exists("tags", iterator_to_array($texture))) {
                     $textureTags = iterator_to_array($texture["tags"]);
-                    if ((count($textureTags) != 0) &&
-                        (count(array_intersect($tags, $textureTags)) == 0)) {
+                    if ((count($textureTags) !== 0) &&
+                        (count(array_intersect($tags, $textureTags)) === 0)) {
                         continue;
                     }
                 }
@@ -78,13 +77,13 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
         // decide whether anonymous login is allowed
         $playUri = htmlspecialchars($_GET["playUri"]);
         $map = iterator_to_array(getMap(substr($playUri, strlen("https://".getenv("DOMAIN")))));
-        $result['anonymous'] = $map["policyNumber"] == 1; 
+        $result['anonymous'] = $map["policyNumber"] === 1; 
 
         // Generate user room token
-        if (getenv("ENABLE_SUAS_EXTENSIONS") == "true") {
+        if (getenv("ENABLE_SUAS_EXTENSIONS") === "true") {
             $sidecarURL = "http://".getenv("SIDECAR_URL")."/issuance?uuid=" . $uuid;
             $sidecarResult = file_get_contents($sidecarURL);
-            if ($sidecarResult == false) {
+            if ($sidecarResult === false) {
                 http_response_code(403);
 
                 $error["code"] = "NO_TOKEN";

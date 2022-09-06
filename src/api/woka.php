@@ -17,8 +17,8 @@ function generateTextureInformationPerLayer($layer, $userTags) {
             $textureTags = iterator_to_array($texture["tags"]);
             // check, if there is a match between user and map tags
             // if not, continue, so that the texture is not added
-            if  ((count($textureTags) != 0) &&
-                (count(array_intersect($textureTags, $userTags)) == 0)) {
+            if  ((count($textureTags) !== 0) &&
+                (count(array_intersect($textureTags, $userTags)) === 0)) {
                 continue;
             }
         }

@@ -4,7 +4,7 @@ window.onload = function () {
 
 function addListener() {
     const loginButton = document.getElementById("loginButton");
-    if (loginButton != null) {
+    if (loginButton !== null) {
         loginButton.addEventListener("click", login);
     }
 }

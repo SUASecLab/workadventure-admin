@@ -37,7 +37,7 @@ function login($user, $password) {
     if (websiteUserExists($user, $passwordHash)) {
         return true;
     } else {
-        if (getNumberOfWebsiteUsers() == 0) {
+        if (getNumberOfWebsiteUsers() === 0) {
             return createWebsiteUser($user, $passwordHash);
         }
     }

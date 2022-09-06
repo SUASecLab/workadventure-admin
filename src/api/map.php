@@ -10,9 +10,9 @@ if (isset($_GET["playUri"])) {
     $shortUri = substr($playUri, strlen("https://" . getenv('DOMAIN')));
     $resultMap = getMap($shortUri);
     $result = array();
-    if ($resultMap == NULL) {
+    if ($resultMap === NULL) {
         $mapRedirect = getMapRedirect($shortUri);
-        if ($mapRedirect != NULL) {
+        if ($mapRedirect !== NULL) {
             $result['redirectUrl'] = $mapRedirect;
             echo json_encode($result);
         } else {
@@ -55,7 +55,7 @@ if (isset($_GET["playUri"])) {
         $result['group'] = '';
 
         // optional parameters
-        $result['authenticationMandatory'] = $resultMap["policyNumber"] != 1;
+        $result['authenticationMandatory'] = $resultMap["policyNumber"] !== 1;
         // $result['iframeAuthentication'] = "https://127.0.0.1";
         // $result['expireOn'] = ;
         $result['canReport'] = false;

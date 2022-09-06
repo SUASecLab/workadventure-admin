@@ -14,7 +14,7 @@ if (!isLoggedIn()) {
     die();
 }
 // map should be removed
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeMap") && (isset($_POST["mapUrl"]))) {
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "removeMap") && (isset($_POST["mapUrl"]))) {
     $mapToRemove = htmlspecialchars($_POST["mapUrl"]);
     if (removeMap($mapToRemove)) { ?>
             <aside class="alert alert-success" role="alert">
@@ -29,7 +29,7 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "removeM
     }
 }
 // map should be added
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addMap") && (isset($_POST["mapUrl"])) && (isset($_POST["fileUrl"])) && (isset($_POST["access"]))) {
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "addMap") && (isset($_POST["mapUrl"])) && (isset($_POST["fileUrl"])) && (isset($_POST["access"]))) {
     $validInput = true;
     $mapUrl = htmlspecialchars($_POST["mapUrl"]);
     $mapFileUrl = htmlspecialchars($_POST["fileUrl"]);
@@ -39,21 +39,21 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addMap"
     if ((($accessRestriction) < 1) || ($accessRestriction > 3)) {
         $validInput = false;
     }
-    if (strlen(trim($mapUrl)) == 0) {
+    if (strlen(trim($mapUrl)) === 0) {
         $validInput = false;
     }
-    if (strlen(trim($mapFileUrl)) == 0) {
+    if (strlen(trim($mapFileUrl)) === 0) {
         $validInput = false;
     }
-    if (($validInput) && ($accessRestriction == 3)) {
+    if (($validInput) && ($accessRestriction === 3)) {
         if (isset($_POST["tags"])) {
             $tags = json_decode($_POST["tags"]);
-            if (sizeof($tags) == 0) {
+            if (sizeof($tags) === 0) {
                 $validInput = false;
             } else {
                 // add tags
                 foreach ($tags as $tag) {
-                    if (strlen(trim($tag)) == 0) {
+                    if (strlen(trim($tag)) === 0) {
                         $validInput = false;
                     } else {
                         array_push($tagsArray, trim($tag));
@@ -89,7 +89,7 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "addMap"
     }
 }
 // show alert if start room map has not been set so far
-if (getMapFileUrl(getenv('START_ROOM_URL')) == NULL) { ?>
+if (getMapFileUrl(getenv('START_ROOM_URL')) === NULL) { ?>
         <aside class="alert alert-danger" role="alert">
             The map file for the start room has not been set so far!
         </aside>
@@ -105,7 +105,7 @@ if (getMapFileUrl(getenv('START_ROOM_URL')) == NULL) { ?>
         <?php
 $firstIteration = true;
 $maps = getAllMaps();
-if ($maps == NULL) { ?>
+if ($maps === NULL) { ?>
     <aside class="alert alert-danger" role="alert">
         Could not load maps
     </aside>
@@ -142,12 +142,12 @@ foreach ($maps as $map) {
                     <td>
                         <?php
     $policy = $map["policyNumber"];
-    if ($policy == "1") { ?>
+    if ($policy === 1) { ?>
                             <p class="fw-normal">
                                 Public
                             </p>
                         <?php
-    } else if ($policy == "2") { ?>
+    } else if ($policy === 2) { ?>
                             <p class="fw-normal">
                                 Members
                             </p>
@@ -191,7 +191,7 @@ foreach ($maps as $map) {
                 <?php
 $startRoom = getenv('START_ROOM_URL');
 $startRoom = explode("/", $startRoom) [4];
-if (getMapFileUrl(getenv('START_ROOM_URL')) != NULL) { ?>
+if (getMapFileUrl(getenv('START_ROOM_URL')) !== NULL) { ?>
                     <input type="text" class="form-control" id="mapURL" aria-describedby="map_url_prefix" name="map_url">
                 <?php
 } else { ?>

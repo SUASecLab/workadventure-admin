@@ -13,7 +13,7 @@ if ((isset($_GET["ipAddress"])) && (isset($_GET["token"])) && (isset($_GET["room
     $userData = iterator_to_array(getUserData($uuid));
 
     $isBanned = false;
-    if ((array_key_exists("banned", $userData)) && ($userData["banned"] == true)) {
+    if ((array_key_exists("banned", $userData)) && ($userData["banned"] === true)) {
         $isBanned = true;
     }
 

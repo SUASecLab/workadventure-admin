@@ -33,7 +33,7 @@ if ($nrOfUsers === NULL) {
     </p>
     <?php
 // Get all users
-$users = iterator_to_array(getAllUsers());
+$users = getAllUsers();
 if ($users === NULL) {
 ?>
       <aside class="alert alert-danger" role="alert">
@@ -43,6 +43,7 @@ if ($users === NULL) {
     $DB = NULL;
     die();
 }
+$users = iterator_to_array($users);
 // Display all accounts
 
 ?>
