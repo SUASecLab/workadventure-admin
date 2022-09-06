@@ -48,15 +48,19 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "addMap
     if (($validInput) && ($accessRestriction === 3)) {
         if (isset($_POST["tags"])) {
             $tags = json_decode($_POST["tags"]);
-            if (sizeof($tags) === 0) {
+            if (gettype($tags) !== "array") {
                 $validInput = false;
             } else {
-                // add tags
-                foreach ($tags as $tag) {
-                    if (strlen(trim($tag)) === 0) {
-                        $validInput = false;
-                    } else {
-                        array_push($tagsArray, trim($tag));
+                if (sizeof($tags) === 0) {
+                    $validInput = false;
+                } else {
+                    // add tags
+                    foreach ($tags as $tag) {
+                        if (strlen(trim($tag)) === 0) {
+                            $validInput = false;
+                        } else {
+                            array_push($tagsArray, trim($tag));
+                        }
                     }
                 }
             }
@@ -113,6 +117,7 @@ if ($maps === NULL) { ?>
     die();
 }
 foreach ($maps as $map) {
+    $myMap = (array) $map;
     if ($firstIteration) {
         $firstIteration = false;
 ?>
@@ -131,17 +136,17 @@ foreach ($maps as $map) {
                 <tr>
                     <td>
                         <p class="fw-normal">
-                            <?php echo $map["mapUrl"]; ?>
+                            <?php echo $myMap["mapUrl"]; ?>
                         </p>
                     </td>
                     <td>
                         <p class="fw-normal">
-                            <?php echo $map["mapFileUrl"]; ?>
+                            <?php echo $myMap["mapFileUrl"]; ?>
                         </p>
                     </td>
                     <td>
                         <?php
-    $policy = $map["policyNumber"];
+    $policy = $myMap["policyNumber"];
     if ($policy === 1) { ?>
                             <p class="fw-normal">
                                 Public
@@ -156,12 +161,16 @@ foreach ($maps as $map) {
                             <p class="fw-normal">
                                 Members with tags
                                 <?php
-        $mapTags = $map["tags"];
-        foreach ($mapTags as $tag) { ?>
-                            <div class="badge rounded-pill bg-primary tag">
-                                <?php echo $tag; ?>
-                            </div>
-                        <?php
+        if (array_key_exists("tags", $myMap)) {
+            $mapTags = $myMap["tags"];
+            foreach ($mapTags as $tag) { ?>
+                                <div class="badge rounded-pill bg-primary tag">
+                                    <?php echo $tag; ?>
+                                </div>
+                            <?php
+            }
+        } else {
+            echo "No tags stored";
         }
 ?>
                         </p>
@@ -170,7 +179,7 @@ foreach ($maps as $map) {
 ?>
                     </td>
                     <td>
-                        <button class="tag btn btn-danger" onclick="removeMap('<?php echo $map['mapUrl']; ?>');">
+                        <button class="tag btn btn-danger" onclick="removeMap('<?php echo $myMap['mapUrl']; ?>');">
                             Remove
                         </button>
                     </td>
@@ -182,6 +191,12 @@ foreach ($maps as $map) {
     <article>
         <?php
             $baseUrl = "https://" . getenv('DOMAIN') . "/@/org/" . getenv('DOMAIN') . "/";
+            $startRoom = getenv('START_ROOM_URL');
+            if ($startRoom === false) { ?>
+                <aside class="alert alert-danger" role="alert">
+                    The environment variable "START_ROOM_URL" has not been set so far! Can not create maps!
+                </aside>
+            <?php } else {
 ?>
         <form action="javascript:void(0)">
             <p class="fs-4" id="add-map-paragraph">Add a new room</p>
@@ -189,7 +204,6 @@ foreach ($maps as $map) {
             <div class="input-group mb-3">
                 <span class="input-group-text" id="map_url_prefix"><?php echo $baseUrl; ?></span>
                 <?php
-$startRoom = getenv('START_ROOM_URL');
 $startRoom = explode("/", $startRoom) [4];
 if (getMapFileUrl(getenv('START_ROOM_URL')) !== NULL) { ?>
                     <input type="text" class="form-control" id="mapURL" aria-describedby="map_url_prefix" name="map_url">
@@ -226,5 +240,6 @@ if (getMapFileUrl(getenv('START_ROOM_URL')) !== NULL) { ?>
 
 </html>
 <?php
+}
 $DB = NULL;
 ?>

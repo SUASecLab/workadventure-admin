@@ -138,7 +138,7 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "update
       </aside>
       <?php
     } else {
-        $visitCardUrl = NULL;
+        $visitCardUrl = "";
         if (isset($_POST["visitCardUrl"])) {
             $visitCardUrl = htmlspecialchars($_POST["visitCardUrl"]);
         }
@@ -202,7 +202,6 @@ if ($userData === NULL) {
   <?php
     die();
 }
-$userData = iterator_to_array($userData);
 ?>
   <main>
     <section>
@@ -230,7 +229,7 @@ $userData = iterator_to_array($userData);
         </section>
         <section class="mb-3">
           <?php
-if ((array_key_exists("tags", $userData)) && (count(iterator_to_array($userData["tags"])) > 0)){
+if ((array_key_exists("tags", $userData)) && (count($userData["tags"]) > 0)){
 ?>
             <p>Tags (click to remove):</p>
             <?php
@@ -253,15 +252,8 @@ if ((array_key_exists("tags", $userData)) && (count(iterator_to_array($userData[
           </form>
         </section>
         <section>
-<?php if ((array_key_exists("messages", $userData)) && (count(iterator_to_array($userData["messages"])) > 0)){
-            $messages = $userData["messages"];
-  if ($messages === NULL) { ?>
-              <br>
-              <div class="alert alert-danger" role="alert">
-                <p>Could not fetch messages</p>
-              </div>
-            <?php
-  } else { ?>
+<?php if ((array_key_exists("messages", $userData)) && (count($userData["messages"]) > 0)){
+            $messages = $userData["messages"]; ?>
               <br>
               <p class="fs-3">User messages:</p>
               <table class="table">
@@ -286,7 +278,6 @@ if ((array_key_exists("tags", $userData)) && (count(iterator_to_array($userData[
                 <?php
     } ?>
               </table> <?php
-  }
 } ?>
         </section>
         <br>
@@ -303,7 +294,8 @@ if ((array_key_exists("tags", $userData)) && (count(iterator_to_array($userData[
           </form>
         </section>
         <section>
-<?php if ((array_key_exists("banned", $userData)) && ($userData["banned"] === true)) { ?>
+<?php if ((array_key_exists("banned", $userData)) && ($userData["banned"] === true) &&
+          (array_key_exists("banReason", $userData))) { ?>
             <br>
             <p>This user has been banned!</p>
             <div class="mb-3">

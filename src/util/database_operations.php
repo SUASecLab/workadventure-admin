@@ -1,25 +1,41 @@
 <?php 
 require_once __DIR__ . '/../../vendor/autoload.php';
 use MongoDB\Client;
+use MongoDB\Database;
 use MongoDB\BSON\ObjectId;
+use MongoDB\Driver\Cursor;
+use MongoDB\Model\BSONDocument;
 
-function getDatabaseHandle() {
+function getDatabaseHandle():MongoDB\Database|null {
     $user = getenv("DB_USER");
     $pwd = getenv("DB_PASSWORD");
     $dbName = getenv("DB_NAME");
     
-    $mongo = new Client("mongodb://${user}:${pwd}@admin-db:27017/".$dbName);
-    return $mongo->$dbName;
+    try{
+        $mongo = new Client("mongodb://${user}:${pwd}@admin-db:27017/".$dbName,
+            [],
+            [
+                'typeMap' => [
+                    'root' => 'array', 
+                    'document' => 'array', 
+                    'array' => 'array'
+                ]
+            ]);
+        return $mongo->$dbName;
+    } catch (Exception $e) {
+        error_log("Could not set up database connection: " . $e->getMessage());
+        return null;
+    }
 }
 
-function getDatabaseHandleOrDie() {
+function getDatabaseHandleOrDie():MongoDB\Database {
     $handle = getDatabaseHandle();
     if ($handle === NULL) {
         die();
     }
     return $handle;
 }
-function getDatabaseHandleOrPrintError() {
+function getDatabaseHandleOrPrintError():MongoDB\Database {
     $handle = getDatabaseHandle();
     if ($handle === NULL) {
         echo "<aside class=\"alert alert-danger\" role=\"alert\">";
@@ -29,14 +45,14 @@ function getDatabaseHandleOrPrintError() {
     }
     return $handle;
 }
-function userExists($uuid) {
+function userExists(string $uuid): bool {
     GLOBAL $DB;
     $result = $DB->users->findOne([
         "uuid" => $uuid
     ]);
     return $result !== NULL;
 }
-function writeUuidToDatabase($uuid) {
+function writeUuidToDatabase(string $uuid): bool {
     GLOBAL $DB;
     $result = $DB->users->insertOne([
         "uuid" => $uuid,
@@ -45,7 +61,7 @@ function writeUuidToDatabase($uuid) {
     ]);
     return $result->getInsertedCount() === 1;
 }
-function updateUserData($uuid, $name, $email, $visitCardURL) {
+function updateUserData(string $uuid, string $name, string $email, string $visitCardURL): bool {
     GLOBAL $DB;
     $result = $DB->users->updateOne(
         [ 'uuid' => $uuid ],
@@ -58,18 +74,19 @@ function updateUserData($uuid, $name, $email, $visitCardURL) {
     
     return $result->getModifiedCount() === 1;
 }
-function getUuidFromEmail($email) {
+function getUuidFromEmail(string $email): string {
     GLOBAL $DB;
 
     $result = $DB->users->findOne(["email" => $email]);
     return $result["uuid"];
 }
-function createAccountIfNotExistent($uuid) {
+function createAccountIfNotExistent(string $uuid): bool {
     if (!userExists($uuid)) {
         return writeUuidToDatabase($uuid);
     }
+    return false;
 }
-function banUser($uuid, $banReason) {
+function banUser(string $uuid, string $banReason): bool {
     GLOBAL $DB;
     $result = $DB->users->updateOne(
         [ 'uuid' => $uuid ],
@@ -81,7 +98,7 @@ function banUser($uuid, $banReason) {
     
     return $result->getModifiedCount() === 1;
 }
-function liftBan($uuid) {
+function liftBan(string $uuid): bool {
     GLOBAL $DB;
     $result = $DB->users->updateOne(
         ['uuid' => $uuid],
@@ -90,27 +107,56 @@ function liftBan($uuid) {
     
     return $result->getModifiedCount() === 1;
 }
-function getNumberOfUsers() {
+function getNumberOfUsers(): int|null {
     GLOBAL $DB;
-    $users = $DB->users->find();
-    $numberOfUsers = 0;
-    foreach($users as $user) {
-        $numberOfUsers++;
+    try {
+        $users = $DB->users->find();
+        $numberOfUsers = 0;
+        foreach($users as $user) {
+            $numberOfUsers++;
+        }
+        return $numberOfUsers;
+    } catch (Exception $e) {
+        error_log("Could not fetch user count: " . $e->getMessage());
+        return null;
     }
-    return $numberOfUsers;
 }
-function getAllUsers() {
+/**
+ * Get all users from the database
+ * @return array{array{"_id": mixed, "uuid": string, "name": string,
+ *  "email": string, "visitCardURL"?: string, "tags"?: string[],
+ *  "messages"?: string[], "banned"?: bool, "banReason"?: string,
+ *  "startMap"?: string}}
+ */
+function getAllUsers(): array|null {
     GLOBAL $DB;
-    return $DB->users->find();
+    try {
+        return $DB->users->find()->toArray();
+    } catch (Exception $e) {
+        error_log("Could not fetch users from database: " . $e->getMessage());
+        return null;
+    }
 }
-function getUserData($uuid) {
+/**
+ * Get a specific user from the database
+ * @return array{"_id": mixed, "uuid": string, "name": string,
+ *  "email": string, "visitCardURL"?: string, "tags"?: string[],
+ *  "messages"?: string[], "banned"?: bool, "banReason"?: string,
+ *  "startMap"?: string}
+ */
+function getUserData(string $uuid): array|null {
     GLOBAL $DB;
-    $user = $DB->users->findOne([
-        "uuid" => $uuid
-    ]);
-    return $user;
+    try {
+        $user = $DB->users->findOne([
+            "uuid" => $uuid
+        ]);
+        return $user;
+    } catch (Exception $e) {
+        error_log("Could not fetch user data: " . $e->getMessage());
+        return null;
+    }
 }
-function addTag($uuid, $newTag) {
+function addTag(string $uuid, string $newTag): bool {
     GLOBAL $DB;
     $user = getUserData($uuid);
 
@@ -118,11 +164,10 @@ function addTag($uuid, $newTag) {
         return false;
     }
 
-    $user = iterator_to_array($user); 
     $tags = array();
 
     if (array_key_exists("tags", $user)) {
-        $tags = iterator_to_array($user["tags"]);
+        $tags = $user["tags"];
     }
 
     array_push($tags, $newTag);
@@ -136,7 +181,7 @@ function addTag($uuid, $newTag) {
 
     return $result->getModifiedCount() === 1;
 }
-function removeTag($uuid, $remTag) {
+function removeTag(string $uuid, string $remTag): bool {
     GLOBAL $DB;
     $user = getUserData($uuid);
 
@@ -144,9 +189,11 @@ function removeTag($uuid, $remTag) {
         return false;
     }
 
-    $user = iterator_to_array($user); 
+    if (!array_key_exists("tags", $user)) {
+        return true;
+    }
     
-    $tags = iterator_to_array($user["tags"]);
+    $tags = $user["tags"];
     $removeTag = array($remTag);
     $tags = array_diff($tags, $removeTag);
 
@@ -159,15 +206,17 @@ function removeTag($uuid, $remTag) {
 
     return $result->getModifiedCount() === 1;
 }
-function removeMessages($uuid) {
+function removeMessages(string $uuid): bool {
     GLOBAL $DB;
 
-    $DB->users->updateOne(
+    $result = $DB->users->updateOne(
         [ 'uuid' => $uuid ],
         [ '$set' => [ 'messages'  => array() ]]
     );
+
+    return $result->getModifiedCount() === 1;
 }
-function websiteUserExists($user, $password) {
+function websiteUserExists(string $user, string $password): bool {
     GLOBAL $DB;
     $document = $DB->websiteUsers->findOne(
         [
@@ -182,7 +231,7 @@ function websiteUserExists($user, $password) {
     return true;
 }
 
-function getNumberOfWebsiteUsers() {
+function getNumberOfWebsiteUsers(): int {
     GLOBAL $DB;
     $users = $DB->websiteUsers->find();
     $numberOfUsers = 0;
@@ -192,7 +241,7 @@ function getNumberOfWebsiteUsers() {
     return $numberOfUsers;
 }
 
-function createWebsiteUser($username, $hashedPassword) {
+function createWebsiteUser(string $username, string $hashedPassword): bool {
     GLOBAL $DB;
 
     $result = $DB->websiteUsers->insertOne([
@@ -206,8 +255,13 @@ function createWebsiteUser($username, $hashedPassword) {
     return $result->getInsertedCount() === 1;
 }
 
-function getMapFileUrl($mapUrl) {
+function getMapFileUrl(string|bool $mapUrl): string|null {
     GLOBAL $DB;
+    // START_ROOM_URL not set
+    if (gettype($mapUrl) === "boolean") {
+        error_log("START_ROOM_URL env var is not set");
+        return null;
+    }
     $document = $DB->maps->findOne(
         [
             "mapUrl" => $mapUrl
@@ -219,15 +273,30 @@ function getMapFileUrl($mapUrl) {
     }
     return "https://".$document["mapFileUrl"];
 }
-
-function getMap($mapUrl) {
+/**
+ * Get data for a specific map
+ * @param string $mapUrl URL of the Map (for WA)
+ * @return array{"_id": mixed, "mapUrl": string,
+ *  "mapFileUrl": string, "policyNumber": int, "tags"?: string[]}
+ */
+function getMap(string $mapUrl): array|null {
     GLOBAL $DB;
-    return $DB->maps->findOne(
-        ["mapUrl" => $mapUrl]
-    );
+    try {
+        return $DB->maps->findOne(
+            ["mapUrl" => $mapUrl]
+        );
+    } catch (Exception $e) {
+        error_log("Could not get map URL: " . $e->getMessage());
+        return null;
+    }
 }
-
-function storeMap($mapUrl, $mapFileUrl, $policyNumber, $tags) {
+/**
+ * @param string $mapUrl URL of the map (for WA)
+ * @param string $mapFileUrl URL where the file of the map is stored
+ * @param int $policyNumber Policy number for access restrictions
+ * @param string[] $tags Tags array for access restrictions
+ */
+function storeMap(string $mapUrl, string $mapFileUrl, int $policyNumber, array $tags): bool {
     GLOBAL $DB;
 
     $result = $DB->maps->insertOne([
@@ -242,16 +311,26 @@ function storeMap($mapUrl, $mapFileUrl, $policyNumber, $tags) {
 
     return $result->getInsertedCount() === 1;
 }
-function getAllMaps() {
+/**
+ * Get array of all maps
+ * @return array{array{"_id": mixed, "mapUrl": string,
+ *  "mapFileUrl": string, "policyNumber": int, "tags"?: string[]}}
+ */
+function getAllMaps(): array|null {
     GLOBAL $DB;
-    return $DB->maps->find();
+    try {
+        return $DB->maps->find()->toArray();
+    } catch (Exception $e) {
+        error_log("Could not fetch maps from database: " . $e->getMessage());
+        return null;
+    }
 }
-function removeMap($mapUrl) {
+function removeMap(string $mapUrl): bool {
     GLOBAL $DB;
     $result = $DB->maps->deleteOne(["mapUrl" => $mapUrl]);
     return $result->getDeletedCount() === 1;
 }
-function getMapRedirect($mapUrl) {
+function getMapRedirect(string $mapUrl): string|null {
     GLOBAL $DB;
     $result = $DB->mapRedirects->findOne([
         "mapUrl" => $mapUrl
@@ -262,7 +341,7 @@ function getMapRedirect($mapUrl) {
         return NULL;
     }
 }
-function addMapRedirect($mapUrl, $redirectUrl) {
+function addMapRedirect(string $mapUrl, string $redirectUrl): bool {
     GLOBAL $DB;
     $result = $DB->mapRedirects->insertOne([
         "mapUrl" => $mapUrl,
@@ -270,18 +349,27 @@ function addMapRedirect($mapUrl, $redirectUrl) {
     ]);
     return $result->getInsertedCount() === 1;
 }
-function getAllMapRedirects() {
+/**
+ * Get all map redirects
+ * @return array{0?:array{"_id": mixed, "mapUrl": string, "redirectUrl": string}}
+ */
+function getAllMapRedirects(): array| null {
     GLOBAL $DB;
-    return $DB->mapRedirects->find();
+    try {
+        return $DB->mapRedirects->find()->toArray();
+    } catch (Exception $e) {
+        error_log("Could not fetch map redirects: " . $e->getMessage());
+        return null;
+    }
 }
-function removeMapRedirect($redirect) {
+function removeMapRedirect(string $redirect): bool {
     GLOBAL $DB;
     $result = $DB->mapRedirects->deleteOne([
         "mapUrl" => $redirect
     ]);
     return $result->getDeletedCount() === 1;
 }
-function removeUserMessage($uuid, $message) {
+function removeUserMessage(string $uuid, string $message): bool {
     GLOBAL $DB;
     $user = getUserData($uuid);
 
@@ -289,9 +377,11 @@ function removeUserMessage($uuid, $message) {
         return false;
     }
 
-    $user = iterator_to_array($user);
+    if (!array_key_exists("messages", $user)) {
+        return true;
+    }
 
-    $messages = iterator_to_array($user["messages"]);
+    $messages = $user["messages"];
     $messageToRemove = array($message);
     $messages = array_diff($messages, $messageToRemove);
 
@@ -302,19 +392,17 @@ function removeUserMessage($uuid, $message) {
 
     return $result->getModifiedCount() === 1;
 }
-function storeUserMessage($uuid, $message) {
+function storeUserMessage(string $uuid, string $message): bool {
     GLOBAL $DB;
     $user = getUserData($uuid);
 
     if ($user === NULL) {
         return false;
     }
-
-    $user = iterator_to_array($user);
     $messages = array();
 
     if (array_key_exists("messages", $user)) {
-        $messages = iterator_to_array($user["messages"]);
+        $messages = $user["messages"];
     }
 
     array_push($messages, $message);
@@ -326,25 +414,48 @@ function storeUserMessage($uuid, $message) {
 
     return $result->getModifiedCount() === 1;
 }
-function texturesStored() {
+function texturesStored(): bool {
     GLOBAL $DB;
     $textures = getTextures();
+
+    if ($textures === null) {
+        error_log("Could not fetch textures from database");
+        return false;
+    }
+
     $numberOfTextures = 0;
     foreach($textures as $texture) {
         $numberOfTextures++;
     }
     return $numberOfTextures > 0;
 }
-function getTextures() {
+/**
+ * Get all textures
+ * _id is the object id, can be converted to string
+ * @return array{0?:array{"_id": string, "waId": string, "url": string, "layer": string, "tags"?: string[]}}
+ */
+function getTextures(): array|null {
     GLOBAL $DB;
-    return $DB->textures->find();
+    try {
+        return $DB->textures->find()->toArray();
+    } catch (Exception $e) {
+        error_log("Could not fetch textures: " . $e->getMessage());
+        return null;
+    }
 }
-function removeTexture($id) {
+function removeTexture(string $id): bool {
     GLOBAL $DB;
     $result = $DB->textures->deleteOne(['_id' => new ObjectId($id)]);
     return $result->getDeletedCount() === 1;
 }
-function storeTexture($id, $layer, $url, $tags) {
+/**
+ * @param string $id id of the texture
+ * @param string $layer layer of the texture
+ * @param string $url URL where the layer is available
+ * @param array{} $tags Tags for access restriction of the texture
+ * @return bool indicating whether the texture could be stored (true = success, false = failure)
+ */
+function storeTexture(string $id, string $layer, string $url, array $tags): bool {
     GLOBAL $DB;
     $result = $DB->textures->insertOne([
         "waId" => $id,
@@ -354,9 +465,16 @@ function storeTexture($id, $layer, $url, $tags) {
     ]);
     return $result->getInsertedCount() === 1;
 }
-function getTexturesByLayer($layer) {
+/**
+ * Get all textures by layer
+ * @return array{array{"_id": mixed, "waId": string, "url": string, "layer": string, "tags"?: string[]}}
+ */
+function getTexturesByLayer(string $layer): array|null {
     GLOBAL $DB;
-    return $DB->textures->find(
-        ["layer" => $layer]
-    );
+    try {
+        return $DB->textures->find(["layer" => $layer])->toArray();
+    } catch (Exception $e) {
+        error_log("Could not get textures by layer: " . $e->getMessage());
+        return null;
+    }
 }

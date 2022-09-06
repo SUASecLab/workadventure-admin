@@ -131,9 +131,9 @@ if (texturesStored()) {
               <?php
         foreach ($textures as $texture) {
             $tags = NULL;
-            $texture = iterator_to_array($texture);
+            $texture = (array) $texture;
             if (array_key_exists("tags", $texture)) {
-              $tags = iterator_to_array($texture["tags"]);
+              $tags = $texture["tags"];
             }
             ?>
                 <tr>

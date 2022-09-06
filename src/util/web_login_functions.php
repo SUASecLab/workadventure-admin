@@ -1,7 +1,7 @@
 <?php
 require_once ('database_operations.php');
 
-function isLoggedIn() {
+function isLoggedIn(): bool {
     GLOBAL $DB;
 
     if (!isset($_SESSION["user"])) {
@@ -17,19 +17,19 @@ function isLoggedIn() {
 
     return websiteUserExists($user, $password);
 }
-function showLogin() {
+function showLogin(): void {
     echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
     echo "You are not logged in. Please log in to continue.";
     echo "</aside>";
     echo "<a href=\"login\" class=\"element btn btn-primary\">Log in</a>";
     echo "</body></html>";
 }
-function getHash($data) {
+function getHash(string $data): string {
     $salt = getenv('ADMIN_API_SALT');
     $saltWithAlgorithm = '$6$rounds=5000$' . $salt . '$';
     return htmlspecialchars(crypt($data, $saltWithAlgorithm));
 }
-function login($user, $password) {
+function login(string $user, string $password): bool {
     GLOBAL $DB;
     $passwordHash = getHash($password);
     $_SESSION["user"] = $user;

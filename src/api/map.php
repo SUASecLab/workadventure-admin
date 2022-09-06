@@ -1,19 +1,19 @@
 <?php
 header("Content-Type:application/json");
-require_once ('../util/api_authentication.php');
-require_once ('../util/database_operations.php');
-require_once ('../util/api_helper_functions.php');
+require_once ("../util/api_authentication.php");
+require_once ("../util/database_operations.php");
+require_once ("../util/api_helper_functions.php");
 $DB = getDatabaseHandleOrDie();
 authorizeOrDie();
 if (isset($_GET["playUri"])) {
     $playUri = htmlspecialchars($_GET["playUri"]);
-    $shortUri = substr($playUri, strlen("https://" . getenv('DOMAIN')));
+    $shortUri = substr($playUri, strlen("https://" . getenv("DOMAIN")));
     $resultMap = getMap($shortUri);
     $result = array();
     if ($resultMap === NULL) {
         $mapRedirect = getMapRedirect($shortUri);
         if ($mapRedirect !== NULL) {
-            $result['redirectUrl'] = $mapRedirect;
+            $result["redirectUrl"] = $mapRedirect;
             echo json_encode($result);
         } else {
             http_response_code(404);
@@ -47,24 +47,28 @@ if (isset($_GET["playUri"])) {
             }
         }
 
-        $result['mapUrl'] = "https://".$resultMap["mapFileUrl"];
-        $result['policy_type'] = $resultMap["policyNumber"];
-        $result['tags'] = $resultMap["tags"];
-        $result['roomSlug'] = ''; // deprecated
-        $result['contactPage'] = '';
-        $result['group'] = '';
+        $result["mapUrl"] = "https://".$resultMap["mapFileUrl"];
+        $result["policy_type"] = $resultMap["policyNumber"];
+        if (array_key_exists("tags", $resultMap)) {
+            $result["tags"] = $resultMap["tags"];
+        } else {
+            $result["tags"] = array();
+        }
+        $result["roomSlug"] = ""; // deprecated
+        $result["contactPage"] = "";
+        $result["group"] = "";
 
         // optional parameters
-        $result['authenticationMandatory'] = $resultMap["policyNumber"] !== 1;
-        // $result['iframeAuthentication'] = "https://127.0.0.1";
-        // $result['expireOn'] = ;
-        $result['canReport'] = false;
-        // $result['loadingCowebsiteLogo'] = ;
-        // $result['miniLogo'] = ;
-        // $result['loadingLogo'] = ;
-        // $result['loginSceneLogo'] = ;
-        // $result['showPoweredBy'] = ;
-        // $result['thirdParty'] = ;
+        $result["authenticationMandatory"] = $resultMap["policyNumber"] !== 1;
+        // $result["iframeAuthentication"] = "https://127.0.0.1";
+        // $result["expireOn"] = ;
+        $result["canReport"] = false;
+        // $result["loadingCowebsiteLogo"] = ;
+        // $result["miniLogo"] = ;
+        // $result["loadingLogo"] = ;
+        // $result["loginSceneLogo"] = ;
+        // $result["showPoweredBy"] = ;
+        // $result["thirdParty"] = ;
         echo json_encode($result);
     }
 } else {

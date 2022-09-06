@@ -17,25 +17,51 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
         } else {
             $selectedTextures = [];
         }
-        $userData = iterator_to_array(getUserData($uuid));
+
+        $userData = getUserData($uuid);
+        if ($userData === null) {
+            http_response_code(403);
+
+            $error["code"] = "NO_USERDATA";
+            $error["title"] = "No user data";
+            $error["subtitle"] = "No user data received.";
+            $error["details"] = "";
+            $error["image"] = "";
+
+            echo json_encode($error);
+            die("Could not fetch userdata");
+        }
 
         $tags = array();
         if (array_key_exists("tags", $userData)) {
-            $tags = iterator_to_array($userData["tags"]);
+            $tags = $userData["tags"];
         }
 
         $result['userUuid'] = $uuid;
         $result['email']= $userData["email"];
         $result['tags'] = $tags;
 
-        $textures =  iterator_to_array(getTextures());
+        $textures =  getTextures();
         $textureArray = array();
+        
+        if ($textures === null) {
+            http_response_code(403);
+
+            $error["code"] = "NO_TEXTURES";
+            $error["title"] = "No texture data";
+            $error["subtitle"] = "No texture data received.";
+            $error["details"] = "";
+            $error["image"] = "";
+
+            echo json_encode($error);
+            die("Could not fetch texture data");
+        }
 
         foreach ($textures as $texture) {
             if (in_array($texture["waId"], $selectedTextures)) {
                 // check if tags are matching (if any)
-                if (array_key_exists("tags", iterator_to_array($texture))) {
-                    $textureTags = iterator_to_array($texture["tags"]);
+                if (array_key_exists("tags", $texture)) {
+                    $textureTags = $texture["tags"];
                     if ((count($textureTags) !== 0) &&
                         (count(array_intersect($tags, $textureTags)) === 0)) {
                         continue;
@@ -76,7 +102,21 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
 
         // decide whether anonymous login is allowed
         $playUri = htmlspecialchars($_GET["playUri"]);
-        $map = iterator_to_array(getMap(substr($playUri, strlen("https://".getenv("DOMAIN")))));
+        $map = getMap(substr($playUri, strlen("https://".getenv("DOMAIN"))));
+
+        if ($map === null) {
+            http_response_code(403);
+
+            $error["code"] = "NO_MAP";
+            $error["title"] = "No map data";
+            $error["subtitle"] = "No map data received.";
+            $error["details"] = "";
+            $error["image"] = "";
+
+            echo json_encode($error);
+            die("Could not fetch map data");
+        }
+
         $result['anonymous'] = $map["policyNumber"] === 1; 
 
         // Generate user room token
@@ -94,7 +134,7 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
 
                 echo json_encode($error);
             } else {
-                $result['userRoomToken'] = json_decode($sidecarResult, true)["token"]; // WA.player.userRoomToken
+                $result['userRoomToken'] = ((array) json_decode($sidecarResult, true))["token"]; // WA.player.userRoomToken
                 echo json_encode($result);
             }
         } else {

@@ -9,7 +9,7 @@ session_start();
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once ('../util/database_operations.php');
 require_once ('../util/web_login_functions.php');
-function showGoToAdmin() {
+function showGoToAdmin(): void {
   echo "<br>";
   echo "<a class=\"btn btn-primary\" href=\"./\" role=\"button\" id=\"goToAdminButton\">Go to the administration panel</a>";
 }

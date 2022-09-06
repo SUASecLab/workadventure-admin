@@ -78,13 +78,23 @@ if ($redirects === NULL) {
 </aside>
 <?php
 } else {
-    if (count($redirects->toArray()) > 0) {
+    if (count($redirects) > 0) {
 ?>
         <p class="fs-4">Enumeration of room redirections</p>
         <table class="table" style="margin-bottom: 1rem;">
         <?php
         $firstIteration = true;
+        // we have to refetch the redirects here, because counting already itererated
+        // trough the iterator
         $redirects = getAllMapRedirects();
+
+        if ($redirects === null) { ?>
+            <aside class="alert alert-danger" role="alert">
+                Could not fetch redirect entries
+            </aside>
+        <?php
+            die();
+        }
         foreach ($redirects as $redirect) {
             if ($firstIteration) {
                 $firstIteration = false;
@@ -150,7 +160,8 @@ if ($maps === NULL) { ?>
                 <ul class="dropdown-menu" aria-labelledby="sourceMapsDropdown">
                     <?php
                     foreach ($maps as $map) {
-                        $mapUrl = $map["mapUrl"];
+                        $myMap = (array) $map;
+                        $mapUrl = $myMap["mapUrl"];
 ?>
                         <li>
                             <button class="dropdown-item" onclick="destinationMapSelect('<?php echo $mapUrl; ?>');"><?php echo $mapUrl; ?></button>

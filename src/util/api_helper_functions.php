@@ -1,6 +1,6 @@
 <?php
 require_once ('database_operations.php');
-function getUuid($userIdentifier) {
+function getUuid(string $userIdentifier): string {
     if (str_contains($userIdentifier, "@")) {
         // email as unique identifier -> get uuid
         return getUuidFromEmail($userIdentifier);
@@ -10,9 +10,15 @@ function getUuid($userIdentifier) {
     }
 }
 
-// checks if user is not allowed to access map
-function userCanAccessMap($userUuid, $shortMapUri) {
-    $map = iterator_to_array(getMap($shortMapUri));
+// checks if user is allowed to access map
+function userCanAccessMap(string|null $userUuid, string $shortMapUri): bool {
+    $map = getMap($shortMapUri);
+
+    if ($map === null) {
+        error_log("Could not fetch map information");
+        return false;
+    }
+
     $policy = $map["policyNumber"];
     if ($policy !== 1) {
         // null is acceptable here, because this is not meant for security, but for UX
@@ -20,13 +26,26 @@ function userCanAccessMap($userUuid, $shortMapUri) {
         if ($userUuid === null) {
             return true;
         }
-        if (!userExists($userUuid)) {
-            return false;
+        if ($policy === 2) {
+            if (!userExists($userUuid)) {
+                return false;
+            } else {
+                return true;
+            }
         }
-        if ($policy === 3) {
-            $user = iterator_to_array(getUserData($userUuid));
-            $sharedTagsCount = count(array_intersect(iterator_to_array($map["tags"]),
-                                                    iterator_to_array($user["tags"])));
+        if (($policy === 3) && (array_key_exists("tags", $map))) {
+            $user = getUserData($userUuid);
+
+            if ($user === null) {
+                error_log("Could not fetch user data.");
+                return false;
+            }
+
+            if (!array_key_exists("tags", $user)) {
+                return false;
+            }
+
+            $sharedTagsCount = count(array_intersect($map["tags"], $user["tags"]));
             if ($sharedTagsCount < 1) {
                 return false;
             }

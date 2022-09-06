@@ -5,16 +5,33 @@ require_once ('../util/api_helper_functions.php');
 require_once ('../util/database_operations.php');
 require_once ('../util/uuid_adapter.php');
 $DB = getDatabaseHandleOrDie();
-function generateTextureInformationPerLayer($layer, $userTags) {
-    $layerList = iterator_to_array(getTexturesByLayer($layer));
+/**
+ * @param string $layer The layer for which the tags should be fetched
+ * @param string[] $userTags The tags the user has
+ * @return array<int, array{"id": string, "name": string, "url": string, "position": int}>
+ */
+function generateTextureInformationPerLayer(string $layer, array $userTags): array {
+    $layerList = getTexturesByLayer($layer);
     $layerTextures = array();
     $layerIndex = 0;
 
+    if ($layerList === null) {
+        http_response_code(403);
+
+        $error["code"] = "NO_TEXTURES";
+        $error["title"] = "No texture data";
+        $error["subtitle"] = "No texture data received.";
+        $error["details"] = "";
+        $error["image"] = "";
+
+        echo json_encode($error);
+        die("Could not fetch texture data");
+    }
+
     foreach($layerList as $texture) {
         $textureTags = array();
-        $texture = iterator_to_array($texture);
         if (array_key_exists("tags", $texture)) {
-            $textureTags = iterator_to_array($texture["tags"]);
+            $textureTags = $texture["tags"];
             // check, if there is a match between user and map tags
             // if not, continue, so that the texture is not added
             if  ((count($textureTags) !== 0) &&
@@ -42,11 +59,24 @@ if ((isset($_GET["roomUrl"]) && (isset($_GET["uuid"])))) {
     $uuid = htmlspecialchars($_GET["uuid"]);
     $uuid = getUuid($uuid);
     if (isValidUuid($uuid)) {
-        $userData = iterator_to_array(getUserData($uuid));
+        $userData = getUserData($uuid);
         $userTags = array();
 
+        if ($userData === null) {
+            http_response_code(403);
+
+            $error["code"] = "NO_USERDATA";
+            $error["title"] = "No user data";
+            $error["subtitle"] = "No user data received.";
+            $error["details"] = "";
+            $error["image"] = "";
+
+            echo json_encode($error);
+            die("Could not fetch userdata");
+        }
+
         if (array_key_exists("tags", $userData)) {
-            $userTags = iterator_to_array($userData["tags"]);
+            $userTags = $userData["tags"];
         }
 
         $result = array(

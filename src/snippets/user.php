@@ -43,7 +43,6 @@ if ($users === NULL) {
     $DB = NULL;
     die();
 }
-$users = iterator_to_array($users);
 // Display all accounts
 
 ?>
@@ -56,7 +55,9 @@ $users = iterator_to_array($users);
         </tr>
 
         <?php
-foreach ($users as $user) { ?>
+foreach ($users as $user) {
+          $user = (array) $user;
+          ?>
           <tr>
             <td>
               <p class="fw-normal">
@@ -65,7 +66,7 @@ foreach ($users as $user) { ?>
             </td>
             <td>
 <?php 
-  if (array_key_exists("tags", iterator_to_array($user))) {
+  if (array_key_exists("tags", $user)) {
   $tags = $user["tags"];
     foreach ($tags as $currentTag) {
         if (strlen(trim($currentTag)) > 0) {?>

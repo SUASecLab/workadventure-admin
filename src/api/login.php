@@ -25,7 +25,21 @@ if (isset($_GET["token"])) {
         die();
     }
 
-    $userData = iterator_to_array(getUserData($uuid));
+    $userData = getUserData($uuid);
+
+    if ($userData === null) {
+        http_response_code(403);
+
+        $error["code"] = "NO_USERDATA";
+        $error["title"] = "No user data";
+        $error["subtitle"] = "No user data received.";
+        $error["details"] = "";
+        $error["image"] = "";
+
+        echo json_encode($error);
+        die("Could not fetch userdata");
+    }
+    
     if (array_key_exists("startMap", $userData)) {
         $map = $userData["startMap"];
     } else {

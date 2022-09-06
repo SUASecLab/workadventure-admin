@@ -10,7 +10,20 @@ if ((isset($_GET["ipAddress"])) && (isset($_GET["token"])) && (isset($_GET["room
     $uuid = htmlspecialchars($_GET["token"]);
     $uuid = getUuid($uuid);
     isValidUuidOrDie($uuid);
-    $userData = iterator_to_array(getUserData($uuid));
+    $userData = getUserData($uuid);
+    
+    if ($userData === null) {
+        http_response_code(403);
+
+        $error["code"] = "NO_USERDATA";
+        $error["title"] = "No user data";
+        $error["subtitle"] = "No user data received.";
+        $error["details"] = "";
+        $error["image"] = "";
+
+        echo json_encode($error);
+        die("Could not fetch userdata");
+    }
 
     $isBanned = false;
     if ((array_key_exists("banned", $userData)) && ($userData["banned"] === true)) {
