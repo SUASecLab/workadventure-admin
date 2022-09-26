@@ -155,6 +155,22 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "update
         }
     }
 }
+// update start map if requested
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "updateStartMap") && (isset($_POST["startMap"]))) {
+  $newStartMap = htmlspecialchars($_POST["startMap"]);
+  $result = updateStartMap($uuid, $newStartMap);
+  if ($result == true) { ?>
+    <aside class="alert alert-success" role="alert">
+      <p>Updated start map</p>
+    </aside>
+  <?php
+  } else { ?>
+    <aside class="alert alert-danger" role="alert">
+      <p>Could not update start map</p>
+    </aside>
+    <?php
+  }
+}
 // remove message if requested
 if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "removeMessage") && (isset($_POST["message"]))) {
     $message = htmlspecialchars($_POST["message"]);
@@ -202,6 +218,16 @@ if ($userData === NULL) {
   <?php
     die();
 }
+
+// fetch map information
+$maps = getAllMaps();
+if ($maps == NULL) { ?>
+  <asidee class="alert alert-danger" role="alert">
+    Could not load maps
+  </aside>
+<?php
+die();
+}
 ?>
   <main>
     <section>
@@ -243,6 +269,31 @@ if ((array_key_exists("tags", $userData)) && (count($userData["tags"]) > 0)){
             echo "<br><br>";
 }
           ?>
+        </section>
+        <section>
+          <p>Set start map</p>
+          <p>Current start map: <?php echo getStartMap($uuid) ?></p>
+          <label for="dropdownMenu" class="form-label">Select new start map</label>
+            <div class="dropdown" id="dropdownMenu">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="mapsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    Select
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="mapsDropdown">
+                    <?php
+                    foreach ($maps as $map) {
+                        $myMap = (array) $map;
+                        $mapUrl = $myMap["mapUrl"];
+?>
+                        <li>
+                            <button class="dropdown-item" onclick="updateMapSelect('<?php echo $mapUrl; ?>');"><?php echo $mapUrl; ?></button>
+                        </li>
+                        <?php
+                    }
+?>
+                </ul>
+            </div>
+            <button class="btn btn-primary" type="submit" style="margin-top: 1rem;" id="updateStartMapButton"
+              onclick="updateStartMap('<?php echo $uuid; ?>');">Update start map</button>
         </section>
         <section>
           <p>Add tag:</p>

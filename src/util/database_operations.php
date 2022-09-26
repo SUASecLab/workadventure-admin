@@ -206,6 +206,29 @@ function removeTag(string $uuid, string $remTag): bool {
 
     return $result->getModifiedCount() === 1;
 }
+function getStartMap(string $uuid): string|false {
+    GLOBAL $DB;
+
+    $result = $DB->users->findOne([
+        "uuid" => $uuid
+    ]);
+
+    if (array_key_exists("startMap", $result)) {
+        return $result["startMap"];
+    } else {
+        return getenv('START_ROOM_URL');
+    }
+}
+function updateStartMap(string $uuid, string $map): bool {
+    GLOBAL $DB;
+
+    $result = $DB->users->updateOne(
+        [ 'uuid' => $uuid ],
+        [ '$set' => [ 'startMap' => $map] ]
+    );
+
+    return $result->getModifiedCount() === 1;
+}
 function removeMessages(string $uuid): bool {
     GLOBAL $DB;
 

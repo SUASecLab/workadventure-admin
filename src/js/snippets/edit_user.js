@@ -48,6 +48,22 @@ function addTag(uuid) {
     });
 }
 
+function updateMapSelect(map) {
+    const dropdown = document.getElementById("mapsDropdown");
+    dropdown.innerHTML = map;
+}
+
+function updateStartMap(uuid) {
+    const dropdown = document.getElementById("mapsDropdown");
+    startMap = dropdown.innerHTML;
+
+    $("#edit_user").load("../snippets/edit_user.php", {
+        "action": "updateStartMap",
+        "uuid": uuid,
+        "startMap": startMap
+    });
+}
+
 function removeMessage(uuid, message) {
     $("#edit_user").load("../snippets/edit_user.php", {
         "action": "removeMessage",
