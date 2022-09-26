@@ -53,3 +53,18 @@ function userCanAccessMap(string|null $userUuid, string $shortMapUri): bool {
     }
     return true;
 }
+
+/**
+ * Generate an API error message
+ * @return array{"code": string, "title": string, "subtitle": string, "details": string, "image": string}
+ */
+function apiErrorMessage(string $code, string $title,
+    string $subtitle, string $details = "", string $image = ""): array {
+    return array(
+        "code" => $code,
+        "title" => $title,
+        "subtitle" => $subtitle,
+        "details" => $details,
+        "image" => $image
+    );
+}

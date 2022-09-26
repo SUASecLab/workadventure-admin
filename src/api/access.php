@@ -22,13 +22,8 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
         if ($userData === null) {
             http_response_code(403);
 
-            $error["code"] = "NO_USERDATA";
-            $error["title"] = "No user data";
-            $error["subtitle"] = "No user data received.";
-            $error["details"] = "";
-            $error["image"] = "";
-
-            echo json_encode($error);
+            echo json_encode(apiErrorMessage("NO_USERDATA",
+                "No user data", "No user data received."));
             die("Could not fetch userdata");
         }
 
@@ -47,13 +42,8 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
         if ($textures === null) {
             http_response_code(403);
 
-            $error["code"] = "NO_TEXTURES";
-            $error["title"] = "No texture data";
-            $error["subtitle"] = "No texture data received.";
-            $error["details"] = "";
-            $error["image"] = "";
-
-            echo json_encode($error);
+            echo json_encode(apiErrorMessage("NO_TEXTURES",
+                "No texture data", "No texture data received."));
             die("Could not fetch texture data");
         }
 
@@ -107,13 +97,8 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
         if ($map === null) {
             http_response_code(403);
 
-            $error["code"] = "NO_MAP";
-            $error["title"] = "No map data";
-            $error["subtitle"] = "No map data received.";
-            $error["details"] = "";
-            $error["image"] = "";
-
-            echo json_encode($error);
+            echo json_encode(apiErrorMessage("NO_MAP",
+                "No map data", "No map data received."));
             die("Could not fetch map data");
         }
 
@@ -126,13 +111,8 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
             if ($sidecarResult === false) {
                 http_response_code(403);
 
-                $error["code"] = "NO_TOKEN";
-                $error["title"] = "No auth token";
-                $error["subtitle"] = "No auth token received.";
-                $error["details"] = "";
-                $error["image"] = "";
-
-                echo json_encode($error);
+                echo json_encode(apiErrorMessage("NO_TOKEN",
+                    "No auth token", "No auth token received."));
             } else {
                 $result['userRoomToken'] = ((array) json_decode($sidecarResult, true))["token"]; // WA.player.userRoomToken
                 echo json_encode($result);
@@ -143,24 +123,15 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
     } else {
         http_response_code(403);
 
-        $error["code"] = "INVALID_USER";
-        $error["title"] = "Invalid user";
-        $error["subtitle"] = "The specified user does not exist.";
-        $error["details"] = "";
-        $error["image"] = "";
-
-        echo json_encode($error);
+        echo json_encode(apiErrorMessage("INVALID_USER",
+            "Invalid user", "The specified user does not exist."));
     }
 } else {
     http_response_code(403);
 
-    $error["code"] = "INSUFFICIENT_USER_INFORMATION";
-    $error["title"] = "Insufficient user information";
-    $error["subtitle"] = "You did not specify enough information about the user.";
-    $error["details"] = "";
-    $error["image"] = "";
-
-    echo json_encode($error);
+    echo json_encode(apiErrorMessage("INSUFFICIENT_USER_INFORMATION",
+        "Insufficient user information",
+        "You did not specify enough information about the user."));
 }
 $DB = NULL;
 ?>

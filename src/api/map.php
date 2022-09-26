@@ -34,13 +34,8 @@ if (isset($_GET["playUri"])) {
             if (!userCanAccessMap($uuid, $shortUri)) {
                 http_response_code(403);
 
-                $error["code"] = "MAP_ACCESS_FORBIDDEN";
-                $error["title"] = "Access forbidden";
-                $error["subtitle"] = "Your are not allowed to enter this room.";
-                $error["details"] = "";
-                $error["image"] = "";
-
-                echo json_encode($error);
+                echo json_encode(apiErrorMessage("MAP_ACCESS_FORBIDDEN", "Access forbidden",
+                    "Your are not allowed to enter this room."));
 
                 $DB = NULL;
                 die();
@@ -74,13 +69,9 @@ if (isset($_GET["playUri"])) {
 } else {
     http_response_code(404);
 
-    $error["code"] = "INSUFFICIENT_DATA";
-    $error["title"] = "Insufficient data provided";
-    $error["subtitle"] = "Not enough data was provided to perform this operation.";
-    $error["details"] = "";
-    $error["image"] = "";
-
-    echo json_encode($error);
+    echo json_encode(apiErrorMessage("INSUFFICIENT_DATA",
+        "Insufficient data provided",
+        "Not enough data was provided to perform this operation."));
 }
 $DB = NULL;
 ?>

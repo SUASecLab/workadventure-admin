@@ -15,13 +15,8 @@ if ((isset($_GET["ipAddress"])) && (isset($_GET["token"])) && (isset($_GET["room
     if ($userData === null) {
         http_response_code(403);
 
-        $error["code"] = "NO_USERDATA";
-        $error["title"] = "No user data";
-        $error["subtitle"] = "No user data received.";
-        $error["details"] = "";
-        $error["image"] = "";
-
-        echo json_encode($error);
+        echo json_encode(apiErrorMessage("NO_USERDATA",
+            "No user data", "No user data received."));
         die("Could not fetch userdata");
     }
 
@@ -35,13 +30,9 @@ if ((isset($_GET["ipAddress"])) && (isset($_GET["token"])) && (isset($_GET["room
 } else {
     http_response_code(404);
 
-    $error["code"] = "INSUFFICIENT_USER_INFORMATION";
-    $error["title"] = "Insufficient user information";
-    $error["subtitle"] = "You did not specify enough information about the user.";
-    $error["details"] = "";
-    $error["image"] = "";
-
-    echo json_encode($error);
+    echo json_encode(apiErrorMessage("INSUFFICIENT_USER_INFORMATION",
+        "Insufficient user information",
+        "You did not specify enough information about the user."));
 }
 $DB = NULL;
 ?>

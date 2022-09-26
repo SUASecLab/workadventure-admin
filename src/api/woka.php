@@ -18,13 +18,9 @@ function generateTextureInformationPerLayer(string $layer, array $userTags): arr
     if ($layerList === null) {
         http_response_code(403);
 
-        $error["code"] = "NO_TEXTURES";
-        $error["title"] = "No texture data";
-        $error["subtitle"] = "No texture data received.";
-        $error["details"] = "";
-        $error["image"] = "";
-
-        echo json_encode($error);
+        echo json_encode(apiErrorMessage("NO_TEXTURES",
+            "No texture data",
+            "No texture data received."));
         die("Could not fetch texture data");
     }
 
@@ -65,13 +61,8 @@ if ((isset($_GET["roomUrl"]) && (isset($_GET["uuid"])))) {
         if ($userData === null) {
             http_response_code(403);
 
-            $error["code"] = "NO_USERDATA";
-            $error["title"] = "No user data";
-            $error["subtitle"] = "No user data received.";
-            $error["details"] = "";
-            $error["image"] = "";
-
-            echo json_encode($error);
+            echo json_encode(apiErrorMessage("NO_USERDATA",
+                "No user data", "No user data received."));
             die("Could not fetch userdata");
         }
 
@@ -129,21 +120,17 @@ if ((isset($_GET["roomUrl"]) && (isset($_GET["uuid"])))) {
         echo json_encode($result);
     } else {
         http_response_code(404);
-        $error["code"] = "INVALID_UUID";
-        $error["title"] = "Invalid UUID";
-        $error["subtitle"] = "The provided user identifier is invalid.";
-        $error["details"] = "";
-        $error["image"] = "";
-        echo json_encode($error);
+
+        echo json_encode(apiErrorMessage("INVALID_UUID",
+            "Invalid UUID",
+            "The provided user identifier is invalid."));
     }
 } else {
     http_response_code(404);
-    $error["code"] = "INSUFFICIENT_PARAMETERS";
-    $error["title"] = "Insuficcient parameters";
-    $error["subtitle"] = "You did not specify all required parameters.";
-    $error["details"] = "";
-    $error["image"] = "";
-    echo json_encode($error);
+
+    echo json_encode(apiErrorMessage("INSUFFICIENT_PARAMETERS",
+        "Insuficcient parameters",
+        "You did not specify all required parameters."));
 }
 $DB = NULL;
 ?>
