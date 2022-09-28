@@ -232,6 +232,8 @@ die();
   <main>
     <section>
       <form action="javascript:void(0);" style="margin-bottom: 1rem;">
+        <p class="fs-3">Update user data</p>
+        <p class="fs-4">Main user information<p>
         <div class="mb-3">
           <label for="name" class="form-label">Name</label>
           <input type="text" class="form-control" id="name" name="name" value="<?php echo $userData["name"]; ?>">
@@ -254,6 +256,7 @@ die();
           <input type="text" class="form-control" id="name" value="<?php echo "https://" . getenv('DOMAIN') . "/register/" . $userData["uuid"]; ?>" readonly>
         </section>
         <section class="mb-3">
+          <p class="fs-4">User tags</p>
           <?php
 if ((array_key_exists("tags", $userData)) && (count($userData["tags"]) > 0)){
 ?>
@@ -266,12 +269,20 @@ if ((array_key_exists("tags", $userData)) && (count($userData["tags"]) > 0)){
               </button>
           <?php
             }
-            echo "<br><br>";
+            echo "<br>";
 }
           ?>
         </section>
         <section>
-          <p>Set start map</p>
+          <p>Add tag:</p>
+          <form action="javascript:void(0)">
+            <input class="form-control" type="text" id="newTag"><br>
+            <button class="btn btn-primary" onclick="addTag('<?php echo $uuid; ?>');">Add tag</button>
+          </form>
+          <br>
+        </section>
+        <section>
+          <p class="fs-4">Start map</p>
           <p>Current start map: <?php echo getStartMap($uuid) ?></p>
           <label for="dropdownMenu" class="form-label">Select new start map</label>
             <div class="dropdown" id="dropdownMenu">
@@ -295,18 +306,11 @@ if ((array_key_exists("tags", $userData)) && (count($userData["tags"]) > 0)){
             <button class="btn btn-primary" type="submit" style="margin-top: 1rem;" id="updateStartMapButton"
               onclick="updateStartMap('<?php echo $uuid; ?>');">Update start map</button>
         </section>
+        <br>
         <section>
-          <p>Add tag:</p>
-          <form action="javascript:void(0)">
-            <input class="form-control" type="text" id="newTag"><br>
-            <button class="btn btn-primary" onclick="addTag('<?php echo $uuid; ?>');">Add tag</button>
-          </form>
-        </section>
-        <section>
+          <p class="fs-4">User messages</p>
 <?php if ((array_key_exists("messages", $userData)) && (count($userData["messages"]) > 0)){
             $messages = $userData["messages"]; ?>
-              <br>
-              <p class="fs-3">User messages:</p>
               <table class="table">
                 <tr>
                   <th scope="col">Message</th>
@@ -357,7 +361,7 @@ if ((array_key_exists("tags", $userData)) && (count($userData["tags"]) > 0)){
           <?php
 } else { ?>
             <br>
-            <p>Ban this user:</p>
+            <p class="fs-4">Ban user</p>
             <form action="javascript:void(0);">
               <div class="mb-3">
                 <label for="banReason" class="form-label">Reason:</label>
