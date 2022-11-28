@@ -35,10 +35,10 @@ services:
       - ./:/app
 
   admin:
-    build: ./containers/nginx
+    image: nginx
     restart: ${RESTART_POLICY}
     environment:
-      DOMAIN: "$DOMAIN"
+      - DOMAIN
     depends_on:
       - admin_php
     volumes:
