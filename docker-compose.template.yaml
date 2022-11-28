@@ -4,9 +4,9 @@ services:
     image: mongo:5.0
     restart: ${RESTART_POLICY}
     environment:
-      MONGO_INITDB_ROOT_USERNAME: "$ADMIN_DB_ROOT"
-      MONGO_INITDB_ROOT_PASSWORD: "$ADMIN_DB_ROOT_PASSWORD"
-      MONGO_INITDB_DATABASE: "$MONGO_INITDB_DATABASE"
+      - MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD
+      - MONGO_INITDB_DATABASE
     volumes:
       - ./data:/data/db
       - ./containers/mongo:/docker-entrypoint-initdb.d:ro
@@ -15,15 +15,15 @@ services:
     build: ./containers/php
     restart: ${RESTART_POLICY}
     environment:
-      ADMIN_API_TOKEN : "$ADMIN_API_TOKEN"
-      ADMIN_API_SALT : "$ADMIN_API_SALT"
-      DB_USER: "$ADMIN_DB_USER"
-      DB_PASSWORD: "$ADMIN_DB_PASSWORD"
-      DB_NAME: "$DB_NAME"
-      DOMAIN: "$DOMAIN"
-      START_ROOM_URL: "$START_ROOM_URL"
-      SIDECAR_URL: "$SIDECAR_URL"
-      ENABLE_SUAS_EXTENSIONS: "$ENABLE_SUAS_EXTENSIONS"
+      - ADMIN_API_TOKEN
+      - ADMIN_API_SALT
+      - DB_USER
+      - DB_PASSWORD
+      - DB_NAME
+      - DOMAIN
+      - START_ROOM_URL
+      - SIDECAR_URL
+      - ENABLE_SUAS_EXTENSIONS
     volumes:
       - ./src:/var/www/html:ro
       - ./vendor:/var/www/vendor:ro
@@ -35,10 +35,10 @@ services:
       - ./:/app
 
   admin:
-    build: configuration/nginx
+    image: nginx
     restart: ${RESTART_POLICY}
     environment:
-      DOMAIN: "$DOMAIN"
+      - DOMAIN
     depends_on:
       - admin_php
     volumes:
