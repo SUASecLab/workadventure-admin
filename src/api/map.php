@@ -42,28 +42,100 @@ if (isset($_GET["playUri"])) {
             }
         }
 
+        // Provide MapDetailsData
+        // mapUrl
         $result["mapUrl"] = "https://".$resultMap["mapFileUrl"];
-        $result["policy_type"] = $resultMap["policyNumber"];
-        if (array_key_exists("tags", $resultMap)) {
-            $result["tags"] = $resultMap["tags"];
-        } else {
-            $result["tags"] = array();
-        }
-        $result["roomSlug"] = ""; // deprecated
-        $result["contactPage"] = "";
-        $result["group"] = "";
 
-        // optional parameters
+        // authenticationMandatory
         $result["authenticationMandatory"] = $resultMap["policyNumber"] !== 1;
-        // $result["iframeAuthentication"] = "https://127.0.0.1";
-        // $result["expireOn"] = ;
-        $result["canReport"] = false;
-        // $result["loadingCowebsiteLogo"] = ;
-        // $result["miniLogo"] = ;
-        // $result["loadingLogo"] = ;
-        // $result["loginSceneLogo"] = ;
-        // $result["showPoweredBy"] = ;
-        // $result["thirdParty"] = ;
+
+        // group
+        $result["group"] = null; // TODO: set to org/world
+
+        // mucRooms
+        $result["mucRooms"] = array(array(
+            "name" => $resultMap["mapFileUrl"],
+            "url" => $result["mapUrl"],
+            "type" => "live"
+        ));
+
+        // contactPage
+        //$result["contactPage"] = null; // not used by us
+
+        // iframeAuthentication
+        //$result["iframeAuthentication"] = null; // not used by us
+
+        // opidLogoutRedirectUrl
+        //$result["opidLogoutRedirectUrl"] = null; // not used by us
+
+        // opidWokaNamePolicy
+        //$result["opidWokaNamePolicy"] = null; // not used by us
+
+        // expireOn
+        //$result["expireOn"] = "2099-01-01T00:00:00-00:00"; // not used by us
+
+        // canReport
+        $result["canReport"] = false; // we disable the reporting feature
+
+        // editable
+        $result["editable"] = false; // we disable the map editor
+
+        // loadingCowebsiteLogo
+        //$result["loadingCowebsiteLogo"] = null; // not used by us
+
+        // miniLogo
+        //$result["miniLogo"] = null; // not used by us
+
+        // loadingLogo
+        //$result["loadingLogo"] = null; // not used by us
+
+        // loginSceneLogo
+        //$result["loginSceneLogo"] = null; // not used by us
+
+        // showPoweredBy
+        //$result["showPoweredBy"] = null; // not used by us
+
+        // thirdParty
+        //$result["thirdParty"] = null; // not used by us
+
+        // metadata
+        //$result["metadata"] = null; // not used by us
+
+        // roomName
+        //$result["roomName"] = null; // not used by us
+
+        // pricingUrl
+        //$result["pricingUrl"] = null; // not used by us
+
+        // enableChat
+        $result["enableChat"] = true; // not used by us
+
+        // enableChatUpload
+        $result["enableChatUpload"] = false; // not used by us
+
+        // enableChatOnlineList
+        $result["enableChatOnlineList"] = true; // not used by us
+
+        // enableChatDisconnectedList
+        $result["enableChatDisconnectedList"] = false; // not used by us
+
+        // metatags
+        //$result["metatags"] = null; // not used by us
+
+        // legals
+        //$result["legals"] = null; // not used by us
+
+        // customizeWokaScene
+        //$result["customizeWokaScene"] = null; // not used by us
+
+        // backgroundColor
+        //$result["backgroundColor"] = null; // not used by us
+
+        // reportIssuesUrl
+        //$result["reportIssuesUrl"] = null; // not used by us
+
+        // entityCollectionsUrls
+        //$result["entityCollectionsUrls"] = null; // not used by us
         echo json_encode($result);
     }
 } else {

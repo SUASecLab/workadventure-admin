@@ -32,9 +32,11 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
             $tags = $userData["tags"];
         }
 
+        // basic user data
         $result['userUuid'] = $uuid;
         $result['email']= $userData["email"];
         $result['tags'] = $tags;
+        //$result['username'] = null; // not used by us
 
         $textures =  getTextures();
         $textureArray = array();
@@ -65,7 +67,7 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
             }
         }
 
-        $result["textures"] = $textureArray;
+        $result["textures"] = array_reverse($textureArray);
 
         $visitCardUrl = NULL;
         if (array_key_exists("visitCardURL", $userData)) {
@@ -102,7 +104,19 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
             die("Could not fetch map data");
         }
 
-        $result['anonymous'] = $map["policyNumber"] === 1; 
+        $result['anonymous'] = $map["policyNumber"] === 1;
+        $result['canEdit'] = false;
+        $result["activatedInviteUser"] = false;
+        //$result["applications"] = null; // not used by us
+
+        // XMPP
+        //$result["jabberId"] = null; // not used by us
+        //$result["jabberPassword"] = null; // not used by us
+        $result["mucRooms"] = array(array(
+            "name" => $map["mapFileUrl"],
+            "url" =>  "https://".$map["mapFileUrl"],
+            "type" => "live"
+        ));
 
         // Generate user room token
         if (getenv("ENABLE_SUAS_EXTENSIONS") === "true") {
