@@ -8,7 +8,6 @@ targets:
 - edit_user=edit a user; reuires 'uuid' as post parameter
 - login=log in; don't die if no user is logged in
 - rooms = view and manage maps
-- textures = manage custom textures
 - index = show the index
 */
 $target = htmlspecialchars($_GET["target"]);
@@ -40,9 +39,8 @@ if ($target === "rooms") {
     <script src="js/snippets/redirects.js"></script>
     <?php
 }
-?>
-
-    <title>WorkAdventure Administration</title>
+$enableSUASExtensions = getenv("ENABLE_SUAS_EXTENSIONS") === "true"; ?>
+    <title><?php echo ($enableSUASExtensions ? "SUASecLab" : "WorkAdventure"); ?> Administration</title>
 </head>
 
 <body>
@@ -57,9 +55,9 @@ $DB = getDatabaseHandleOrPrintError();
         <div class="container-fluid">
             <div id="navbarMain">
                 <?php if ($target === "edit_user") { ?>
-                    <a class="navbar-brand" href="../">WorkAdventure Administration</a>
+                    <a class="navbar-brand" href="../"><?php echo ($enableSUASExtensions ? "SUASecLab" : "WorkAdventure"); ?> Administration</a>
                 <?php } else { ?>
-                    <a class="navbar-brand" href="./">WorkAdventure Administration</a>
+                    <a class="navbar-brand" href="./"><?php echo ($enableSUASExtensions ? "SUASecLab" : "WorkAdventure"); ?> Administration</a>
                 <?php } ?>
             </div>
             <?php
