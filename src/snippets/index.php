@@ -35,15 +35,6 @@ if (!isLoggedIn()) {
           </div>
         </div>
       </div>
-      <div class="col-sm-6">
-        <div class="card card-style">
-          <div class="card-body">
-            <h5 class="card-title">Textures</h5>
-            <p class="card-text">Additional textures can be added here</p>
-            <a href="textures" class="btn btn-primary">Go to textures settings</a>
-          </div>
-        </div>
-      </div>
     </div>
   </main>
 </body>
