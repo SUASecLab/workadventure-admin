@@ -278,53 +278,65 @@ function createWebsiteUser(string $username, string $hashedPassword): bool {
     return $result->getInsertedCount() === 1;
 }
 
-function getMapFileUrl(string|bool $mapUrl): string|null {
+function getMapFileUrl(string|bool $wamUrl): string|null {
     GLOBAL $DB;
     // START_ROOM_URL not set
-    if (gettype($mapUrl) === "boolean") {
+    if (gettype($wamUrl) === "boolean") {
         error_log("START_ROOM_URL env var is not set");
         return null;
     }
     $document = $DB->maps->findOne(
         [
-            "mapUrl" => $mapUrl
+            "wamUrl" => $wamUrl
         ]
     );
 
     if ($document === NULL) {
         return NULL;
     }
-    return "https://".$document["mapFileUrl"];
+    return "https://".$document["mapUrl"];
 }
 /**
  * Get data for a specific map
- * @param string $mapUrl URL of the Map (for WA)
- * @return array{"_id": mixed, "mapUrl": string,
- *  "mapFileUrl": string, "policyNumber": int, "tags"?: string[]}
+ * @param string $wamUrl URL of the Map (for WA)
+ * @return array{"_id": mixed, "wamUrl": string,
+ *  "mapUrl": string, "policyNumber": int, "tags"?: string[]}
  */
-function getMap(string $mapUrl): array|null {
+function getMap(string $wamUrl): array|null {
     GLOBAL $DB;
     try {
-        return $DB->maps->findOne(
-            ["mapUrl" => $mapUrl]
-        );
+    	if (str_starts_with($wamUrl, "/register/")) {
+    	    $uuid = substr($wamUrl, strlen("/register/"));
+    	    if (userExists($uuid)) {
+    	    	/* will call db findOne() function is else branch below */
+    	        return getMap(getenv("START_ROOM_URL"));
+    	    } else {
+    	        return null;
+    	    }
+    	} else {
+	    return $DB->maps->findOne(
+	        [
+	            "wamUrl" => $wamUrl
+	        ]
+	    );
+    	}
     } catch (Exception $e) {
         error_log("Could not get map URL: " . $e->getMessage());
         return null;
     }
 }
 /**
- * @param string $mapUrl URL of the map (for WA)
- * @param string $mapFileUrl URL where the file of the map is stored
+ * @param string $wamUrl URL of the map (WorkAdventure map)
+ * @param string $mapUrl URL where the json file of the map is stored
  * @param int $policyNumber Policy number for access restrictions
  * @param string[] $tags Tags array for access restrictions
  */
-function storeMap(string $mapUrl, string $mapFileUrl, int $policyNumber, array $tags): bool {
+function storeMap(string $wamUrl, string $mapUrl, int $policyNumber, array $tags): bool {
     GLOBAL $DB;
 
     $result = $DB->maps->insertOne([
+        "wamUrl" => $wamUrl,
         "mapUrl" => $mapUrl,
-        "mapFileUrl" => $mapFileUrl,
         "policyNumber" => $policyNumber,
         "tags" => $tags
     ]);
@@ -336,8 +348,8 @@ function storeMap(string $mapUrl, string $mapFileUrl, int $policyNumber, array $
 }
 /**
  * Get array of all maps
- * @return array{array{"_id": mixed, "mapUrl": string,
- *  "mapFileUrl": string, "policyNumber": int, "tags"?: string[]}}
+ * @return array{array{"_id": mixed, "wamUrl": string,
+ *  "mapUrl": string, "policyNumber": int, "tags"?: string[]}}
  */
 function getAllMaps(): array|null {
     GLOBAL $DB;
@@ -348,48 +360,9 @@ function getAllMaps(): array|null {
         return null;
     }
 }
-function removeMap(string $mapUrl): bool {
+function removeMap(string $wamUrl): bool {
     GLOBAL $DB;
-    $result = $DB->maps->deleteOne(["mapUrl" => $mapUrl]);
-    return $result->getDeletedCount() === 1;
-}
-function getMapRedirect(string $mapUrl): string|null {
-    GLOBAL $DB;
-    $result = $DB->mapRedirects->findOne([
-        "mapUrl" => $mapUrl
-    ]);
-    if ($result !== NULL) {
-        return $result["redirectUrl"];
-    } else {
-        return NULL;
-    }
-}
-function addMapRedirect(string $mapUrl, string $redirectUrl): bool {
-    GLOBAL $DB;
-    $result = $DB->mapRedirects->insertOne([
-        "mapUrl" => $mapUrl,
-        "redirectUrl" => $redirectUrl
-    ]);
-    return $result->getInsertedCount() === 1;
-}
-/**
- * Get all map redirects
- * @return array{0?:array{"_id": mixed, "mapUrl": string, "redirectUrl": string}}
- */
-function getAllMapRedirects(): array| null {
-    GLOBAL $DB;
-    try {
-        return $DB->mapRedirects->find()->toArray();
-    } catch (Exception $e) {
-        error_log("Could not fetch map redirects: " . $e->getMessage());
-        return null;
-    }
-}
-function removeMapRedirect(string $redirect): bool {
-    GLOBAL $DB;
-    $result = $DB->mapRedirects->deleteOne([
-        "mapUrl" => $redirect
-    ]);
+    $result = $DB->maps->deleteOne(["wamUrl" => $wamUrl]);
     return $result->getDeletedCount() === 1;
 }
 function removeUserMessage(string $uuid, string $message): bool {
@@ -498,6 +471,23 @@ function getTexturesByLayer(string $layer): array|null {
         return $DB->textures->find(["layer" => $layer])->toArray();
     } catch (Exception $e) {
         error_log("Could not get textures by layer: " . $e->getMessage());
+        return null;
+    }
+}
+/**
+ * Get a companion by id
+ * @param string $id id of the companion
+ * @return array{"_id": mixed, "id": string,
+ *  "name": string, "behavior": string, "url": string}
+ */
+function getCompanion($id): array|null {
+    GLOBAL $DB;
+    try {
+        return $DB->companions->findOne([
+            "id" => $id
+        ]);
+    } catch (Exception $e) {
+        error_log("Could not fetch companion from database: " . $e->getMessage());
         return null;
     }
 }

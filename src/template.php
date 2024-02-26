@@ -30,15 +30,8 @@ $target = htmlspecialchars($_GET["target"]);
         <script src="../js/bootstrap/bootstrap.bundle.min.js"></script>
         <script src="../js/ajax/jquery.min.js"></script>
         <script src="../js/snippets/<?php echo $target; ?>.js"></script>
-    <?php } ?>
+    <?php }
 
-    <?php
-if ($target === "rooms") {
-?>
-    <script src="js/snippets/maps.js"></script>
-    <script src="js/snippets/redirects.js"></script>
-    <?php
-}
 $enableSUASExtensions = getenv("ENABLE_SUAS_EXTENSIONS") === "true"; ?>
     <title><?php echo ($enableSUASExtensions ? "SUASecLab" : "WorkAdventure"); ?> Administration</title>
 </head>

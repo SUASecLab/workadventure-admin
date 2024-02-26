@@ -10,10 +10,11 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
     //  contents of ipAdress are ignored here
     $userIdentifier = htmlspecialchars($_GET["userIdentifier"]);
     $uuid = getUuid($userIdentifier);
+
     if (userExists($uuid)) {
         $selectedTextures = array();
-        if (isset($_GET["characterLayers"])) {
-            $selectedTextures = $_GET["characterLayers"];
+        if (isset($_GET["characterTextureIds"])) {
+            $selectedTextures = $_GET["characterTextureIds"];
         } else {
             $selectedTextures = [];
         }
@@ -62,13 +63,24 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
                 array_push($textureArray, array(
                     "id" => $texture["waId"],
                     "url" => $texture["url"],
-                    "layer" => $texture["layer"]
+                    //"layer" => $texture["layer"]
                 ));
             }
         }
 
-        $result["textures"] = array_reverse($textureArray);
+        $result["characterTextures"] = $textureArray;
 
+
+        if (isset($_GET["companionTextureId"])) {
+            $selectedCompanion = $_GET["companionTextureId"]; // = id in companions
+            $companion = getCompanion($selectedCompanion);
+            $result["companionTexture"] = array(
+                "id" => $companion["id"],
+                "url" => $companion["url"]
+            );
+        } else {
+            $result["companionTexture"] = null;
+        }
         $visitCardUrl = NULL;
         if (array_key_exists("visitCardURL", $userData)) {
             $visitCardUrl = "https://".$userData["visitCardURL"];
@@ -107,16 +119,18 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
         $result['anonymous'] = $map["policyNumber"] === 1;
         $result['canEdit'] = false;
         $result["activatedInviteUser"] = false;
-        //$result["applications"] = null; // not used by us
+        $result["applications"] = null; // not used by us
 
         // XMPP
-        //$result["jabberId"] = null; // not used by us
-        //$result["jabberPassword"] = null; // not used by us
-        $result["mucRooms"] = array(array(
-            "name" => $map["mapFileUrl"],
-            "url" =>  "https://".$map["mapFileUrl"],
-            "type" => "live"
-        ));
+        $result["jabberId"] = null; // not used by us
+        $result["jabberPassword"] = null; // not used by us
+        //$result["mucRooms"] = array(array(
+        //    "name" => $map["mapUrl"],
+        //    "url" =>  "https://".$map["mapUrl"],
+        //    "type" => "live"
+        //));
+        // send empty arrays -> no rooms, this variable is not nullable even if stated otherwise in documentation
+        $result["mucRooms"] = array();
 
         // Generate user room token
         if (getenv("ENABLE_SUAS_EXTENSIONS") === "true") {

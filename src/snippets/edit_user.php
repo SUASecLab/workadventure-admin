@@ -293,10 +293,10 @@ if ((array_key_exists("tags", $userData)) && (count($userData["tags"]) > 0)){
                     <?php
                     foreach ($maps as $map) {
                         $myMap = (array) $map;
-                        $mapUrl = $myMap["mapUrl"];
+                        $wamUrl = $myMap["wamUrl"];
 ?>
                         <li>
-                            <button class="dropdown-item" onclick="updateMapSelect('<?php echo $mapUrl; ?>');"><?php echo $mapUrl; ?></button>
+                            <button class="dropdown-item" onclick="updateMapSelect('<?php echo $wamUrl; ?>');"><?php echo $wamUrl; ?></button>
                         </li>
                         <?php
                     }

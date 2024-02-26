@@ -11,14 +11,8 @@ if (isset($_GET["playUri"])) {
     $resultMap = getMap($shortUri);
     $result = array();
     if ($resultMap === NULL) {
-        $mapRedirect = getMapRedirect($shortUri);
-        if ($mapRedirect !== NULL) {
-            $result["redirectUrl"] = $mapRedirect;
-            echo json_encode($result);
-        } else {
-            http_response_code(404);
-            die();
-        }
+         http_response_code(404);
+        die();
     } else {
         // check if user is allowed to enter the map if a user identification is provided
         if (isset($_GET["userId"])) {
@@ -43,8 +37,13 @@ if (isset($_GET["playUri"])) {
         }
 
         // Provide MapDetailsData
+        //wamUrl
+        // substring is to remove the leading "/~" characters, this is necessary to prevent
+        // a 404 error in the map storage
+        $result["wamUrl"] = "https://" . getenv("DOMAIN") . substr($resultMap["wamUrl"], 2);
+
         // mapUrl
-        $result["mapUrl"] = "https://".$resultMap["mapFileUrl"];
+        $result["mapUrl"] = "https://".$resultMap["mapUrl"];
 
         // authenticationMandatory
         $result["authenticationMandatory"] = $resultMap["policyNumber"] !== 1;
@@ -53,11 +52,13 @@ if (isset($_GET["playUri"])) {
         $result["group"] = null; // TODO: set to org/world
 
         // mucRooms
-        $result["mucRooms"] = array(array(
-            "name" => $resultMap["mapFileUrl"],
-            "url" => $result["mapUrl"],
-            "type" => "live"
-        ));
+
+        //$result["mucRooms"] = array(array(
+        //    "name" => $resultMap["mapUrl"],
+        //    "url" => "https://".$map["mapUrl"],
+        //    "type" => "live"
+        //));
+        $result["mucRooms"] = null;
 
         // contactPage
         //$result["contactPage"] = null; // not used by us
@@ -136,6 +137,10 @@ if (isset($_GET["playUri"])) {
 
         // entityCollectionsUrls
         //$result["entityCollectionsUrls"] = null; // not used by us
+
+        // errorSceneLogo
+        //$result["errorSceneLogo"] = null; // not used by us
+
         echo json_encode($result);
     }
 } else {

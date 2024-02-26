@@ -26,16 +26,17 @@ server {
     rewrite ^/user(.*)$ /template.php?target=user$1 last;
 
     # API routing
-    rewrite ^/api/room/access(.*)$ /api/access.php$1 last;
     rewrite ^/api/map(.*)$ /api/map.php$1 last;
     rewrite ^/api/login-url/(.*)$  /api/login.php?token=$1 last;
     rewrite ^/api/report(.*)$ /api/report.php$1 last;
-    rewrite ^/api/room/sameWorld(.*)$ /api/sameWorld.php$1 last;
     rewrite ^/api/capabilities(.*)$ /api/capabilities.php$1 last;
+    rewrite ^/api/woka/list(.*)$ /api/woka.php$1 last;
+    rewrite ^/api/room/access(.*)$ /api/access.php$1 last;
+    rewrite ^/api/room/tags(.*)$ /api/tags.php$1 last;
+    rewrite ^/api/room/sameWorld(.*)$ /api/sameWorld.php$1 last;
 
     # Features we do not implement
     rewrite ^/api/ban(.*)$ /api/not_implemented.php$1 last;
-    rewrite ^/api/woka/list(.*)$ /api/not_implemented.php$1 last;
     rewrite ^/oauth/logout(.*)$ /api/not_implemented.php$1 last;
     rewrite ^/white-label/cf-challenge(.*)$ /api/not_implemented.php$1 last;
     # Don't serve these files
