@@ -1,9 +1,9 @@
 <?php
 header("Content-Type:application/json");
-require_once ('../util/api_authentication.php');
-require_once ('../util/database_operations.php');
-require_once ('../util/api_helper_functions.php');
-require_once ('../util/uuid_adapter.php');
+require_once ("../util/api_authentication.php");
+require_once ("../util/database_operations.php");
+require_once ("../util/api_helper_functions.php");
+require_once ("../util/uuid_adapter.php");
 $DB = getDatabaseHandleOrDie();
 authorizeOrDie();
 if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GET["ipAddress"]))) {
@@ -11,21 +11,24 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
     $userIdentifier = htmlspecialchars($_GET["userIdentifier"]);
     $uuid = getUuid($userIdentifier);
 
+    /* validation fields */
+    $status = "ok";
+    $isCharacterTexturesValid = true;
+    $isCompanionTextureValid = true;
+
     if (userExists($uuid)) {
         $selectedTextures = array();
         if (isset($_GET["characterTextureIds"])) {
             $selectedTextures = $_GET["characterTextureIds"];
         } else {
             $selectedTextures = [];
+            $isCharacterTexturesValid = false;
         }
 
         $userData = getUserData($uuid);
         if ($userData === null) {
-            http_response_code(403);
-
-            echo json_encode(apiErrorMessage("NO_USERDATA",
-                "No user data", "No user data received."));
-            die("Could not fetch userdata");
+            $status = "error";
+            error_log("Could not fetch userdata for user ". $uuid);
         }
 
         $tags = array();
@@ -34,20 +37,17 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
         }
 
         // basic user data
-        $result['userUuid'] = $uuid;
-        $result['email']= $userData["email"];
-        $result['tags'] = $tags;
-        //$result['username'] = null; // not used by us
+        $result["userUuid"] = $uuid;
+        $result["email"]= $userData["email"];
+        $result["tags"] = $tags;
+        //$result["username"] = null; // not used by us
 
         $textures =  getTextures();
         $textureArray = array();
         
         if ($textures === null) {
-            http_response_code(403);
-
-            echo json_encode(apiErrorMessage("NO_TEXTURES",
-                "No texture data", "No texture data received."));
-            die("Could not fetch texture data");
+            $status = "error";
+            error_log("No texture data stored");
         }
 
         foreach ($textures as $texture) {
@@ -57,7 +57,8 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
                     $textureTags = $texture["tags"];
                     if ((count($textureTags) !== 0) &&
                         (count(array_intersect($tags, $textureTags)) === 0)) {
-                        continue;
+                            $isCharacterTexturesValid = false;
+                            continue;
                     }
                 }
                 array_push($textureArray, array(
@@ -74,10 +75,14 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
         if (isset($_GET["companionTextureId"])) {
             $selectedCompanion = $_GET["companionTextureId"]; // = id in companions
             $companion = getCompanion($selectedCompanion);
-            $result["companionTexture"] = array(
-                "id" => $companion["id"],
-                "url" => $companion["url"]
-            );
+            if ($companion === null) {
+                $isCompanionTextureValid = false;
+            } else {
+                $result["companionTexture"] = array(
+                    "id" => $companion["id"],
+                    "url" => $companion["url"]
+                );
+            }
         } else {
             $result["companionTexture"] = null;
         }
@@ -86,7 +91,7 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
             $visitCardUrl = "https://".$userData["visitCardURL"];
         }
 
-        $result['visitCardUrl'] = $visitCardUrl;
+        $result["visitCardUrl"] = $visitCardUrl;
 
         // fetch messages
         $messages = array();
@@ -101,7 +106,7 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
                 array_push($messages, $currentMessage);
             }
         }
-        $result['messages'] = $messages;
+        $result["messages"] = $messages;
         removeMessages($uuid);
 
         // decide whether anonymous login is allowed
@@ -116,8 +121,8 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
             die("Could not fetch map data");
         }
 
-        $result['anonymous'] = $map["policyNumber"] === 1;
-        $result['canEdit'] = false;
+        $result["anonymous"] = $map["policyNumber"] === 1;
+        $result["canEdit"] = false;
         $result["activatedInviteUser"] = false;
         $result["applications"] = null; // not used by us
 
@@ -132,17 +137,20 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
         // send empty arrays -> no rooms, this variable is not nullable even if stated otherwise in documentation
         $result["mucRooms"] = array();
 
+        // textures and companion
+        $result["isCharacterTexturesValid"] = $isCharacterTexturesValid;
+        $result["isCompanionTextureValid"] = $isCompanionTextureValid;
+        $result["status"] = $status;
+
         // Generate user room token
         if (getenv("ENABLE_SUAS_EXTENSIONS") === "true") {
             $sidecarURL = "http://".getenv("SIDECAR_URL")."/issuance?uuid=" . $uuid;
             $sidecarResult = file_get_contents($sidecarURL);
             if ($sidecarResult === false) {
-                http_response_code(403);
-
-                echo json_encode(apiErrorMessage("NO_TOKEN",
-                    "No auth token", "No auth token received."));
+                $result["status"] = "error";
+                error_log("No auth token received.");
             } else {
-                $result['userRoomToken'] = ((array) json_decode($sidecarResult, true))["token"]; // WA.player.userRoomToken
+                $result["userRoomToken"] = ((array) json_decode($sidecarResult, true))["token"]; // WA.player.userRoomToken
                 echo json_encode($result);
             }
         } else {
@@ -150,16 +158,11 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
         }
     } else {
         http_response_code(403);
-
-        echo json_encode(apiErrorMessage("INVALID_USER",
-            "Invalid user", "The specified user does not exist."));
+        error_log("Invalid user specified");
     }
 } else {
     http_response_code(403);
-
-    echo json_encode(apiErrorMessage("INSUFFICIENT_USER_INFORMATION",
-        "Insufficient user information",
-        "You did not specify enough information about the user."));
+    error_log("Invalid user specified");
 }
 $DB = NULL;
 ?>
