@@ -29,7 +29,6 @@ if (isset($_GET["roomUrl"])) {
             array_push($result, $currentMap);
         }
     }
-    error_log(json_encode($result));
     echo json_encode($result);
 } else {
     // return error if no room was set

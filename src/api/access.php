@@ -12,7 +12,6 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
     $uuid = getUuid($userIdentifier);
 
     /* validation fields */
-    $status = "ok";
     $isCharacterTexturesValid = true;
     $isCompanionTextureValid = true;
 
@@ -27,8 +26,8 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
 
         $userData = getUserData($uuid);
         if ($userData === null) {
-            $status = "error";
             error_log("Could not fetch userdata for user ". $uuid);
+            die();
         }
 
         $tags = array();
@@ -46,8 +45,8 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
         $textureArray = array();
         
         if ($textures === null) {
-            $status = "error";
             error_log("No texture data stored");
+            die();
         }
 
         foreach ($textures as $texture) {
@@ -140,7 +139,7 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
         // textures and companion
         $result["isCharacterTexturesValid"] = $isCharacterTexturesValid;
         $result["isCompanionTextureValid"] = $isCompanionTextureValid;
-        $result["status"] = $status;
+        $result["status"] = "ok";
 
         // Generate user room token
         if (getenv("ENABLE_SUAS_EXTENSIONS") === "true") {

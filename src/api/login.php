@@ -45,6 +45,14 @@ if (isset($_GET["token"])) {
         $map = getMap(getenv('START_ROOM_URL'));
     }
 
+    if ($map == null) {
+        http_response_code(403);
+
+        echo json_encode(apiErrorMessage("NO_MAPDATA",
+            "No map data", "No map data received."));
+        die("Could not fetch map data.");
+    }
+
     // send data
     echo json_encode(array(
         "userUuid" => $uuid,

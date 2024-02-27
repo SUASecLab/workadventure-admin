@@ -302,8 +302,12 @@ function getMapFileUrl(string|bool $wamUrl): string|null {
  * @return array{"_id": mixed, "wamUrl": string,
  *  "mapUrl": string, "policyNumber": int, "tags"?: string[]}
  */
-function getMap(string $wamUrl): array|null {
+function getMap(string|bool $wamUrl): array|null {
     GLOBAL $DB;
+    if (gettype($wamUrl) === "boolean") {
+        error_log("START_ROOM_URL env var is not set");
+        return null;
+    }
     try {
     	if (str_starts_with($wamUrl, "/register/")) {
     	    $uuid = substr($wamUrl, strlen("/register/"));
