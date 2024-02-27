@@ -141,6 +141,26 @@ if (isset($_GET["playUri"])) {
         // errorSceneLogo
         //$result["errorSceneLogo"] = null; // not used by us
 
+        // SUASecLab customizations
+        if (getenv("ENABLE_SUAS_EXTENSIONS") === "true") {
+            // contact page
+            $result["contactPage"] = "https://itsec.hs-sm.de/";
+            //loadingCowebsiteLogo -> cowebsite loading page logo
+            $result["loadingCowebsiteLogo"] = "/maps/logos/logo_mini.png";
+            //loadingLogo -> logo used on loading page
+            $result["loadingLogo"] = "/maps/logos/logo_lab.png";
+            //miniLogo -> miniLogo (?)
+            $result["loginSceneLogo"] = "/maps/logos/logo_mini.png";
+            //loginSceneLogo -> logo shown on login scene
+            $result["loginSceneLogo"] = "/maps/logos/logo_lab.png";
+            // show powered by workadventure
+            $result["showPoweredBy"] = true;
+            // backgroundColor -> set new background color (html code)
+            $result["backgroundColor"] = "#012d5c";
+            //errorSceneLogo -> error Logo
+            $result["errorSceneLogo"] = "/maps/logos/logo_error.png";
+        }
+
         echo json_encode($result);
     }
 } else {
