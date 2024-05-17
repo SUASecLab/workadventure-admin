@@ -22,7 +22,7 @@ if (isset($_GET["roomUrl"])) {
         foreach ($allMaps as $nextMap) {
             $map = (array) $nextMap;
             $currentMap = array(
-                "name" => "https://" . getenv("DOMAIN") . $map["wamUrl"],
+                "name" => $map["name"],
                 "url" => "https://" . getenv("DOMAIN") . $map["wamUrl"],
                 "roomUrl" => "https://" . getenv("DOMAIN") . $map["wamUrl"],
             );
