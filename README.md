@@ -20,9 +20,9 @@ Setup with Docker
 -------------------------
 
 In order to run the administration services, four Docker containers have to be created:
-1. A database service (mongodb) for storing user data persistently.
+1. A database service (mongodb) to store user data persistently.
 2. A PHP container for running the PHP code
-3. A  composer container for downloading the PHP and web UI dependencies.
+3. A  composer container to downloading the PHP and web UI dependencies.
 4. An HTTP server for hosting the files for the API and the web UI.
 
 We use docker-compose for this.  See the `docker-compose.template.yaml` file  for a base compose configuration you can use for your setup. In the `.env.example` file you can find the additional environment variables which have to be declared for running the admin services. Afterwards, add the containers which are being exposed as dependencies to your Traefik container.
@@ -32,10 +32,9 @@ Usage
 
 First of all, the containers have to be set up. Then, start them and navigate to the URL under which the code is hosted (`https://YOUR-DOMAIN/admin/` if you did not alter the labels). If you log in the first time to the  web UI, a user account is created with the provided credentials. Currently it is not possible to create multiple user accounts.
 Within the web UI, you can set up maps, users and textures.
-For extracting Woka texture information from `pusher/data/woka.json` you can use the `extract_woka_data.py` script and run the generated mongo commands in the mongo shell of the  database container.
 
 License
 -----------
 This software is distributed under same license as WorkAdventure ([see here](https://workadventu.re/faq/license "see here")).
 
-Currently, the targeted version of WorkAdventure is 1.11. The contents of this repository are used in production with WorkAdventure 1.11.4.
+Currently, the targeted version of WorkAdventure is 1.19. The contents of this repository are used in production with WorkAdventure 1.19.7.

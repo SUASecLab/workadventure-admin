@@ -1,32 +1,32 @@
-version: "3"
-services:
   admin-db:
-    image: mongo:5.0
+    image: mongo:7
     restart: ${RESTART_POLICY}
     environment:
-      - MONGO_INITDB_ROOT_USERNAME
-      - MONGO_INITDB_ROOT_PASSWORD
-      - MONGO_INITDB_DATABASE
+      MONGO_INITDB_ROOT_USERNAME: "$ADMIN_DB_ROOT"
+      MONGO_INITDB_ROOT_PASSWORD: "$ADMIN_DB_ROOT_PASSWORD"
+      MONGO_INITDB_DATABASE: "workadventure"
     volumes:
-      - ./data:/data/db
-      - ./containers/mongo:/docker-entrypoint-initdb.d:ro
-
+      - ./data/admin:/data/db
+      - ./data/database:/docker-entrypoint-initdb.d:ro
+ 
   admin_php:
-    build: ./containers/php
+    build: ../php
     restart: ${RESTART_POLICY}
     environment:
-      - ADMIN_API_TOKEN
-      - ADMIN_API_SALT
-      - DB_USER
-      - DB_PASSWORD
-      - DB_NAME
-      - DOMAIN
-      - START_ROOM_URL
-      - SIDECAR_URL
-      - ENABLE_SUAS_EXTENSIONS
+      ADMIN_API_TOKEN : "$ADMIN_API_TOKEN"
+      ADMIN_API_SALT : "$ADMIN_API_SALT"
+      DB_USER: "$ADMIN_DB_USER"
+      DB_PASSWORD: "$ADMIN_DB_PASSWORD"
+      DB_NAME: "workadventure"
+      DOMAIN: "$DOMAIN"
+      START_ROOM_URL: "$START_ROOM_URL"
+      SIDECAR_URL: "$SIDECAR_URL"
     volumes:
       - ./src:/var/www/html:ro
       - ./vendor:/var/www/vendor:ro
+    depends_on:
+      - admin-db
+      - sidecar
 
   composer:
     image: composer/composer
@@ -35,10 +35,10 @@ services:
       - ./:/app
 
   admin:
-    image: nginx
+    build: ../nginx
     restart: ${RESTART_POLICY}
     environment:
-      - DOMAIN
+      DOMAIN: "$DOMAIN"
     depends_on:
       - admin_php
     volumes:
@@ -46,14 +46,14 @@ services:
       - ./vendor:/var/www/vendor:ro
       - ./containers/nginx:/etc/nginx/templates
     labels:
-      - "traefik.http.middlewares.strip-admin-prefix.stripprefix.prefixes=/admin"
-      - "traefik.http.routers.admin.rule=(Host(`${DOMAIN}`) && PathPrefix(`/admin`))"
-      - "traefik.http.routers.admin.middlewares=strip-admin-prefix@docker"
-      - "traefik.http.routers.admin.entryPoints=web"
-      - "traefik.http.services.admin.loadbalancer.server.port=80"
-      - "traefik.http.routers.admin-ssl.rule=(Host(`${DOMAIN}`) && PathPrefix(`/admin`))"
-      - "traefik.http.routers.admin-ssl.middlewares=strip-admin-prefix@docker"
-      - "traefik.http.routers.admin-ssl.entryPoints=websecure"
-      - "traefik.http.routers.admin-ssl.tls=true"
-      - "traefik.http.routers.admin-ssl.service=admin"
-      - "traefik.enable=true"
+      traefik.http.middlewares.strip-admin-prefix.stripprefix.prefixes: "/admin"
+      traefik.http.routers.admin.rule: "(Host(`${DOMAIN}`) && PathPrefix(`/admin`))"
+      traefik.http.routers.admin.middlewares: "strip-admin-prefix@docker"
+      traefik.http.routers.admin.entryPoints: "web"
+      traefik.http.services.admin.loadbalancer.server.port: "80"
+      traefik.http.routers.admin-ssl.rule: "(Host(`${DOMAIN}`) && PathPrefix(`/admin`))"
+      traefik.http.routers.admin-ssl.middlewares: "strip-admin-prefix@docker"
+      traefik.http.routers.admin-ssl.entryPoints: "websecure"
+      traefik.http.routers.admin-ssl.tls: "true"
+      traefik.http.routers.admin-ssl.service: "admin"
+      traefik.enable: "true"
