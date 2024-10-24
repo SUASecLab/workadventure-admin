@@ -300,7 +300,7 @@ function getMapFileUrl(string|bool $wamUrl): string|null {
  * Get data for a specific map
  * @param string $wamUrl URL of the Map (for WA)
  * @return array{"_id": mixed, "wamUrl": string,
- *  "mapUrl": string, "policyNumber": int, "tags"?: string[]}
+ *  "mapUrl": string, "policyNumber": int, "name": string, "tags"?: string[]}
  */
 function getMap(string|bool $wamUrl): array|null {
     GLOBAL $DB;
@@ -353,7 +353,7 @@ function storeMap(string $wamUrl, string $mapUrl, int $policyNumber, array $tags
 /**
  * Get array of all maps
  * @return array{array{"_id": mixed, "wamUrl": string,
- *  "mapUrl": string, "policyNumber": int, "tags"?: string[]}}
+ *  "mapUrl": string, "policyNumber": int, "name": string, "tags"?: string[]}}
  */
 function getAllMaps(): array|null {
     GLOBAL $DB;

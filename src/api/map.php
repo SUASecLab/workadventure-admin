@@ -51,20 +51,8 @@ if (isset($_GET["playUri"])) {
         // group
         $result["group"] = null; // TODO: set to org/world
 
-        // mucRooms
-
-        //$result["mucRooms"] = array(array(
-        //    "name" => $resultMap["mapUrl"],
-        //    "url" => "https://".$map["mapUrl"],
-        //    "type" => "live"
-        //));
-        $result["mucRooms"] = null;
-
         // contactPage
         //$result["contactPage"] = null; // not used by us
-
-        // iframeAuthentication
-        //$result["iframeAuthentication"] = null; // not used by us
 
         // opidLogoutRedirectUrl
         //$result["opidLogoutRedirectUrl"] = null; // not used by us
