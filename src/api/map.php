@@ -8,6 +8,14 @@ authorizeOrDie();
 if (isset($_GET["playUri"])) {
     $playUri = htmlspecialchars($_GET["playUri"]);
     $shortUri = substr($playUri, strlen("https://" . getenv("DOMAIN")));
+
+
+    if (strcmp($playUri,"https://" . getenv("DOMAIN") . "/login") === 0) {
+       $shortUri = getenv('START_ROOM_URL');
+       error_log("LOGIN URL CALLED!");
+    }
+
+
     $resultMap = getMap($shortUri);
     $result = array();
     if ($resultMap === NULL) {
