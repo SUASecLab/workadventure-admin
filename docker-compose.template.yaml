@@ -1,5 +1,5 @@
   admin-db:
-    image: mongo:7
+    image: mongo:8
     restart: ${RESTART_POLICY}
     environment:
       MONGO_INITDB_ROOT_USERNAME: "$ADMIN_DB_ROOT"
