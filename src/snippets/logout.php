@@ -21,7 +21,7 @@ if (!isLoggedIn()) {
     isCSRFDataValidOrDie();
 
     // Delete cookie
-    setcookie("csrf_cookie", $_SESSION["csrf_token"] /* @phpstan-ignore argument.type */, ["samesite" => "Strict", "expires" => time() - 3600]);
+    setcookie("csrf_cookie", $_SESSION["csrf_token"] /* @phpstan-ignore argument.type */, ["samesite" => "Strict", "expires" => time() - 300]);
 
     // Delete session
     session_unset();

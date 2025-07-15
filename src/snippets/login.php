@@ -53,7 +53,7 @@ if ((isset($_POST["username"])) && (isset($_POST["password"])) && (isset($_POST[
     $validLogin = false;
 
     // Create Same-Site-Cookie
-    setcookie("csrf_cookie", $_SESSION["csrf_token"], ["samesite" => "Strict", "expires" => time() + 3600]);
+    setcookie("csrf_cookie", $_SESSION["csrf_token"], ["samesite" => "Strict", "expires" => time() + 300]);
 }
 if ($alreadyLoggedIn) { ?>
 <section class="alert alert-warning" role="alert">

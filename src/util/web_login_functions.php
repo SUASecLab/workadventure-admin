@@ -54,7 +54,7 @@ function login(string $user, string $password): bool {
     return false;
 }
 function isCSRFDataValidOrDie(): void {
-    if (!isset($_COOKIE["csrf_cookie"])) {#
+    if (!isset($_COOKIE["csrf_cookie"])) {
         session_unset();
         session_destroy();
         die("Your session expired");
@@ -62,5 +62,8 @@ function isCSRFDataValidOrDie(): void {
     if ((!isset($_SESSION["csrf_token"])) || ($_SESSION["csrf_token"] !== $_COOKIE["csrf_cookie"])) {
         die("Invalid request");
     }
+
+    // Valid cookie: prolong time
+    setcookie("csrf_cookie", $_COOKIE["csrf_cookie"] /* @phpstan-ignore argument.type */ , ["samesite" => "Strict", "expires" => time() + 300]);
 }
 ?>
