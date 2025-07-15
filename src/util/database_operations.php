@@ -222,6 +222,10 @@ function getStartMap(string $uuid): string|false {
 function updateStartMap(string $uuid, string $map): bool {
     GLOBAL $DB;
 
+    if (getMap($map) == NULL) {
+        return false;
+    }
+
     $result = $DB->users->updateOne(
         [ 'uuid' => $uuid ],
         [ '$set' => [ 'startMap' => $map] ]
