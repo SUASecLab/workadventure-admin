@@ -332,15 +332,17 @@ function getMap(string|bool $wamUrl): array|null {
 /**
  * @param string $wamUrl URL of the map (WorkAdventure map)
  * @param string $mapUrl URL where the json file of the map is stored
+ * @param string $mapName Human readible name of the map
  * @param int $policyNumber Policy number for access restrictions
  * @param string[] $tags Tags array for access restrictions
  */
-function storeMap(string $wamUrl, string $mapUrl, int $policyNumber, array $tags): bool {
+function storeMap(string $wamUrl, string $mapUrl, string $mapName, int $policyNumber, array $tags): bool {
     GLOBAL $DB;
 
     $result = $DB->maps->insertOne([
         "wamUrl" => $wamUrl,
         "mapUrl" => $mapUrl,
+        "name" => $mapName,
         "policyNumber" => $policyNumber,
         "tags" => $tags
     ]);

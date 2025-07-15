@@ -48,7 +48,7 @@ if ((isset($_POST["action"])) && ($action === "removeMap") && (isset($_POST["map
     }
 }
 // map should be added
-if ((isset($_POST["action"])) && ($action === "addMap") && (isset($_POST["mapUrl"])) && (isset($_POST["fileUrl"])) && (isset($_POST["access"])) && (isset($_POST["csrf_token"]))) {
+if ((isset($_POST["action"])) && ($action === "addMap") && (isset($_POST["mapUrl"])) && (isset($_POST["fileUrl"])) && (isset($_POST["mapName"])) && (isset($_POST["access"])) && (isset($_POST["csrf_token"]))) {
     // Check CSRF token
     if ($_SESSION["csrf_token"] !== $_POST["csrf_token"]) {
       die("Invalid data received");
@@ -57,6 +57,7 @@ if ((isset($_POST["action"])) && ($action === "addMap") && (isset($_POST["mapUrl
     $validInput = true;
     $mapUrl = htmlspecialchars($_POST["mapUrl"]);
     $mapFileUrl = htmlspecialchars($_POST["fileUrl"]);
+    $mapName = htmlspecialchars($_POST["mapName"]);
     $accessRestriction = intval(htmlspecialchars($_POST["access"]));
     $tagsArray = array();
     // validate input
@@ -94,7 +95,7 @@ if ((isset($_POST["action"])) && ($action === "addMap") && (isset($_POST["mapUrl
     }
     // add map
     if ($validInput) {
-        $success = storeMap("/".$mapUrl, $mapFileUrl, $accessRestriction, $tagsArray);
+        $success = storeMap("/".$mapUrl, $mapFileUrl, $mapName, $accessRestriction, $tagsArray);
         // check whether adding the map worked
         if ($success) { ?>
                 <aside class="alert alert-success" role="alert">
@@ -138,7 +139,9 @@ if ($maps === NULL) { ?>
 <?php
     die();
 }
+$iterator = 0;
 foreach ($maps as $map) {
+    $iterator++;
     $myMap = (array) $map;
     if ($firstIteration) {
         $firstIteration = false;
@@ -146,8 +149,8 @@ foreach ($maps as $map) {
                 <thead>
                     <tr>
                         <th>WAM link URL</th>
-                        <th>JSON file URL</th>
                         <th>Access Restriction</th>
+                        <th>Details</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -159,11 +162,6 @@ foreach ($maps as $map) {
                     <td>
                         <p class="fw-normal">
                             <?php echo $myMap["wamUrl"]; ?>
-                        </p>
-                    </td>
-                    <td>
-                        <p class="fw-normal">
-                            <?php echo $myMap["mapUrl"]; ?>
                         </p>
                     </td>
                     <td>
@@ -199,6 +197,35 @@ foreach ($maps as $map) {
                     <?php
     }
 ?>
+                    <td>
+                        <p class="fw-normal">
+                            <button type="button" class="tag btn btn-primary" data-bs-toggle="modal" data-bs-target="#<?php echo $iterator; ?>">
+                                Show details
+                            </button>
+                            
+                            <div class="modal fade" id="<?php echo $iterator; ?>" tabindex="1" aria-labelledby="<?php echo $iterator; ?>-label" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="<?php echo $iterator; ?>-label">Map details</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <h5>WAM link URL:</h5>
+                                        <p><?php echo $myMap["wamUrl"]; ?></p>
+                                        <h5>JSON file URL:</h5>
+                                        <p><?php echo $myMap["mapUrl"]; ?></p>
+                                        <h5>Human readable name:</h5>
+                                        <p><?php echo $myMap["name"]; ?></p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </p>
+                    </td>
                     </td>
                     <td>
                         <button class="tag btn btn-danger" onclick="removeMap('<?php echo $myMap['wamUrl']; ?>', '<?php echo $_SESSION['csrf_token']; /* @phpstan-ignore echo.nonString */ ?>');">
@@ -226,9 +253,9 @@ foreach ($maps as $map) {
             <div class="input-group mb-3">
                 <span class="input-group-text" id="map_url_prefix"><?php echo $baseUrl; ?></span>
                 <?php
-$startRoom = explode("/", $startRoom) [4];
+$startRoom = explode("/", $startRoom, 2) [1];
 if (getMapFileUrl(getenv('START_ROOM_URL')) !== NULL) { ?>
-                    <input type="text" class="form-control" id="mapURL" aria-describedby="map_url_prefix" name="map_url">
+                    <input type="text" class="form-control" id="mapURL" aria-describedby="map_url_prefix" name="map_url" required>
                 <?php
 } else { ?>
                     <input type="text" class="form-control" id="mapURL" aria-describedby="map_url_prefix" name="map_url" value="<?php echo $startRoom; ?>" readonly>
@@ -238,7 +265,11 @@ if (getMapFileUrl(getenv('START_ROOM_URL')) !== NULL) { ?>
             <label for="mapURLFile" class="form-label">JSON file URL</label>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="map_url_file_prefix">https://</span>
-                <input type="text" class="form-control" id="mapURLFile" aria-describedby="map_url_file_prefix" name="map_file_url">
+                <input type="text" class="form-control" id="mapURLFile" aria-describedby="map_url_file_prefix" name="map_file_url" required>
+            </div>
+            <label for="mapName" class="form-label">Human readable map name</label>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" id="mapName" name="map_name" required>
             </div>
             <p class="fs-6">Access restriction</p>
             <div class="form-check">

@@ -31,6 +31,7 @@ function removeMap(mapUrl, csrf_token) {
 function addMap() {
     const mapUrl = document.getElementById("mapURL").value;
     const mapFileUrl = document.getElementById("mapURLFile").value;
+    const mapName = document.getElementById("mapName").value;
     const accessRestrictionRadios = document.getElementsByName("radio");
     const csrf_token = document.getElementById("csrf_token").value;
     var accessRestriction = -1;
@@ -45,6 +46,7 @@ function addMap() {
         "action": "addMap",
         "mapUrl": mapUrl,
         "fileUrl": mapFileUrl,
+        "mapName": mapName,
         "access": accessRestriction,
         "csrf_token": csrf_token
     };
