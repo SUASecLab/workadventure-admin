@@ -76,7 +76,7 @@ if (isLoggedIn()) {
 
     <?php
 if (($target !== "login") && (!isLoggedIn())) {
-    showLogin();
+    showLogin($target !== "edit_user");
     die();
 }
 $DB = NULL;

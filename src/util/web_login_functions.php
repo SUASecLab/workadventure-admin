@@ -23,11 +23,15 @@ function isLoggedIn(): bool {
 
     return websiteUserExists($user, $password);
 }
-function showLogin(): void {
+function showLogin(bool $webroot=true): void {
     echo "<aside class=\"container alert alert-danger\" role=\"alert\">";
     echo "You are not logged in. Please log in to continue.";
     echo "</aside>";
-    echo "<a href=\"login\" class=\"element btn btn-primary\">Log in</a>";
+    if ($webroot == true) {
+        echo "<a href=\"login\" class=\"element btn btn-primary\">Log in</a>";
+    } else {
+        echo "<a href=\"../login\" class=\"element btn btn-primary\">Log in</a>";
+    }
     echo "</body></html>";
 }
 function getHash(string $data): string {
