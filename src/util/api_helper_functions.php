@@ -11,7 +11,11 @@ function getUuid(string $userIdentifier): string {
 }
 
 // checks if user is allowed to access map
-function userCanAccessMap(string|null $userUuid, string $shortMapUri): bool {
+function userCanAccessMap(string|null $userUuid, string|bool $shortMapUri): bool {
+    if (gettype($shortMapUri) === "boolean") {
+        return false;
+    }
+
     $map = getMap($shortMapUri);
 
     if ($map === null) {

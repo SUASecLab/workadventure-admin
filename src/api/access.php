@@ -8,7 +8,14 @@ $DB = getDatabaseHandleOrDie();
 authorizeOrDie();
 if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GET["ipAddress"]))) {
     //  contents of ipAdress are ignored here
-    $userIdentifier = htmlspecialchars($_GET["userIdentifier"]);
+
+    // ensure the identifier is a string
+    $userIdentifier = $_GET["userIdentifier"];
+    if (gettype($userIdentifier) !== "string") {
+        die("Invalid data provided");
+    }
+    
+    $userIdentifier = htmlspecialchars($userIdentifier);
     $uuid = getUuid($userIdentifier);
 
     /* validation fields */

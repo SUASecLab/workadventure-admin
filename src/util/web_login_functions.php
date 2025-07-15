@@ -7,7 +7,13 @@ function isLoggedIn(): bool {
     if (!isset($_SESSION["user"])) {
         return false;
     }
-    $user = htmlspecialchars($_SESSION["user"]);
+
+    // Get user name
+    $user = $_SESSION["user"];
+    if (gettype($user) !== "string") {
+        return false;
+    }
+    $user = htmlspecialchars($user);
     if (!isset($_SESSION["password"])) {
         return false;
     }

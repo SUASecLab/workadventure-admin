@@ -5,12 +5,16 @@ if (!isset($_GET["target"])) {
 }
 /*
 targets:
-- edit_user=edit a user; reuires 'uuid' as post parameter
+- edit_user=edit a user; requires 'uuid' as post parameter
 - login=log in; don't die if no user is logged in
 - rooms = view and manage maps
 - index = show the index
 */
-$target = htmlspecialchars($_GET["target"]);
+$target = $_GET["target"];
+if (gettype($target) !== "string") {
+    die("Invalid data provided");
+}
+$target = htmlspecialchars($target);
 ?>
 <!doctype html>
 <html lang="en">

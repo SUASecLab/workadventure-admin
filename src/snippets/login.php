@@ -19,8 +19,24 @@ $triedToLogin = false;
 $validLogin = false;
 $alreadyLoggedIn = isLoggedIn();
 if ((isset($_POST["username"])) && (isset($_POST["password"]))) {
-    $username = htmlspecialchars($_POST["username"]);
-    $password = htmlspecialchars($_POST["password"]);
+    // Get parameters
+    $username = $_POST["username"];
+    $password = $_POST["password"];
+    
+    // Check parameter types
+    if (gettype($username) !== "string") {
+      $validLogin = false;
+      die("Invalid data provided");
+    }
+    if (gettype($password) !== "string") {
+      $validLogin = false;
+      die("Invalid data provided");
+    }
+
+    // Escape
+    $username = htmlspecialchars($username);
+    $password = htmlspecialchars($password);
+
     $validLogin = login($username, $password);
     $triedToLogin = true;
 } else {
@@ -33,9 +49,15 @@ if ($alreadyLoggedIn) { ?>
 <?php
 showGoToAdmin();
 } else if ($validLogin) {
+  // Obtain username securely
+  $username = $_POST["username"];
+  if (gettype($username) !== "string") {
+    die("Invalid data provided");
+  }
+  $username = htmlspecialchars($username);
 ?>
   <section class="alert alert-success" role="alert">
-    Welcome back, <?php echo htmlspecialchars($_POST["username"]); ?>
+    Welcome back, <?php echo $username; ?>
   </section>
   <?php
   showGoToAdmin();

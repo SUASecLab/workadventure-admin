@@ -13,9 +13,20 @@ if (!isLoggedIn()) {
     $DB = NULL;
     die();
 }
+
+// Get action
+$action = "";
+if (isset($_POST["action"])) {
+    $action = $_POST["action"];
+
+    if (gettype($action) !== "string") {
+        die("Invalid data provided");
+    }
+    $action = htmlspecialchars($action);
+}
 // we use the old naming scheme: mapUrl -> .wam; mapFileUrl: -> .json files
 // map should be removed
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "removeMap") && (isset($_POST["mapUrl"]))) {
+if ((isset($_POST["action"])) && ($action === "removeMap") && (isset($_POST["mapUrl"]))) {
     $mapToRemove = htmlspecialchars($_POST["mapUrl"]);
     if (removeMap($mapToRemove)) { ?>
             <aside class="alert alert-success" role="alert">
@@ -30,7 +41,7 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "remove
     }
 }
 // map should be added
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "addMap") && (isset($_POST["mapUrl"])) && (isset($_POST["fileUrl"])) && (isset($_POST["access"]))) {
+if ((isset($_POST["action"])) && ($action === "addMap") && (isset($_POST["mapUrl"])) && (isset($_POST["fileUrl"])) && (isset($_POST["access"]))) {
     $validInput = true;
     $mapUrl = htmlspecialchars($_POST["mapUrl"]);
     $mapFileUrl = htmlspecialchars($_POST["fileUrl"]);

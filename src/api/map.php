@@ -6,15 +6,18 @@ require_once ("../util/api_helper_functions.php");
 $DB = getDatabaseHandleOrDie();
 authorizeOrDie();
 if (isset($_GET["playUri"])) {
-    $playUri = htmlspecialchars($_GET["playUri"]);
+    // Get play URI and check type
+    $playUri = $_GET["playUri"];
+    if (gettype($playUri) !== "string") {
+        die("Invalid data provided");
+    }
+    $playUri = htmlspecialchars($playUri);
     $shortUri = substr($playUri, strlen("https://" . getenv("DOMAIN")));
-
 
     if (strcmp($playUri,"https://" . getenv("DOMAIN") . "/login") === 0) {
        $shortUri = getenv('START_ROOM_URL');
        error_log("LOGIN URL CALLED!");
     }
-
 
     $resultMap = getMap($shortUri);
     $result = array();

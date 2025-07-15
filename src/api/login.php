@@ -15,8 +15,13 @@ authorizeOrDie();
 
 //token = organizationMemberToken = user UUID
 if (isset($_GET["token"])) {
-    // get user UUID
-    $uuid = htmlspecialchars($_GET["token"]);
+    // get user UUID (also check type)
+    $uuid = $_GET["token"];    
+    if (gettype($uuid) !== "string") {
+        die("Invalid data type provided");
+    }
+
+    $uuid = htmlspecialchars($uuid);
     $uuid = getUuid($uuid);
 
     // check if user exists

@@ -24,7 +24,13 @@ if (!isset($_POST["uuid"])) {
     <?php
     die();
 }
-$uuid = htmlspecialchars($_POST["uuid"]);
+
+// Obtain uuid in a more secure way
+$uuid = $_POST["uuid"];
+if (gettype($uuid) !== "string") {
+  die("Invalid data provided");
+}
+$uuid = htmlspecialchars($uuid);
 
 if(!isValidUuid($uuid)) {
 ?>
