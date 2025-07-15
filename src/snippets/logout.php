@@ -17,6 +17,13 @@ if (!isLoggedIn()) {
     </main>
   <?php
 } else {
+    // Check CSRF data
+    isCSRFDataValidOrDie();
+
+    // Delete cookie
+    setcookie("csrf_cookie", $_SESSION["csrf_token"] /* @phpstan-ignore argument.type */, ["samesite" => "Strict", "expires" => time() - 3600]);
+
+    // Delete session
     session_unset();
     session_destroy();
 ?>

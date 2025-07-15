@@ -20,10 +20,11 @@ function setupMaps() {
     newMapsTags = [];
 }
 
-function removeMap(mapUrl) {
+function removeMap(mapUrl, csrf_token) {
     $("#rooms").load("snippets/rooms.php", {
         "action": "removeMap",
-        "mapUrl": mapUrl
+        "mapUrl": mapUrl,
+        "csrf_token": csrf_token
     }, setupMaps);
 }
 
@@ -31,6 +32,7 @@ function addMap() {
     const mapUrl = document.getElementById("mapURL").value;
     const mapFileUrl = document.getElementById("mapURLFile").value;
     const accessRestrictionRadios = document.getElementsByName("radio");
+    const csrf_token = document.getElementById("csrf_token").value;
     var accessRestriction = -1;
 
     for (var i = 0; i < accessRestrictionRadios.length; i++) {
@@ -43,7 +45,8 @@ function addMap() {
         "action": "addMap",
         "mapUrl": mapUrl,
         "fileUrl": mapFileUrl,
-        "access": accessRestriction
+        "access": accessRestriction,
+        "csrf_token": csrf_token
     };
 
     if (accessRestriction === 3) {

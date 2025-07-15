@@ -15,6 +15,9 @@ if (!isLoggedIn()) {
     $DB = NULL;
     die();
 }
+// Check CSRF data
+isCSRFDataValidOrDie();
+
 // Get user's uuid
 if (!isset($_POST["uuid"])) {
 ?>
@@ -43,7 +46,12 @@ if(!isValidUuid($uuid)) {
 
 createAccountIfNotExistent($uuid);
 // Get new tag
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "addTag") && (isset($_POST["tag"]))) {
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "addTag") && (isset($_POST["tag"])) && (isset($_POST["csrf_token"]))) {
+    // Check CSRF token
+    if ($_SESSION["csrf_token"] !== $_POST["csrf_token"]) {
+      die("Invalid data received");
+    }
+
     $tag = htmlspecialchars($_POST["tag"]);
     if (strlen(trim($tag)) > 0) {
         $addTagResult = addTag($uuid, $tag);
@@ -68,7 +76,12 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "addTag
     }
 }
 // Get tag to remove
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "removeTag") && (isset($_POST["tag"]))) {
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "removeTag") && (isset($_POST["tag"])) && (isset($_POST["csrf_token"]))) {
+    // Check CSRF token
+    if ($_SESSION["csrf_token"] !== $_POST["csrf_token"]) {
+      die("Invalid data received");
+    }
+
     $tag = htmlspecialchars($_POST["tag"]);
     if (strlen(trim($tag)) > 0) {
         $remTagResult = removeTag($uuid, $tag);
@@ -93,7 +106,11 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "remove
     }
 }
 // Ban user if requested
-if (isset($_POST["action"]) && (htmlspecialchars($_POST["action"]) === "ban") && (isset($_POST["reason"]))) {
+if (isset($_POST["action"]) && (isset($_POST["csrf_token"])) && (htmlspecialchars($_POST["action"]) === "ban") && (isset($_POST["reason"]))) {
+    // Check CSRF token
+    if ($_SESSION["csrf_token"] !== $_POST["csrf_token"]) {
+      die("Invalid data received");
+    }
     $reason = htmlspecialchars($_POST["reason"]);
     if (strlen(trim($reason)) > 0) {
       if (banUser($uuid, htmlspecialchars($_POST["reason"]))) {
@@ -118,7 +135,11 @@ if (isset($_POST["action"]) && (htmlspecialchars($_POST["action"]) === "ban") &&
     }
 }
 //unban user if requested
-if (isset($_POST["action"]) && (htmlspecialchars($_POST["action"]) === "unban")) {
+if (isset($_POST["action"]) && (isset($_POST["csrf_token"])) && (htmlspecialchars($_POST["action"]) === "unban")) {
+    // Check CSRF token
+    if ($_SESSION["csrf_token"] !== $_POST["csrf_token"]) {
+      die("Invalid data received");
+    }
     if (liftBan($uuid)) {
 ?>
       <aside class="alert alert-success" role="alert">
@@ -134,7 +155,12 @@ if (isset($_POST["action"]) && (htmlspecialchars($_POST["action"]) === "unban"))
     }
 }
 // Update userdata if requested
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "updateUserData") && (isset($_POST["name"])) && (isset($_POST["email"]))) {
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "updateUserData") && (isset($_POST["name"])) && (isset($_POST["email"])) && (isset($_POST["csrf_token"]))) {
+    // Check CSRF token
+    if ($_SESSION["csrf_token"] !== $_POST["csrf_token"]) {
+      die("Invalid data received");
+    }
+
     $name = htmlspecialchars($_POST["name"]);
     $email = htmlspecialchars($_POST["email"]);
     if ((strlen(trim($name)) === 0) || (strlen(trim($email)) === 0)) {
@@ -162,7 +188,12 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "update
     }
 }
 // update start map if requested
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "updateStartMap") && (isset($_POST["startMap"]))) {
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "updateStartMap") && (isset($_POST["startMap"])) && (isset($_POST["csrf_token"]))) {
+  // Check CSRF token
+  if ($_SESSION["csrf_token"] !== $_POST["csrf_token"]) {
+    die("Invalid data received");
+  }
+
   $newStartMap = htmlspecialchars($_POST["startMap"]);
   $result = updateStartMap($uuid, $newStartMap);
   if ($result == true) { ?>
@@ -178,7 +209,13 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) == "updateS
   }
 }
 // remove message if requested
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "removeMessage") && (isset($_POST["message"]))) {
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "removeMessage") && (isset($_POST["message"])) && (isset($_POST["csrf_token"]))) {
+    // Check CSRF token
+    if ($_SESSION["csrf_token"] !== $_POST["csrf_token"]) {
+      die("Invalid data received");
+    }
+
+
     $message = htmlspecialchars($_POST["message"]);
     if (removeUserMessage($uuid, $message)) { ?>
       <aside class="alert alert-success" role="alert">
@@ -193,7 +230,12 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "remove
     }
 }
 // send message if requested
-if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "sendMessage") && (isset($_POST["message"]))) {
+if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "sendMessage") && (isset($_POST["message"])) && (isset($_POST["csrf_token"]))) {
+    // Check CSRF token
+    if ($_SESSION["csrf_token"] !== $_POST["csrf_token"]) {
+      die("Invalid data received");
+    }
+
     $message = htmlspecialchars($_POST["message"]);
     if (strlen(trim($message)) > 0) {
         if (storeUserMessage($uuid, $message)) { ?>
@@ -254,7 +296,7 @@ die();
           <input type="text" class="form-control" id="visitCardUrlLabel" aria-describedby="visitCardUrlPrefix" name="visitCardUrl"
             value="<?php echo (array_key_exists("visitCardURL", $userData)) ? $userData["visitCardURL"] : ""; ?>">
         </div>
-        <button class="btn btn-primary" onclick="updateUserData('<?php echo $uuid; ?>');">Update</button>
+        <button class="btn btn-primary" onclick="updateUserData('<?php echo $uuid; ?>', '<?php echo $_SESSION['csrf_token']; /* @phpstan-ignore echo.nonString */ ?>');">Update</button>
       </form>
       <section>
         <section class="mb-3">
@@ -270,7 +312,7 @@ if ((array_key_exists("tags", $userData)) && (count($userData["tags"]) > 0)){
             <?php
     $tags = $userData["tags"];
     foreach ($tags as $currentTag) { ?>
-              <button class="tag btn btn-primary" onclick="removeTag('<?php echo $uuid; ?>', '<?php echo $currentTag; ?>');">
+              <button class="tag btn btn-primary" onclick="removeTag('<?php echo $uuid; ?>', '<?php echo $currentTag; ?>', '<?php echo $_SESSION['csrf_token']; /* @phpstan-ignore echo.nonString */ ?>');">
                 <?php echo $currentTag; ?>
               </button>
           <?php
@@ -283,7 +325,7 @@ if ((array_key_exists("tags", $userData)) && (count($userData["tags"]) > 0)){
           <p>Add tag:</p>
           <form action="javascript:void(0)">
             <input class="form-control" type="text" id="newTag"><br>
-            <button class="btn btn-primary" onclick="addTag('<?php echo $uuid; ?>');">Add tag</button>
+            <button class="btn btn-primary" onclick="addTag('<?php echo $uuid; ?>', '<?php echo $_SESSION['csrf_token']; /* @phpstan-ignore echo.nonString */ ?>');">Add tag</button>
           </form>
           <br>
         </section>
@@ -310,7 +352,7 @@ if ((array_key_exists("tags", $userData)) && (count($userData["tags"]) > 0)){
                 </ul>
             </div>
             <button class="btn btn-primary" type="submit" style="margin-top: 1rem;" id="updateStartMapButton"
-              onclick="updateStartMap('<?php echo $uuid; ?>');">Update start map</button>
+              onclick="updateStartMap('<?php echo $uuid; ?>', '<?php echo $_SESSION['csrf_token']; /* @phpstan-ignore echo.nonString */ ?>');">Update start map</button>
         </section>
         <br>
         <section>
@@ -331,7 +373,7 @@ if ((array_key_exists("tags", $userData)) && (count($userData["tags"]) > 0)){
                       </p>
                     </td>
                     <td>
-                      <button class="tag btn btn-danger" onclick="removeMessage('<?php echo $uuid; ?>', '<?php echo $message; ?>');">
+                      <button class="tag btn btn-danger" onclick="removeMessage('<?php echo $uuid; ?>', '<?php echo $message; ?>', '<?php echo $_SESSION['csrf_token']; /* @phpstan-ignore echo.nonString */ ?>');">
                         Remove
                       </button>
                     </td>
@@ -349,7 +391,7 @@ if ((array_key_exists("tags", $userData)) && (count($userData["tags"]) > 0)){
               <label for="messageInput" class="form-label">Message:</label>
               <textarea class="form-control" id="messageInput" name="message" rows="3"></textarea>
             </div>
-            <button class="btn btn-primary" onclick="sendMessage('<?php echo $uuid; ?>');">
+            <button class="btn btn-primary" onclick="sendMessage('<?php echo $uuid; ?>', '<?php echo $_SESSION['csrf_token']; /* @phpstan-ignore echo.nonString */ ?>');">
               Send
             </button>
           </form>
@@ -363,7 +405,7 @@ if ((array_key_exists("tags", $userData)) && (count($userData["tags"]) > 0)){
               <label for="banReason" class="form-label">Reason:</label>
               <input type="text" class="form-control" id="banReason" value="<?php echo $userData["banReason"]; ?>" readonly>
             </div>
-            <button class="btn btn-danger" onclick="unban('<?php echo $uuid; ?>');">Lift ban</button>
+            <button class="btn btn-danger" onclick="unban('<?php echo $uuid; ?>', '<?php echo $_SESSION['csrf_token']; /* @phpstan-ignore echo.nonString */ ?>');">Lift ban</button>
           <?php
 } else { ?>
             <br>
@@ -373,7 +415,7 @@ if ((array_key_exists("tags", $userData)) && (count($userData["tags"]) > 0)){
                 <label for="banReason" class="form-label">Reason:</label>
                 <input type="text" class="form-control" id="banReason" name="message">
               </div>
-              <button class="btn btn-danger" onclick="ban('<?php echo $uuid; ?>');">Ban</button>
+              <button class="btn btn-danger" onclick="ban('<?php echo $uuid; ?>', '<?php echo $_SESSION['csrf_token']; /* @phpstan-ignore echo.nonString */ ?>');">Ban</button>
             </form>
           <?php
 } ?>

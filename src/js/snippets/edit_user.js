@@ -16,7 +16,7 @@ window.onload = function () {
     });
 }
 
-function updateUserData(uuid) {
+function updateUserData(uuid, csrf_token) {
     const name = document.getElementById("name").value;
     const email = document.getElementById("email").value;
     const visitCardUrl = document.getElementById("visitCardUrlLabel").value;
@@ -26,25 +26,28 @@ function updateUserData(uuid) {
         "uuid": uuid,
         "name": name,
         "email": email,
-        "visitCardUrl": visitCardUrl
+        "visitCardUrl": visitCardUrl,
+        "csrf_token": csrf_token
     });
 }
 
-function removeTag(uuid, tag) {
+function removeTag(uuid, tag, csrf_token) {
     $("#edit_user").load("../snippets/edit_user.php", {
         "action": "removeTag",
         "uuid": uuid,
-        "tag": tag
+        "tag": tag,
+        "csrf_token": csrf_token
     });
 }
 
-function addTag(uuid) {
+function addTag(uuid, csrf_token) {
     const tag = document.getElementById("newTag").value;
 
     $("#edit_user").load("../snippets/edit_user.php", {
         "action": "addTag",
         "uuid": uuid,
-        "tag": tag
+        "tag": tag,
+        "csrf_token": csrf_token
     });
 }
 
@@ -53,48 +56,53 @@ function updateMapSelect(map) {
     dropdown.innerHTML = map;
 }
 
-function updateStartMap(uuid) {
+function updateStartMap(uuid, csrf_token) {
     const dropdown = document.getElementById("mapsDropdown");
     startMap = dropdown.innerHTML;
 
     $("#edit_user").load("../snippets/edit_user.php", {
         "action": "updateStartMap",
         "uuid": uuid,
-        "startMap": startMap
+        "startMap": startMap,
+        "csrf_token": csrf_token
     });
 }
 
-function removeMessage(uuid, message) {
+function removeMessage(uuid, message, csrf_token) {
     $("#edit_user").load("../snippets/edit_user.php", {
         "action": "removeMessage",
         "uuid": uuid,
-        "message": message
+        "message": message,
+        "csrf_token": csrf_token
     });
 }
 
-function sendMessage(uuid) {
+function sendMessage(uuid, csrf_token) {
     const message = document.getElementById("messageInput").value;
 
     $("#edit_user").load("../snippets/edit_user.php", {
         "action": "sendMessage",
         "uuid": uuid,
-        "message": message
+        "message": message,
+        "csrf_token": csrf_token
     });
 }
 
-function unban(uuid) {
+function unban(uuid, csrf_token) {
     $("#edit_user").load("../snippets/edit_user.php", {
         "action": "unban",
-        "uuid": uuid
+        "uuid": uuid,
+        "csrf_token": csrf_token
     });
 }
 
-function ban(uuid) {
+function ban(uuid, csrf_token) {
     const reason = document.getElementById("banReason").value;
 
     $("#edit_user").load("../snippets/edit_user.php", {
         "action": "ban",
         "uuid": uuid,
-        "reason": reason
+        "reason": reason,
+        "csrf_token": csrf_token
     });
 }

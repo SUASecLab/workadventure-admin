@@ -14,6 +14,8 @@ if (!isLoggedIn()) {
     $DB = NULL;
     die();
 }
+// Check CSRF data
+isCSRFDataValidOrDie();
 include_once ('../util/uuid_adapter.php');
 // Get number of users
 $nrOfUsers = getNumberOfUsers();

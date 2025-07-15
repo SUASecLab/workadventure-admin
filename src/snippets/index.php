@@ -14,6 +14,8 @@ if (!isLoggedIn()) {
     $DB = NULL;
     die();
 }
+// Check CSRF data
+isCSRFDataValidOrDie();
 ?>
   <main>
     <div class="row">

@@ -9,16 +9,24 @@ session_start();
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once ('../util/database_operations.php');
 require_once ('../util/web_login_functions.php');
+require_once ('../util/uuid_adapter.php');
+
 function showGoToAdmin(): void {
   echo "<br>";
   echo "<a class=\"btn btn-primary\" href=\"./\" role=\"button\" id=\"goToAdminButton\">Go to the administration panel</a>";
 }
+
 // Connect to database
 $DB = getDatabaseHandleOrPrintError();
 $triedToLogin = false;
 $validLogin = false;
 $alreadyLoggedIn = isLoggedIn();
-if ((isset($_POST["username"])) && (isset($_POST["password"]))) {
+if ((isset($_POST["username"])) && (isset($_POST["password"])) && (isset($_POST["csrf_token"]))) {
+    // Check CSRF token
+    if ($_SESSION["csrf_token"] !== $_POST["csrf_token"]) {
+      die("Invalid data received");
+    }
+
     // Get parameters
     $username = $_POST["username"];
     $password = $_POST["password"];
@@ -40,7 +48,12 @@ if ((isset($_POST["username"])) && (isset($_POST["password"]))) {
     $validLogin = login($username, $password);
     $triedToLogin = true;
 } else {
+    // Create CSRF token
+    $_SESSION["csrf_token"] = generateUuid();
     $validLogin = false;
+
+    // Create Same-Site-Cookie
+    setcookie("csrf_cookie", $_SESSION["csrf_token"], ["samesite" => "Strict", "expires" => time() + 3600]);
 }
 if ($alreadyLoggedIn) { ?>
 <section class="alert alert-warning" role="alert">
@@ -76,6 +89,7 @@ showGoToAdmin();
         <input type="text" class="form-control" id="username"><br>
         <label for="password" class="form-label">Password:</label>
         <input class="form-control" type="password" id="password"><br>
+        <input type="hidden" id="csrf_token" value="<?php echo $_SESSION["csrf_token"]; /* @phpstan-ignore echo.nonString */?>">
         <button class="btn btn-primary" id="loginButton">
           Log in
         </button>
@@ -85,6 +99,5 @@ showGoToAdmin();
 }
 ?>
 </body>
-
 </html>
 <?php $DB = NULL; ?>

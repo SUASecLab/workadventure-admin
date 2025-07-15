@@ -12,10 +12,12 @@ function addListener() {
 function login() {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
+    const csrf_token = document.getElementById("csrf_token").value;
 
     $("#login").load("snippets/login.php", {
         "username": username,
-        "password": password
+        "password": password,
+        "csrf_token": csrf_token,
     }, function() {
         addListener();
 

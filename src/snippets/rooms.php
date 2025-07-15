@@ -13,6 +13,8 @@ if (!isLoggedIn()) {
     $DB = NULL;
     die();
 }
+// Check CSRF data
+isCSRFDataValidOrDie();
 
 // Get action
 $action = "";
@@ -26,7 +28,12 @@ if (isset($_POST["action"])) {
 }
 // we use the old naming scheme: mapUrl -> .wam; mapFileUrl: -> .json files
 // map should be removed
-if ((isset($_POST["action"])) && ($action === "removeMap") && (isset($_POST["mapUrl"]))) {
+if ((isset($_POST["action"])) && ($action === "removeMap") && (isset($_POST["mapUrl"])) && (isset($_POST["csrf_token"]))) {
+    // Check CSRF token
+    if ($_SESSION["csrf_token"] !== $_POST["csrf_token"]) {
+      die("Invalid data received");
+    }
+
     $mapToRemove = htmlspecialchars($_POST["mapUrl"]);
     if (removeMap($mapToRemove)) { ?>
             <aside class="alert alert-success" role="alert">
@@ -41,7 +48,12 @@ if ((isset($_POST["action"])) && ($action === "removeMap") && (isset($_POST["map
     }
 }
 // map should be added
-if ((isset($_POST["action"])) && ($action === "addMap") && (isset($_POST["mapUrl"])) && (isset($_POST["fileUrl"])) && (isset($_POST["access"]))) {
+if ((isset($_POST["action"])) && ($action === "addMap") && (isset($_POST["mapUrl"])) && (isset($_POST["fileUrl"])) && (isset($_POST["access"])) && (isset($_POST["csrf_token"]))) {
+    // Check CSRF token
+    if ($_SESSION["csrf_token"] !== $_POST["csrf_token"]) {
+      die("Invalid data received");
+    }
+
     $validInput = true;
     $mapUrl = htmlspecialchars($_POST["mapUrl"]);
     $mapFileUrl = htmlspecialchars($_POST["fileUrl"]);
@@ -189,7 +201,7 @@ foreach ($maps as $map) {
 ?>
                     </td>
                     <td>
-                        <button class="tag btn btn-danger" onclick="removeMap('<?php echo $myMap['wamUrl']; ?>');">
+                        <button class="tag btn btn-danger" onclick="removeMap('<?php echo $myMap['wamUrl']; ?>', '<?php echo $_SESSION['csrf_token']; /* @phpstan-ignore echo.nonString */ ?>');">
                             Remove
                         </button>
                     </td>
@@ -243,6 +255,7 @@ if (getMapFileUrl(getenv('START_ROOM_URL')) !== NULL) { ?>
             </div>
             <div id="tagsArea" class="input-group mb-3">
             </div>
+            <input type="hidden" id="csrf_token" value="<?php echo $_SESSION["csrf_token"]; /* @phpstan-ignore echo.nonString */?>">
             <button class="btn btn-primary" id="addMapButton" style="margin-top: 1rem;">Add map</button>
         </form>
     </article>
