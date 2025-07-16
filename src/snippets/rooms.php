@@ -185,7 +185,7 @@ foreach ($maps as $map) {
             $mapTags = $myMap["tags"];
             foreach ($mapTags as $tag) { ?>
                                 <div class="badge rounded-pill bg-primary tag">
-                                    <?php echo $tag; ?>
+                                    <?php echo htmlspecialchars($tag); ?>
                                 </div>
                             <?php
             }

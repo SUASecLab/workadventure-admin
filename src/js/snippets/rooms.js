@@ -90,6 +90,9 @@ function removeTagsElements() {
 function addTag() {
     var tagInputForm = document.getElementById("tagInput");
     var tagToAdd = tagInputForm.value;
+    var textArea = document.createElement("textarea");
+    textArea.innerText = tagToAdd;
+    tagToAdd = textArea.innerHTML;
     tagInputForm.value = "";
 
     if ((!(newMapsTags.includes(tagToAdd))) && (tagToAdd.length > 0)) {
