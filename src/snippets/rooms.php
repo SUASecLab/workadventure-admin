@@ -37,7 +37,7 @@ if ((isset($_POST["action"])) && ($action === "removeMap") && (isset($_POST["map
     $mapToRemove = htmlspecialchars($_POST["mapUrl"]);
     if (removeMap($mapToRemove)) { ?>
             <aside class="alert alert-success" role="alert">
-                Sucessfully removed <?php echo $mapToRemove; ?>
+                Successfully removed <?php echo $mapToRemove; ?>
             </aside>
         <?php
     } else { ?>
@@ -99,7 +99,7 @@ if ((isset($_POST["action"])) && ($action === "addMap") && (isset($_POST["mapUrl
         // check whether adding the map worked
         if ($success) { ?>
                 <aside class="alert alert-success" role="alert">
-                    Sucessfully stored <?php echo $mapUrl; ?>
+                    Successfully stored <?php echo $mapUrl; ?>
                 </aside>
             <?php
         } else { ?>
