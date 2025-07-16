@@ -62,6 +62,11 @@ if ($alreadyLoggedIn) { ?>
 <?php
 showGoToAdmin();
 } else if ($validLogin) {
+  // Reset session data
+  session_regenerate_id();
+  $_SESSION["csrf_token"] = generateUuid();
+  setcookie("csrf_cookie", hash("sha256", $_SESSION["csrf_token"]), ["samesite" => "Strict", "secure" => true, "httponly" => true, "expires" => time() + 300]);
+
   // Obtain username securely
   $username = $_POST["username"];
   if (gettype($username) !== "string") {
