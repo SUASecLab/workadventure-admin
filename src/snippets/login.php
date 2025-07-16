@@ -73,9 +73,11 @@ showGoToAdmin();
     die("Invalid data provided");
   }
   $username = htmlspecialchars($username);
+  
 ?>
   <section class="alert alert-success" role="alert">
     Welcome back, <?php echo $username; ?>
+    <input type="hidden" id="nonce" value="<?php echo $_SESSION["get_token"]; /* @phpstan-ignore echo.nonString */?>">
   </section>
   <?php
   showGoToAdmin();

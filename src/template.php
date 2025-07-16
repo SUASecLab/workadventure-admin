@@ -44,8 +44,15 @@ $enableSUASExtensions = getenv("ENABLE_SUAS_EXTENSIONS") === "true"; ?>
     <?php
 require_once ('util/database_operations.php');
 require_once ('util/web_login_functions.php');
+require_once ('util/uuid_adapter.php');
 // Connect to database
 $DB = getDatabaseHandleOrPrintError();
+
+// Create Get token
+if (isset($_SESSION["get_token"])) {
+    $_SESSION["old_get_token"] = $_SESSION["get_token"];
+}
+$_SESSION["get_token"] = hash("sha256", generateUuid());
 ?>
 
     <nav class="container navbar navbar-expant-lg navbar-light bg-light">
@@ -60,9 +67,9 @@ $DB = getDatabaseHandleOrPrintError();
             <?php
 if (isLoggedIn()) {
     if ($target === "edit_user") { ?>
-        <a class="navbar-brand" href="../logout" id="navLoginLogout">Log out</a>
+        <a class="navbar-brand" href="../logout?token=<?php echo $_SESSION['get_token']; ?>" id="navLoginLogout">Log out</a>
     <?php } else { ?>
-        <a class="navbar-brand" href="logout" id="navLoginLogout">Log out</a>
+        <a class="navbar-brand" href="logout?token=<?php echo $_SESSION['get_token']; ?>" id="navLoginLogout">Log out</a>
     <?php }
 } else {
     if ($target === "edit_user") { ?>

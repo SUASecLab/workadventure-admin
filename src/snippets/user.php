@@ -88,7 +88,7 @@ foreach ($users as $user) {
 }
 ?>
       </table>
-      <a class="btn btn-primary" role="button" href="./edit/<?php echo generateUuid(); ?>">Create new user</a>
+      <a class="btn btn-primary" role="button" href="./edit/<?php echo generateUuid(); ?>?create=true&token=<?php echo $_SESSION['get_token']; ?>">Create new user</a>
     </article>
   </main>
 </body>

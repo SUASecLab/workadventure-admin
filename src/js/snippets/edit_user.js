@@ -1,8 +1,10 @@
 window.onload = function () {
-    const uuid = window.location.href.split("/").pop();
+    const uuid = window.location.href.split("/").pop().split("?")[0];
 
     $("#edit_user").load("../snippets/edit_user.php", {
-        "uuid": uuid
+        "uuid": uuid,
+        "create": new URLSearchParams(window.location.search).get("create"),
+        "token": new URLSearchParams(window.location.search).get("token")
     }, function() {
         const navbarMain = document.getElementById("navbarMain");
 

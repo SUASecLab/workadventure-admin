@@ -44,7 +44,15 @@ if(!isValidUuid($uuid)) {
   die();
 }
 
-createAccountIfNotExistent($uuid);
+// only create account if the get token matches
+if (($_POST["create"]) === "true") {
+  if (isTokenValid($_POST["token"])) {
+    createAccountIfNotExistent($uuid);
+  } else {
+    die("Invalid data received");
+  }
+}
+
 // Get new tag
 if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "addTag") && (isset($_POST["tag"])) && (isset($_POST["csrf_token"]))) {
     // Check CSRF token

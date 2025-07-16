@@ -1,5 +1,8 @@
 window.onload = function () {
-    $("#logout").load("snippets/logout.php");
+    $("#logout").load("snippets/logout.php", {
+            "token": new URLSearchParams(window.location.search).get("token")
+        }
+    );
 }
 
 function adjustNavbar() {

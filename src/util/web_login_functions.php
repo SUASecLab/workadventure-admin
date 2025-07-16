@@ -66,4 +66,10 @@ function isCSRFDataValidOrDie(): void {
     // Valid cookie: prolong time
     setcookie("csrf_cookie", $_COOKIE["csrf_cookie"] , ["samesite" => "Strict", "secure" => true, "httponly" => true, "expires" => time() + 300]);
 }
+function isTokenValid($token): bool {
+    if ($_SESSION['old_get_token'] === $token) {
+        return true;
+    }
+    return false;
+}
 ?>

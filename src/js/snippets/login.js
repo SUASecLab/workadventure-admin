@@ -21,12 +21,13 @@ function login() {
     }, function() {
         addListener();
 
+        const nonce = document.getElementById("nonce").value;
         const adminButton = document.getElementById("goToAdminButton");
         if (adminButton !== null) {
             // login successful -> change navigation bar's login button to logout
             const loginLogoutForm = document.getElementById("navLoginLogout");
             loginLogoutForm.innerText = "Log out";
-            loginLogoutForm.href = "logout";
+            loginLogoutForm.href = "logout?token=" + nonce;
         }
     });
 }

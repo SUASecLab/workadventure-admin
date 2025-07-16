@@ -20,6 +20,11 @@ if (!isLoggedIn()) {
     // Check CSRF data
     isCSRFDataValidOrDie();
 
+    // Check token
+    if (!isTokenValid($_POST["token"])) {
+      die("Invalid data received");
+    }
+
     // Delete cookie
     setcookie("csrf_cookie", $_SESSION["csrf_token"] /* @phpstan-ignore argument.type */, ["samesite" => "Strict", "expires" => time() - 300]);
 
