@@ -57,13 +57,13 @@ function isCSRFDataValidOrDie(): void {
     if (!isset($_COOKIE["csrf_cookie"])) {
         session_unset();
         session_destroy();
-        die("Your session expired");
+        die("Either your session expired or your connection protocol is insecure");
     }
-    if ((!isset($_SESSION["csrf_token"])) || ($_SESSION["csrf_token"] !== $_COOKIE["csrf_cookie"])) {
+    if ((!isset($_SESSION["csrf_token"])) || (hash("sha256", ($_SESSION["csrf_token"] /* @phpstan-ignore argument.type */)) !== $_COOKIE["csrf_cookie"])) {
         die("Invalid request");
     }
 
     // Valid cookie: prolong time
-    setcookie("csrf_cookie", $_COOKIE["csrf_cookie"] /* @phpstan-ignore argument.type */ , ["samesite" => "Strict", "expires" => time() + 300]);
+    setcookie("csrf_cookie", $_COOKIE["csrf_cookie"] , ["samesite" => "Strict", "secure" => true, "httponly" => true, "expires" => time() + 300]);
 }
 ?>
