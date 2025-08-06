@@ -320,7 +320,7 @@ if ((array_key_exists("tags", $userData)) && (count($userData["tags"]) > 0)){
             <?php
     $tags = $userData["tags"];
     foreach ($tags as $currentTag) { ?>
-              <button class="tag btn btn-primary" onclick="removeTag('<?php echo $uuid; ?>', '<?php echo $currentTag; ?>', '<?php echo $_SESSION['csrf_token']; /* @phpstan-ignore echo.nonString */ ?>');">
+              <button class="tag btn btn-success" onclick="removeTag('<?php echo $uuid; ?>', '<?php echo $currentTag; ?>', '<?php echo $_SESSION['csrf_token']; /* @phpstan-ignore echo.nonString */ ?>');">
                 <?php echo $currentTag; ?>
               </button>
           <?php

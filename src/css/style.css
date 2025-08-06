@@ -3,7 +3,7 @@
     margin: 1rem;
 }
 
-.nav{
+.nav {
     border-width: 1px;
     border-radius: .5rem;
 }
@@ -23,4 +23,11 @@
 .card-style {
     height: 13rem;
     margin-top: 1rem;
+}
+
+#theme-button-parent {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    height: 5rem;
 }

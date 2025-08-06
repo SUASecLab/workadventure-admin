@@ -72,7 +72,7 @@ foreach ($users as $user) {
   $tags = $user["tags"];
     foreach ($tags as $currentTag) {
         if (strlen(trim($currentTag)) > 0) {?>
-            <div class="badge rounded-pill bg-primary tag">
+            <div class="badge rounded-pill bg-success tag">
     <?php echo $currentTag; ?>
             </div> <?php
         }
@@ -81,7 +81,7 @@ foreach ($users as $user) {
 ?>
             </td>
             <td>
-              <a class="btn btn-dark" role="button" href="./edit/<?php echo $user["uuid"]; ?>">Edit</a>
+              <a class="btn btn-primary" role="button" href="./edit/<?php echo $user["uuid"]; ?>">Edit</a>
             </td>
 
           <?php
