@@ -6,8 +6,8 @@
       MONGO_INITDB_ROOT_PASSWORD: "$ADMIN_DB_ROOT_PASSWORD"
       MONGO_INITDB_DATABASE: "workadventure"
     volumes:
-      - ./data/admin:/data/db
-      - ./data/database:/docker-entrypoint-initdb.d:ro
+      - ./data:/data/db
+      - ./database:/docker-entrypoint-initdb.d:ro
  
   admin_php:
     build: ../php
@@ -20,7 +20,6 @@
       DB_NAME: "workadventure"
       DOMAIN: "$DOMAIN"
       START_ROOM_URL: "$START_ROOM_URL"
-      SIDECAR_URL: "$SIDECAR_URL"
     volumes:
       - ./src:/var/www/html:ro
       - ./vendor:/var/www/vendor:ro
@@ -35,7 +34,7 @@
       - ./:/app
 
   admin:
-    build: ../nginx
+    image: nginx:mainline
     restart: ${RESTART_POLICY}
     environment:
       DOMAIN: "$DOMAIN"
