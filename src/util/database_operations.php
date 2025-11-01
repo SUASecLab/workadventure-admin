@@ -313,8 +313,8 @@ function getMap(string|bool $wamUrl): array|null {
         return null;
     }
     try {
-    	if (str_starts_with($wamUrl, "/register/")) {
-    	    $uuid = substr($wamUrl, strlen("/register/"));
+    	if (str_starts_with($wamUrl, "register/")) {
+    	    $uuid = substr($wamUrl, strlen("register/"));
     	    if (userExists($uuid)) {
     	    	/* will call db findOne() function is else branch below */
     	        return getMap(getenv("START_ROOM_URL"));

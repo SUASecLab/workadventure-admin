@@ -44,4 +44,4 @@ License
 -----------
 This software is distributed under same license as WorkAdventure ([see here](https://workadventu.re/faq/license "see here")).
 
-Currently, the targeted version of WorkAdventure is 1.25. The contents of this repository are used in production with WorkAdventure 1.25.13.
+Currently, the targeted version of WorkAdventure is 1.26. The contents of this repository are used in production with WorkAdventure 1.26.16.
