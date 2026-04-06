@@ -27,7 +27,7 @@ function login() {
             const nonce = document.getElementById("nonce").value;
             const loginLogoutForm = document.getElementById("navLoginLogout");
             loginLogoutForm.innerText = "Log out";
-            loginLogoutForm.href = "logout?token=" + nonce;
+            loginLogoutForm.href = "logout?token=" + encodeURI(nonce);
         }
     });
 }
