@@ -1,9 +1,9 @@
 {
     "require": {
         "ramsey/uuid": "^4.9",
-        "mongodb/mongodb": "^2.1",
+        "mongodb/mongodb": "^2.5",
         "twbs/bootstrap": "^5.3",
-        "components/jquery": "^3.7"
+        "components/jquery": "^4.0"
     },
     "scripts": {
         "post-install-cmd": [
