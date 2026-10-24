@@ -27,19 +27,32 @@ server {
     rewrite ^/user(.*)$ /template.php?target=user$1 last;
 
     # API routing
-    rewrite ^/api/map(.*)$ /api/map.php$1 last;
+    rewrite ^/api/capabilities(.*)$ /api/empty.php$1 last;
+    rewrite ^/api/chat/members(.*)$ /api/chat.php$1 last;
     rewrite ^/api/login-url/(.*)$  /api/login.php?token=$1 last;
+    rewrite ^/api/map(.*)$ /api/map.php$1 last;
+    rewrite ^/api/members(.*)$ /api/empty.php$1 last;
     rewrite ^/api/report(.*)$ /api/report.php$1 last;
-    rewrite ^/api/capabilities(.*)$ /api/capabilities.php$1 last;
-    rewrite ^/api/woka/list(.*)$ /api/woka.php$1 last;
     rewrite ^/api/room/access(.*)$ /api/access.php$1 last;
     rewrite ^/api/room/sameWorld(.*)$ /api/sameWorld.php$1 last;
+    rewrite ^/api/woka/list(.*)$ /api/woka.php$1 last;
+    rewrite ^/api/world/tags(.*)$ /api/empty.php$1 last;
 
     # Features we do not implement
     rewrite ^/api/ban(.*)$ /api/not_implemented.php$1 last;
+    rewrite ^/api/ice-servers(.*)$ /api/not_implemented.php$1 last;
+    rewrite ^/api/livekit/credentials(.*)$ /api/not_implemented.php$1 last;
+    rewrite ^/api/oauth/refreshtoken(.*)$ /api/not_implemented.php$1 last;
+    rewrite ^/api/room/message(.*)$ /api/not_implemented.php$1 last;
     rewrite ^/api/room/tags(.*)$ /api/not_implemented.php$1 last;
+    rewrite ^/api/save-name(.*)$ /api/not_implemented.php$1 last;
+    rewrite ^/api/save-textures(.*)$ /api/not_implemented.php$1 last;
+    rewrite ^/api/save-companion-texture(.*)$ /api/not_implemented.php$1 last;
+    rewrite ^/api/recordings/events(.*)$ /api/not_implemented.php$1 last;
     rewrite ^/oauth/logout(.*)$ /api/not_implemented.php$1 last;
     rewrite ^/white-label/cf-challenge(.*)$ /api/not_implemented.php$1 last;
+
+    
     # Don't serve these files
     location ~ /(.vscode*|.gitignore|composer.*) {
         return 404;
