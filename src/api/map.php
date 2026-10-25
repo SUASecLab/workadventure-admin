@@ -14,7 +14,8 @@ if (isset($_GET["playUri"])) {
     $playUri = htmlspecialchars($playUri);
     $shortUri = substr($playUri, strlen("https://" . getenv("DOMAIN")));
 
-    if (strcmp($playUri,"https://" . getenv("DOMAIN") . "/login") === 0) {
+    if ((strcmp($playUri,"https://" . getenv("DOMAIN") . "/login") === 0) || 
+        ($shortUri === "/")) {
        $shortUri = getenv('START_ROOM_URL');
        error_log("LOGIN URL CALLED!");
     }

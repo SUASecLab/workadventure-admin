@@ -29,7 +29,6 @@ server {
     # API routing
     rewrite ^/api/capabilities(.*)$ /api/empty.php$1 last;
     rewrite ^/api/chat/members(.*)$ /api/chat.php$1 last;
-    rewrite ^/api/login-url/(.*)$  /api/login.php?token=$1 last;
     rewrite ^/api/map(.*)$ /api/map.php$1 last;
     rewrite ^/api/members(.*)$ /api/empty.php$1 last;
     rewrite ^/api/report(.*)$ /api/report.php$1 last;
