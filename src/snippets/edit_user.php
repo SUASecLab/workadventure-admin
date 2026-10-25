@@ -9,6 +9,7 @@ session_start();
 require_once ('../util/database_operations.php');
 require_once ('../util/web_login_functions.php');
 require_once ('../util/uuid_adapter.php');
+require_once ('../util/keycloak.php');
 // Connect to database
 $DB = getDatabaseHandleOrPrintError();
 if (!isLoggedIn()) {
@@ -284,6 +285,17 @@ if ($maps == NULL) { ?>
 <?php
 die();
 }
+
+// Send data to keycloak
+if (getenv("ENABLE_SUAS_EXTENSIONS") === "true") {
+  $keycloak_result = register_new_user($uuid);
+  ?>
+      <aside class="alert alert-primary" role="alert">
+      <p><?php echo $keycloak_result ?></p>
+    </aside>
+  <?php
+}
+
 ?>
   <main>
     <section>
@@ -296,7 +308,7 @@ die();
         </div>
         <div class="mb-3">
           <label for="email" class="form-label">Email Address</label>
-          <input type="email" class="form-control" id="email" name="email" value="<?php echo $userData["email"]; ?>">
+          <input type="email" class="form-control" id="email" name="email" value="<?php echo $userData["email"]; ?>" readonly>
         </div>
         <label for="visitCardUrlLabel" class="form-label">Visit card URL</label>
         <div class="input-group mb-3">
@@ -308,8 +320,12 @@ die();
       </form>
       <section>
         <section class="mb-3">
-          <label for="name" class="form-label">Access Link</label>
-          <input type="text" class="form-control" id="name" value="<?php echo "https://" . getenv('DOMAIN') . "/register/" . $userData["uuid"]; ?>" readonly>
+          <label for="name" class="form-label">OpenID Connect username:</label>
+          <input type="text" class="form-control" id="name" value="<?php echo $userData["uuid"]; ?>" readonly>
+        </section>
+        <section class="mb-3">
+          <label for="link" class="form-label">OpenID Connect access link:</label>
+          <input type="text" class="form-control" value="<?php echo "https://".getenv("DOMAIN").getStartMap($uuid); ?>" readonly>
         </section>
         <section class="mb-3">
           <p class="fs-4">User tags</p>

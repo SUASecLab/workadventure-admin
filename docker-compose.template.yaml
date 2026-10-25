@@ -13,19 +13,27 @@
     build: ../php
     restart: ${RESTART_POLICY}
     environment:
-      ADMIN_API_TOKEN : "$ADMIN_API_TOKEN"
-      ADMIN_API_SALT : "$ADMIN_API_SALT"
-      DB_USER: "$ADMIN_DB_USER"
-      DB_PASSWORD: "$ADMIN_DB_PASSWORD"
-      DB_NAME: "workadventure"
-      DOMAIN: "$DOMAIN"
-      START_ROOM_URL: "$START_ROOM_URL"
+      - ADMIN_API_TOKEN
+      - ADMIN_API_SALT
+      - DB_USER=${ADMIN_DB_USER}
+      - DB_PASSWORD=${ADMIN_DB_PASSWORD}
+      - DB_NAME=workadventure
+      - DOMAIN
+      - START_ROOM_URL
+      - SIDECAR_URL
+      - ENABLE_SUAS_EXTENSIONS=true
+      - OPENID_DOMAIN
+      - OPENID_REALM
+      - OPENID_CLI_SECRET
+      - OPENID_REALM_ADMIN_USER
+      - OPENID_REALM_ADMIN_PASSWORD
     volumes:
       - ./src:/var/www/html:ro
       - ./vendor:/var/www/vendor:ro
     depends_on:
       - admin-db
       - sidecar
+      - laboratory
 
   composer:
     image: composer/composer
@@ -37,7 +45,7 @@
     image: nginx:mainline
     restart: ${RESTART_POLICY}
     environment:
-      DOMAIN: "$DOMAIN"
+      - DOMAIN
     depends_on:
       - admin_php
     volumes:

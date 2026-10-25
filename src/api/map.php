@@ -23,7 +23,8 @@ if (isset($_GET["playUri"])) {
     $result = array();
     if ($resultMap === NULL) {
         http_response_code(404);
-        die("Requested map " . $shortUri . " does not exist");
+        error_log("Requested map " . $shortUri . " does not exist");
+        die();
     } else {
         // check if user is allowed to enter the map if a user identification is provided
         if (isset($_GET["userId"])) {

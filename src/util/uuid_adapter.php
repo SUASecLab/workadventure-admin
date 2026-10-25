@@ -1,5 +1,5 @@
 <?php
-include_once ('../../vendor/autoload.php');
+require_once __DIR__ . '/../../vendor/autoload.php';
 use Ramsey\Uuid\Uuid;
 function generateUuid(): string {
     return trim(Uuid::uuid4()->toString());
