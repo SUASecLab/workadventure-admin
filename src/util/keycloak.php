@@ -1,4 +1,6 @@
 <?php
+require_once ('database_operations.php');
+
 // Get environment information
 function get_domain() {
     return getenv("DOMAIN");
@@ -143,13 +145,13 @@ function register_new_user($uuid) {
         $status_code = curl_getinfo($curl_client, CURLINFO_HTTP_CODE);
         curl_close($curl_client);
 
-        if ($status_code === 201) {
-            return "Sent user data to OpenID Connect. Password: ".$password;
+        if (($status_code === 201) && (addAccessCode($uuid, $password))) {
+            return "Sent user data to OpenID Connect";
         } else {
             return "Could not send user information to OpenID Connect: ".$status_code;
         }
     } else {
-        return "User already stored in OpenID Connect.";
+        return "";
     }
 }
 ?>

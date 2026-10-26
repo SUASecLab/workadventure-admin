@@ -265,6 +265,20 @@ if ((isset($_POST["action"])) && (htmlspecialchars($_POST["action"]) === "sendMe
     <?php
     }
 }
+
+// Send data to keycloak
+if (getenv("ENABLE_SUAS_EXTENSIONS") === "true") {
+  $keycloak_result = register_new_user($uuid);
+  if (strlen($keycloak_result) > 0) {
+  ?>
+      <aside class="alert alert-primary" role="alert">
+      <p><?php echo $keycloak_result ?></p>
+    </aside>
+  <?php
+  }
+}
+
+
 // get current user data
 $userData = getUserData($uuid);
 if ($userData === NULL) {
@@ -284,16 +298,6 @@ if ($maps == NULL) { ?>
   </aside>
 <?php
 die();
-}
-
-// Send data to keycloak
-if (getenv("ENABLE_SUAS_EXTENSIONS") === "true") {
-  $keycloak_result = register_new_user($uuid);
-  ?>
-      <aside class="alert alert-primary" role="alert">
-      <p><?php echo $keycloak_result ?></p>
-    </aside>
-  <?php
 }
 
 ?>
@@ -319,13 +323,18 @@ if (getenv("ENABLE_SUAS_EXTENSIONS") === "true") {
         <button class="btn btn-primary" onclick="updateUserData('<?php echo $uuid; ?>', '<?php echo $_SESSION['csrf_token']; /* @phpstan-ignore echo.nonString */ ?>');">Update</button>
       </form>
       <section>
+        <p class="fs-4">OpenID Connect data</p>
         <section class="mb-3">
-          <label for="name" class="form-label">OpenID Connect username:</label>
+          <label for="link" class="form-label">OpenID Connect access link</label>
+          <input type="text" class="form-control" value="<?php echo "https://".getenv("DOMAIN").getStartMap($uuid); ?>" readonly>
+        </section>
+        <section class="mb-3">
+          <label for="name" class="form-label">OpenID Connect identifier</label>
           <input type="text" class="form-control" id="name" value="<?php echo $userData["uuid"]; ?>" readonly>
         </section>
         <section class="mb-3">
-          <label for="link" class="form-label">OpenID Connect access link:</label>
-          <input type="text" class="form-control" value="<?php echo "https://".getenv("DOMAIN").getStartMap($uuid); ?>" readonly>
+          <label for="accessCode" class="form-label">OpenID Connect access code</label>
+          <input type="text" class="form-control" value="<?php echo $userData["accessCode"]; ?>" readonly>
         </section>
         <section class="mb-3">
           <p class="fs-4">User tags</p>

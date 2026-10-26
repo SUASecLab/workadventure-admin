@@ -74,6 +74,18 @@ function updateUserData(string $uuid, string $name, string $email, string $visit
     
     return $result->getModifiedCount() === 1;
 }
+function addAccessCode(string $uuid, string $access_code) {
+    GLOBAL $DB;
+
+    $result = $DB->users->updateOne(
+        [ 'uuid' => $uuid ],
+        [ '$set' => [
+            'accessCode' => $access_code,
+        ]]
+    );
+    
+    return $result->getModifiedCount() === 1;
+}
 function getUuidFromEmail(string $email): string {
     GLOBAL $DB;
 
