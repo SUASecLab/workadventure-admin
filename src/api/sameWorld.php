@@ -34,7 +34,7 @@ if (isset($_GET["roomUrl"])) {
     // return error if no room was set
     http_response_code(400);
 
-    echo json_encode(apiErrorMessage("INSUFFICIENT_DATA",
+    echo json_encode(apiErrorMessage("error", "INSUFFICIENT_DATA",
         "Insufficient data provided",
         "Not enough data was provided to perform this operation."));
 }

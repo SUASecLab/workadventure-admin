@@ -123,7 +123,7 @@ if ((isset($_GET["userIdentifier"])) && (isset($_GET["playUri"])) && (isset($_GE
         if ($map === null) {
             http_response_code(403);
 
-            echo json_encode(apiErrorMessage("NO_MAP",
+            echo json_encode(apiErrorMessage("error", "NO_MAP",
                 "No map data", "No map data received."));
             die("Could not fetch map data");
         }

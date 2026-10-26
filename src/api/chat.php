@@ -1,5 +1,5 @@
 <?php
-header("Content-Type:application/json");
+header("Content-Type: application/json");
 // we implement nothing
 echo json_encode(array(
     "total" => 0,

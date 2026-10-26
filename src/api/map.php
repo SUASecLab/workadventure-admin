@@ -1,5 +1,6 @@
 <?php
-header("Content-Type:application/json");
+header("Content-Type: application/json");
+
 require_once ("../util/api_authentication.php");
 require_once ("../util/database_operations.php");
 require_once ("../util/api_helper_functions.php");
@@ -41,7 +42,7 @@ if (isset($_GET["playUri"])) {
             if (!userCanAccessMap($uuid, $shortUri)) {
                 http_response_code(403);
 
-                echo json_encode(apiErrorMessage("MAP_ACCESS_FORBIDDEN", "Access forbidden",
+                echo json_encode(apiErrorMessage("unauthorized", "MAP_ACCESS_FORBIDDEN", "Access forbidden",
                     "Your are not allowed to enter this room."));
 
                 $DB = NULL;
@@ -167,7 +168,7 @@ if (isset($_GET["playUri"])) {
 } else {
     http_response_code(404);
 
-    echo json_encode(apiErrorMessage("INSUFFICIENT_DATA",
+    echo json_encode(apiErrorMessage("error", "INSUFFICIENT_DATA",
         "Insufficient data provided",
         "Not enough data was provided to perform this operation."));
 }
